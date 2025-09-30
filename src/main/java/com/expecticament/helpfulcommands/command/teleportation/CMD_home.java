@@ -89,7 +89,7 @@ public class CMD_home implements IHelpfulCommandsCommand {
         IEntityDataSaver iEntityDataSaver = ((IEntityDataSaver) plr);
 
         BlockPos pos = plr.getBlockPos();
-        RegistryKey<World> dimensionKey = plr.getWorld().getRegistryKey();
+        RegistryKey<World> dimensionKey = plr.getEntityWorld().getRegistryKey();
         String dimensionName = dimensionKey.getValue().toString();
         iEntityDataSaver.getPersistentData().putIntArray("homePosition", new int[]{ pos.getX(), pos.getY(), pos.getZ() });
         iEntityDataSaver.getPersistentData().putString("homeDimension", dimensionName);

@@ -16,7 +16,7 @@ public class ModPlayerEventCopyFrom implements ServerPlayerEvents.CopyFrom {
 
         // Death Pos for /back
         BlockPos deathPos = oldPlayer.getBlockPos();
-        RegistryKey<World> dimensionKey = oldPlayer.getWorld().getRegistryKey();
+        RegistryKey<World> dimensionKey = oldPlayer.getEntityWorld().getRegistryKey();
         String dimensionName = dimensionKey.getValue().toString();
         player.getPersistentData().putIntArray("deathPosition", new int[]{ deathPos.getX(), deathPos.getY(), deathPos.getZ() });
         player.getPersistentData().putString("deathDimension", dimensionName);

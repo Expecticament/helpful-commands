@@ -72,7 +72,7 @@ public class CMD_killitems implements IHelpfulCommandsCommand {
                 entries.putAll(killItems(src, i.getBoundingBox().expand(range), filter));
             }
         } else{
-            entries.putAll(killItems(src, new Box(src.getWorld().getSpawnPos()).expand(range), filter));
+            entries.putAll(killItems(src, new Box(src.getWorld().getSpawnPoint().getPos()).expand(range), filter));
         }
 
         int count = 0;

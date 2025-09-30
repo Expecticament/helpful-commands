@@ -9,6 +9,8 @@ import com.expecticament.helpfulcommands.command.IHelpfulCommandsCommand;
 import com.expecticament.helpfulcommands.command.ModCommandManager;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -17,8 +19,10 @@ import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldProperties;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.util.HashSet;
 
 public class CMD_spawn implements IHelpfulCommandsCommand {
@@ -173,20 +177,35 @@ public class CMD_spawn implements IHelpfulCommandsCommand {
         BlockPos pos = null;
         ServerWorld world = null;
 
+        MinecraftServer server = player.getEntityWorld().getServer();
+
         switch(spawnType) {
             case Player:
                 ServerPlayerEntity.Respawn respawn = player.getRespawn();
                 if(respawn != null) {
-                    world = player.getServer().getWorld(respawn.dimension());
-                    pos = respawn.pos();
+                    world = regKeyToWorld(server, respawn.respawnData().getDimension());
+                    pos = respawn.respawnData().getPos();
                 }
                 break;
             case World:
-                world = player.getServer().getWorld(World.OVERWORLD);
-                pos = world.getSpawnPos();
+                WorldProperties.SpawnPoint spawnPoint = player.getEntityWorld().toServerWorld().getSpawnPoint();
+                pos = spawnPoint.getPos();
+                world = regKeyToWorld(server, spawnPoint.getDimension());
                 break;
         }
 
         return new TeleportationCommands.TeleportationPosition(world, pos);
+    }
+
+    private static ServerWorld regKeyToWorld(MinecraftServer server, RegistryKey<World> registryKey) {
+        String worldKey = registryKey.getValue().toString();
+
+        for (ServerWorld world : server.getWorlds()) {
+            if (worldKey.equals(world.getRegistryKey().getValue().toString())) {
+                return world;
+            }
+        }
+
+        return null;
     }
 }

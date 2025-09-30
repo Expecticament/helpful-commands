@@ -63,7 +63,7 @@ public class CMD_dimension implements IHelpfulCommandsCommand {
             target = player;
         }
 
-        String dimensionName = target.getWorld().getRegistryKey().getValue().toString();
+        String dimensionName = target.getEntityWorld().getRegistryKey().getValue().toString();
 
         if(target == player) {
             src.sendMessage(Text.translatable("commands.dimension.get.success.self", Text.literal(dimensionName).setStyle(HelpfulCommands.style.primary
@@ -134,7 +134,7 @@ public class CMD_dimension implements IHelpfulCommandsCommand {
     }
 
     private static boolean switchDimensionForTarget(Entity target, ServerWorld dimension) {
-        if(target.getWorld() == dimension) {
+        if(target.getEntityWorld() == dimension) {
             return false;
         }
 
