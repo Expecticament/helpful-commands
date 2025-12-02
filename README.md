@@ -3,6 +3,7 @@
 Feature-rich Minecraft mod that adds many useful commands. Optimize your singleplayer experience or streamline server management. Interactive, straightforward, and easily configurable from within the game. Try it now and enjoy it in the long run.
 ***
 <a href="https://helpfulcommands.expecticament.com/"><img alt="ghpages" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/documentation/ghpages_vector.svg"></a>
+<a href="https://www.curseforge.com/minecraft/mc-mods/helpful-commands"><img alt="curseforge" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/curseforge_vector.svg"></a>
 <a href="https://modrinth.com/mod/helpfulcommands/"><img href="" alt="modrinth" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/modrinth_vector.svg"></a>
 <a href="https://fabricmc.net/"><img alt="fabric" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/supported/fabric_vector.svg"></a>
 
