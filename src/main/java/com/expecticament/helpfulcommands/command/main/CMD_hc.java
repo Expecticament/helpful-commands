@@ -138,11 +138,15 @@ public class CMD_hc implements IHelpfulCommandsCommand {
                 .withHoverEvent(new HoverEvent.ShowText(Text.translatable("about.documentation.tooltip")))
         );
         MutableText buttonGitHub=Text.literal("GitHub").setStyle(buttonStyle
-                .withClickEvent(new ClickEvent.OpenUrl(URI.create("https://github.com/Expecticament/HelpfulCommands")))
+                .withClickEvent(new ClickEvent.OpenUrl(URI.create("https://github.com/Expecticament/helpful-commands")))
                 .withHoverEvent(new HoverEvent.ShowText(Text.translatable("about.github.tooltip")))
         );
+        MutableText buttonCurseForge=Text.literal("CurseForge").setStyle(buttonStyle
+                .withClickEvent(new ClickEvent.OpenUrl(URI.create("https://www.curseforge.com/minecraft/mc-mods/helpful-commands")))
+                .withHoverEvent(new HoverEvent.ShowText(Text.translatable("about.curseforge.tooltip")))
+        );
         MutableText buttonModrinth=Text.literal("Modrinth").setStyle(buttonStyle
-                .withClickEvent(new ClickEvent.OpenUrl(URI.create("https://modrinth.com/mod/helpfulcommands")))
+                .withClickEvent(new ClickEvent.OpenUrl(URI.create("https://modrinth.com/mod/helpful-commands")))
                 .withHoverEvent(new HoverEvent.ShowText(Text.translatable("about.modrinth.tooltip")))
         );
         MutableText buttons=Text.empty();
@@ -163,6 +167,8 @@ public class CMD_hc implements IHelpfulCommandsCommand {
                     .append(Text.literal(" • "))
                     .append(buttonGitHub)
                     .append(Text.literal(" • "))
+                    .append(buttonCurseForge)
+                    .append(Text.literal(" • "))
                     .append(buttonModrinth)
                     .append(Text.literal("〛"))
             ;
@@ -173,11 +179,13 @@ public class CMD_hc implements IHelpfulCommandsCommand {
                     .append(buttonConfig)
                     .append(Text.literal(": /hc config\n"))
                     .append(buttonGitHub)
-                    .append(Text.literal(": https://github.com/Expecticament/HelpfulCommands \n"))
+                    .append(Text.literal(": https://github.com/Expecticament/helpful-commands \n"))
                     .append(buttonDocumentation)
-                    .append(Text.literal(": https://expecticament.github.io/HelpfulCommands \n"))
+                    .append(Text.literal(": https://helpfulcommands.expecticament.com/ \n"))
+                    .append(buttonCurseForge)
+                    .append(Text.literal(": https://www.curseforge.com/minecraft/mc-mods/helpful-commands \n"))
                     .append(buttonModrinth)
-                    .append(Text.literal(": https://modrinth.com/mod/helpfulcommands \n"))
+                    .append(Text.literal(": https://modrinth.com/mod/helpful-commands \n"))
             ;
         }
 

@@ -8,9 +8,9 @@
 		"Expecticament"
 	],
 	"contact": {
-		"homepage": "https://helpfulcommands.expecticament.com/",
-		"sources": "https://github.com/Expecticament/HelpfulCommands/tree/1.21",
-		"issues": "https://github.com/Expecticament/HelpfulCommands/issues"
+		"homepage": "https://helpfulcommands.expecticament.com",
+		"sources": "https://github.com/Expecticament/helpful-commands",
+		"issues": "https://github.com/Expecticament/helpful-commands/issues"
 	},
 	"license": "MIT License",
 	"icon": "data/helpfulcommands/icon.png",
@@ -26,9 +26,12 @@
 	"custom": {
 		"modmenu": {
 			"links": {
-				"modmenu.modrinth": "https://modrinth.com/mod/helpfulcommands",
-				"modmenu.wiki": "https://helpfulcommands.expecticament.com/",
-				"modmenu.github_releases": "https://github.com/Expecticament/HelpfulCommands/releases"
+				"modmenu.wiki": "https://helpfulcommands.expecticament.com",
+				"modmenu.curseforge": "https://www.curseforge.com/minecraft/mc-mods/helpful-commands",
+				"modmenu.modrinth": "https://modrinth.com/mod/helpful-commands",
+				"modmenu.github_releases": "https://github.com/Expecticament/helpful-commands/releases",
+				"modmenu.kofi": "https://ko-fi.com/expecticament",
+				"modmenu.youtube": "https://www.youtube.com/@expecticament"
 			}
 		}
 	},

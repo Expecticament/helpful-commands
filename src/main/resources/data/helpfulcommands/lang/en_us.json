@@ -17,6 +17,7 @@
   "about.config.tooltip": "Click to view and edit the mod configuration",
   "about.documentation": "Documentation",
   "about.documentation.tooltip": "Official Documentation for Helpful Commands",
+  "about.curseforge.tooltip": "Mod's CurseForge page",
   "about.modrinth.tooltip": "Mod's Modrinth page",
   "about.discord.tooltip": "Developer's Discord server",
   "about.github.tooltip": "Mod's GitHub repository and source code",
