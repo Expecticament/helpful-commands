@@ -4,7 +4,7 @@ Feature-rich Minecraft mod that adds many useful commands. Optimize your singlep
 ***
 <a href="https://helpfulcommands.expecticament.com/"><img alt="ghpages" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/documentation/ghpages_vector.svg"></a>
 <a href="https://www.curseforge.com/minecraft/mc-mods/helpful-commands"><img alt="curseforge" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/curseforge_vector.svg"></a>
-<a href="https://modrinth.com/mod/helpfulcommands/"><img href="" alt="modrinth" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/modrinth_vector.svg"></a>
+<a href="https://modrinth.com/mod/helpful-commands/"><img href="" alt="modrinth" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/modrinth_vector.svg"></a>
 <a href="https://fabricmc.net/"><img alt="fabric" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/supported/fabric_vector.svg"></a>
 
 <br></br>
@@ -15,4 +15,4 @@ Check out the mod's Documentation [here](https://helpfulcommands.expecticament.c
 ## «💻» Source Code & Contribution
 In Branches, select a version of the game for which you want to see the source code.
 
-Feel free to suggest any changes that you think will make the mod better. Use the [Issues](https://github.com/Expecticament/HelpfulCommands/issues) page to report bugs and submit your ideas.
+Feel free to suggest any changes that you think will make the mod better. Use the [Issues](https://github.com/Expecticament/helpful-commands/issues) page to report bugs and submit your ideas.
