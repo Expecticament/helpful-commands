@@ -1,97 +1,125 @@
 plugins {
-	id 'fabric-loom' version '1.11-SNAPSHOT'
-	id 'maven-publish'
+    id 'dev.architectury.loom' version "${architectury_loom_version}-SNAPSHOT" apply false
+    id 'architectury-plugin' version "${architectury_plugin_version}-SNAPSHOT"
+    id 'com.gradleup.shadow' version "${gradleup_shadow_version}" apply false
 }
 
-version = project.mod_version
-group = project.maven_group
-
-base {
-	archivesName = project.archives_base_name
+architectury {
+    minecraft = project.minecraft_version
 }
 
-repositories {
-	// Add repositories to retrieve artifacts from in here.
-	// You should only use this when depending on other mods because
-	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
-	// for more information about repositories.
-	maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-	maven { url 'https://maven.nucleoid.xyz' }
+allprojects {
+    group = rootProject.maven_group
+    version = rootProject.mod_version
+
+    repositories {
+        maven {
+            name = 'ParchmentMC'
+            url = 'https://maven.parchmentmc.org'
+        }
+    }
 }
 
-loom {
-    splitEnvironmentSourceSets()
+subprojects {
+    apply plugin: 'dev.architectury.loom'
+    apply plugin: 'architectury-plugin'
+    apply plugin: 'maven-publish'
 
-	mods {
-		"helpfulcommands" {
-			sourceSet sourceSets.main
-			sourceSet sourceSets.client
-		}
-	}
+    if (project.name != "common") {
+        processResources {
+            inputs.property "version", project.version
+            inputs.property "mod_id", project.mod_id
+            inputs.property "mod_name", project.mod_name
+            inputs.property "mod_description", project.mod_description
+            inputs.property "mod_author", project.mod_author
+            inputs.property "license", project.license
+            inputs.property "minecraft_version", project.minecraft_version
+            inputs.property "minecraft_version_range", project.minecraft_version_range
+            inputs.property "fabric_loader_version", project.fabric_loader_version
+            inputs.property "neoforge_version", project.neoforge_version
 
-}
+            filesMatching("fabric.mod.json") {
+                expand(
+                        version: project.version,
+                        mod_id: project.mod_id,
+                        mod_name: project.mod_name,
+                        mod_description: project.mod_description,
+                        mod_author: project.mod_author,
+                        license: project.license,
+                        minecraft_version: project.minecraft_version,
+                        fabric_loader_version: project.fabric_loader_version,
+                )
+            }
 
-dependencies {
-	// To change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+            filesMatching("META-INF/neoforge.mods.toml") {
+                expand(
+                        version: project.version,
+                        mod_id: project.mod_id,
+                        mod_name: project.mod_name,
+                        mod_description: project.mod_description,
+                        mod_author: project.mod_author,
+                        license: project.license,
+                        minecraft_version_range: project.minecraft_version_range,
+                        neoforge_version: project.neoforge_version,
+                )
+            }
+        }
+    }
 
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    base {
+        // Set up a suffixed format for the mod jar names, e.g. `example-fabric`.
+        archivesName = "$rootProject.archives_name-$project.name"
+    }
 
-	// Fabric Permissions
-	include(modImplementation('me.lucko:fabric-permissions-api:0.4.1'))
+    repositories {
+        // Add repositories to retrieve artifacts from in here.
+        // You should only use this when depending on other mods because
+        // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+        // See https://docs.gradle.org/current/userguide/declaring_repositories.html
+        // for more information about repositories.
+    }
 
-	// Server Translations API
-	modImplementation include("xyz.nucleoid:server-translations-api:2.5.2+1.21.9-pre3")
-}
+    loom {
+        silentMojangMappingsLicense()
+    }
 
-processResources {
-	inputs.property "version", project.version
+    dependencies {
+        minecraft "net.minecraft:minecraft:$rootProject.minecraft_version"
+        mappings loom.layered() {
+            officialMojangMappings()
+            parchment("org.parchmentmc.data:parchment-${project.parchment_minecraft}:${project.parchment_version}@zip")
+        }
+    }
 
-	filesMatching("fabric.mod.json") {
-		expand "version": inputs.properties.version
-	}
-}
+    java {
+        // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+        // if it is present.
+        // If you remove this line, sources will not be generated.
+        withSourcesJar()
 
-tasks.withType(JavaCompile).configureEach {
-	it.options.release = 21
-}
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
 
-java {
-	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-	// if it is present.
-	// If you remove this line, sources will not be generated.
-	withSourcesJar()
+    tasks.withType(JavaCompile).configureEach {
+        it.options.release = 21
+    }
 
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
-}
+    // Configure Maven publishing.
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                artifactId = base.archivesName.get()
+                from components.java
+            }
+        }
 
-jar {
-	inputs.property "archivesName", project.base.archivesName
-
-	from("LICENSE") {
-		rename { "${it}_${inputs.properties.archivesName}"}
-	}
-}
-
-// configure the maven publication
-publishing {
-	publications {
-		create("mavenJava", MavenPublication) {
-			artifactId = project.archives_base_name
-			from components.java
-		}
-	}
-
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
-	}
+        // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+        repositories {
+            // Add repositories to publish to here.
+            // Notice: This block does NOT have the same function as the block in the top level.
+            // The repositories here will be used for publishing your artifact, not for
+            // retrieving dependencies.
+        }
+    }
 }

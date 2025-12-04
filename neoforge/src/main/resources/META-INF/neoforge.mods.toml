@@ -1,0 +1,31 @@
+modLoader = "javafml"
+loaderVersion = "[10,)"
+issueTrackerURL = "https://github.com/Expecticament/helpful-commands/issues"
+license = "${license}"
+
+[[mods]]
+modId = "${mod_id}"
+version = "${version}"
+displayName = "${mod_name}"
+authors = "${mod_author}"
+description = '''
+${mod_description}
+'''
+logoFile = "assets/helpful_commands/icon.png"
+
+[[dependencies.${mod_id}]]
+modId = "neoforge"
+type = "required"
+versionRange = "[${neoforge_version},)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "minecraft"
+type = "required"
+versionRange = "${minecraft_version_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[mixins]]
+config = "helpful_commands.mixins.json"
