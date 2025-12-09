@@ -17,7 +17,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.*;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.GameRules;
+import net.minecraft.world.rule.GameRules;
 
 import java.util.*;
 
@@ -103,7 +103,7 @@ public class CMD_dimension implements IHelpfulCommandsCommand {
             }
         }
 
-        boolean commandFeedback = src.getWorld().getGameRules().getBoolean(GameRules.SEND_COMMAND_FEEDBACK);
+        boolean commandFeedback = src.getWorld().getGameRules().getValue(GameRules.SEND_COMMAND_FEEDBACK);
         ArrayList<Entity> list = new ArrayList<>();
         for(Entity i : targets) {
             if(switchDimensionForTarget(i, dimension)) {

@@ -9,16 +9,22 @@ import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.ItemStackArgumentType;
+import net.minecraft.command.permission.Permission;
+import net.minecraft.command.permission.PermissionLevel;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -76,7 +82,7 @@ public class CMD_hat implements IHelpfulCommandsCommand {
             }
             itemStack = handItemStack.copy();
 
-            if (!plr.isCreative() && !plr.hasPermissionLevel(HelpfulCommands.defaultCommandLevel)) {
+            if (!plr.isCreative() && !plr.getPermissions().hasPermission(new Permission.Level(PermissionLevel.fromLevel(HelpfulCommands.defaultCommandLevel)))) {
                 if(targets.size() > itemStack.getCount()) {
                     src.sendError(Text.translatable("commands.hat.error.notEnough", getItemNameText(handItemStack), targetAmountText));
                     return -1;
@@ -95,7 +101,11 @@ public class CMD_hat implements IHelpfulCommandsCommand {
 
         for(ServerPlayerEntity i : targets) {
             i.getInventory().setStack(39, itemStack.copy());
-            i.playSoundToPlayer(SoundEvents.ITEM_ARMOR_EQUIP_GENERIC.value(), SoundCategory.PLAYERS, 1, 1);
+
+            Vec3d vec3 = i.getEntityPos();
+            RegistryEntry<SoundEvent> registryEntry = RegistryEntry.of(SoundEvent.of(SoundEvents.ITEM_ARMOR_EQUIP_GENERIC.value().id()));
+            i.networkHandler.sendPacket(new PlaySoundS2CPacket(registryEntry, SoundCategory.PLAYERS, vec3.getX(), vec3.getY(), vec3.getZ(), 1, 1, i.getEntityWorld().getRandom().nextLong()));
+
             if(i != plr) {
                 if(isAir) {
                     i.sendMessage(Text.translatable("commands.hat.removed.self").setStyle(HelpfulCommands.style.tertiary));

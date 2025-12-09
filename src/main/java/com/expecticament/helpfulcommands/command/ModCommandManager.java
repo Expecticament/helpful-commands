@@ -218,7 +218,11 @@ public class ModCommandManager{
         return getCantUseCommandReason(src, cmd) == null;
     }
     public static MutableText getCantUseCommandReason(ServerCommandSource src, ModCommand cmd){
-        Map<String, ConfigManager.ModConfigCommandEntry> cmdProperties = ConfigManager.loadConfig(src.getServer()).commands;
+        MinecraftServer server = src.getServer();
+        if (server == null) {
+            return Text.empty();
+        }
+        Map<String, ConfigManager.ModConfigCommandEntry> cmdProperties = ConfigManager.loadConfig(server).commands;
 
         if(Permissions.check(src,HelpfulCommands.modID + ".command." + cmd.category.toString().toLowerCase() + "." + cmd.name, HelpfulCommands.defaultCommandLevel)){
             // LuckPerms will not detect mod's command permissions without this empty check. I don't know any better workaround :)

@@ -18,7 +18,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.world.GameRules;
+import net.minecraft.world.rule.GameRules;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -76,7 +76,7 @@ public class CMD_god implements IHelpfulCommandsCommand {
             }
         }
 
-        boolean commandFeedback = src.getWorld().getGameRules().getBoolean(GameRules.SEND_COMMAND_FEEDBACK);
+        boolean commandFeedback = src.getWorld().getGameRules().getValue(GameRules.SEND_COMMAND_FEEDBACK);
         Map<Entity, Boolean> map = new HashMap<>();
         for(ServerPlayerEntity i : targets) {
             if(toggleGod(i, state)) {

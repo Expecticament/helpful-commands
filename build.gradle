@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.11-SNAPSHOT'
+	id 'fabric-loom' version '1.14-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -42,7 +42,7 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	// Fabric Permissions
-	include(modImplementation('me.lucko:fabric-permissions-api:0.4.1'))
+	include(modImplementation('me.lucko:fabric-permissions-api:0.6.1'))
 
 	// Server Translations API
 	modImplementation include("xyz.nucleoid:server-translations-api:2.5.2+1.21.9-pre3")
