@@ -18,7 +18,7 @@ public class ServerLevelHelper {
 
     public static ServerLevel getLevel(String levelLocation) throws UnknownServerLevelException {
         for (ServerLevel serverLevel : server.getAllLevels()) {
-            if (levelLocation.equals(serverLevel.dimension().location().toString())) {
+            if (levelLocation.equals(serverLevel.dimension().identifier().toString())) {
                 return serverLevel;
             }
         }
@@ -27,6 +27,6 @@ public class ServerLevelHelper {
     }
 
     public static String getLevelLocation(ServerLevel serverLevel) {
-        return serverLevel.dimension().location().toString();
+        return serverLevel.dimension().identifier().toString();
     }
 }

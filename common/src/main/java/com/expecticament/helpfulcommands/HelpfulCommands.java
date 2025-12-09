@@ -12,6 +12,8 @@ public final class HelpfulCommands {
 
     private static String modVersion;
 
+    private static boolean isDedicatedServer;
+
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
     public static void init(String version) {
@@ -19,6 +21,8 @@ public final class HelpfulCommands {
     }
 
     public static void onServerStarting(MinecraftServer server) {
+        isDedicatedServer = server.isDedicatedServer();
+
         ConfigManager.initialize(server);
         StylingManager.initialize();
         HomeManager.initialize(server);
@@ -42,4 +46,6 @@ public final class HelpfulCommands {
     }
 
     public static String getModVersion() { return modVersion; }
+
+    public static boolean isDedicatedServer() { return isDedicatedServer; }
 }

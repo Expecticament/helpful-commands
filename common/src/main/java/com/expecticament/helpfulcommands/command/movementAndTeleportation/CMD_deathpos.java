@@ -146,7 +146,7 @@ public class CMD_deathpos extends HelpfulCommandsCommand {
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
         GlobalPos globalPos = deathPos.get();
-        String levelLocation = globalPos.dimension().location().toString();
+        String levelLocation = globalPos.dimension().identifier().toString();
 
         try {
             ServerLevel level = ServerLevelHelper.getLevel(levelLocation);

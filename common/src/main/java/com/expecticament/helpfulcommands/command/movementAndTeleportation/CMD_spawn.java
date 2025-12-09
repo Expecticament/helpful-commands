@@ -195,7 +195,7 @@ public class CMD_spawn extends HelpfulCommandsCommand {
         Style tpBtnStyle = textStyles.getSecondary().withHoverEvent(tpBtnHoverEvent).withClickEvent(tpBtnClickEvent);
 
         Vec3 pos = respawnData.pos().getCenter();
-        String dimensionLocation = respawnData.dimension().location().toString();
+        String dimensionLocation = respawnData.dimension().identifier().toString();
 
         TextBuilder textBuilder = new TextBuilder(src);
         textBuilder
@@ -229,7 +229,7 @@ public class CMD_spawn extends HelpfulCommandsCommand {
             return 1;
         }
         LevelData.RespawnData respawnData = respawnConfig.respawnData();
-        String dimensionLocation = respawnData.dimension().location().toString();
+        String dimensionLocation = respawnData.dimension().identifier().toString();
         ServerLevel serverLevel;
         try {
             serverLevel = ServerLevelHelper.getLevel(dimensionLocation);
@@ -246,7 +246,7 @@ public class CMD_spawn extends HelpfulCommandsCommand {
 
     private boolean teleportToWorldSpawn(ServerPlayer teleportedPlayer, ServerLevel serverLevel) throws CommandSyntaxException {
         LevelData.RespawnData respawnData = serverLevel.getRespawnData();
-        String dimensionLocation = respawnData.dimension().location().toString();
+        String dimensionLocation = respawnData.dimension().identifier().toString();
         try {
             serverLevel = ServerLevelHelper.getLevel(dimensionLocation);
         } catch (ServerLevelHelper.UnknownServerLevelException e) {

@@ -15,14 +15,18 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.item.ItemArgument;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -115,7 +119,7 @@ public class CMD_hat extends HelpfulCommandsCommand {
         }
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
-        boolean commandFeedback = src.getLevel().getGameRules().getBoolean(GameRules.RULE_SENDCOMMANDFEEDBACK);
+        boolean commandFeedback = src.getLevel().getGameRules().get(GameRules.SEND_COMMAND_FEEDBACK);
 
         boolean isAir = itemStack.getItem() == Items.AIR;
 
@@ -174,11 +178,17 @@ public class CMD_hat extends HelpfulCommandsCommand {
 
     private boolean put(ServerPlayer player, ItemStack itemStack) {
         Inventory inventory = player.getInventory();
+
         if (itemStack.getItem() == Items.AIR && inventory.getItem(39).getItem() == itemStack.getItem()) {
             return false;
         }
+
         inventory.setItem(39, itemStack.copy());
-        player.playNotifySound(SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.PLAYERS, 1, 1);
+
+        Vec3 vec3 = player.position();
+        Holder<SoundEvent> holder = Holder.direct(SoundEvent.createVariableRangeEvent(SoundEvents.ARMOR_EQUIP_GENERIC.value().location()));
+        player.connection.send(new ClientboundSoundPacket(holder, SoundSource.PLAYERS, vec3.x(), vec3.y(), vec3.z(), 0.5f, 1, player.level().getRandom().nextLong()));
+
         return true;
     }
 }

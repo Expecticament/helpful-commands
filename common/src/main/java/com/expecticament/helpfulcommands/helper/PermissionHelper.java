@@ -1,7 +1,10 @@
 package com.expecticament.helpfulcommands.helper;
 
+import com.expecticament.helpfulcommands.HelpfulCommands;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permission;
+import net.minecraft.server.permissions.PermissionLevel;
 import net.minecraft.server.players.NameAndId;
 
 public class PermissionHelper {
@@ -9,12 +12,12 @@ public class PermissionHelper {
         try {
             ServerPlayer player = source.getPlayer();
             if (player == null) {
-                return source.hasPermission(defaultOpLevel);
+                return source.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.byId(defaultOpLevel)));
             }
 
             return net.luckperms.api.LuckPermsProvider.get().getPlayerAdapter(ServerPlayer.class).getPermissionData(player).checkPermission(permission).asBoolean();
         } catch (IllegalStateException | NoClassDefFoundError e) {
-            return source.hasPermission(defaultOpLevel);
+            return source.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.byId(defaultOpLevel)));
         }
     }
 
@@ -27,8 +30,8 @@ public class PermissionHelper {
 
         ServerPlayer player = source.getPlayer();
 
-        if (!source.getServer().isDedicatedServer() && player != null) {
-            return source.hasPermission(configOpLevel) && source.getServer().isSingleplayerOwner(new NameAndId(player.getGameProfile()));
+        if (!HelpfulCommands.isDedicatedServer() && player != null) {
+            return source.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.byId(configOpLevel))) && source.getServer().isSingleplayerOwner(new NameAndId(player.getGameProfile()));
         }
 
         if (configPermission.isEmpty()) {

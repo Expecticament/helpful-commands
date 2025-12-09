@@ -139,7 +139,7 @@ public class StylingHelper {
 
     public static Component getLocationText(GlobalPos globalPos) {
         BlockPos blockPos = globalPos.pos();
-        return getLocationText(blockPos.getX(), blockPos.getY(), blockPos.getZ(), globalPos.dimension().location().toString());
+        return getLocationText(blockPos.getX(), blockPos.getY(), blockPos.getZ(), globalPos.dimension().identifier().toString());
     }
 
     public static Component getLocationText(Vec3 vec3, String dimensionKey) {

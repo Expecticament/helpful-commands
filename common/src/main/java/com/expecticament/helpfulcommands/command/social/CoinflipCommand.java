@@ -14,11 +14,15 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +90,9 @@ public class CoinflipCommand extends HelpfulCommandsCommand {
             player.sendSystemMessage(textBuilder.getComponent());
         }
 
-        sourcePlayer.playNotifySound(won ? SoundEvents.PLAYER_LEVELUP : SoundEvents.WANDERING_TRADER_NO, SoundSource.PLAYERS, 0.5f, 1);
+        Vec3 vec3 = sourcePlayer.position();
+        Holder<SoundEvent> holder = Holder.direct(SoundEvent.createVariableRangeEvent((won ? SoundEvents.PLAYER_LEVELUP : SoundEvents.WANDERING_TRADER_NO).location()));
+        sourcePlayer.connection.send(new ClientboundSoundPacket(holder, SoundSource.PLAYERS, vec3.x(), vec3.y(), vec3.z(), 0.5f, 1, src.getLevel().getRandom().nextLong()));
 
         return Command.SINGLE_SUCCESS;
     }
