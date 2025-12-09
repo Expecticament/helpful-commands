@@ -28,11 +28,11 @@ import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class CMD_killitems extends HelpfulCommandsCommand {
+public class KillitemsCommand extends HelpfulCommandsCommand {
 
     protected static final SimpleCommandExceptionType RANGE_CONFIG_VALUE_EXCEEDED = new SimpleCommandExceptionType(Component.empty());
 
-    public CMD_killitems(CommandData commandData) {
+    public KillitemsCommand(CommandData commandData) {
         super(commandData);
     }
 

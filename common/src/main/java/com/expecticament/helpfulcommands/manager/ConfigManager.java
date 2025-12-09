@@ -146,6 +146,8 @@ public class ConfigManager {
     }
 
     public static final Map<String, ConfigFieldProperties> DEFAULT_FIELDS = Map.ofEntries(
+            Map.entry("explosionPowerLimit", new ConfigFieldProperties(ConfigFieldProperties.ValueType.Integer, 5, 1)),
+            Map.entry("fireballPowerLimit", new ConfigFieldProperties(ConfigFieldProperties.ValueType.Integer, 5, 1)),
             Map.entry("killitemsMaxRange", new ConfigFieldProperties(ConfigFieldProperties.ValueType.Integer, 128, 1)),
             Map.entry("maxHomes", new ConfigFieldProperties(ConfigFieldProperties.ValueType.Integer, 5, 1))
     );

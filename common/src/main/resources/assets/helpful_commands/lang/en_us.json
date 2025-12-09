@@ -1,7 +1,7 @@
 {
   "modmenu.nameTranslation.helpful_commands": "Helpful Commands",
-  "modmenu.descriptionTranslation.helpful_commands": "Feature-rich Minecraft mod that adds many useful commands. Optimize your singleplayer experience or streamline server management. Interactive, straightforward, supports permissions, easily configurable.",
-  "modmenu.summaryTranslation.helpful_commands": "Feature-rich mod that adds many useful commands.",
+  "modmenu.descriptionTranslation.helpful_commands": "A feature-rich Minecraft mod that adds many useful commands. Improve server management and give your players more fun and possibilities, or optimize your singleplayer experience. Interactive, supports permissions, easy to configure.",
+  "modmenu.summaryTranslation.helpful_commands": "A feature-rich Minecraft mod that adds many useful commands.",
 
 
   "command.category.helpful_commands.abilities": "Abilities",
@@ -32,6 +32,7 @@
   "commands.helpful_commands.heal.description": "Restore health for entities",
   "commands.helpful_commands.ignite.description": "Set entities on fire for a specified time",
   "commands.helpful_commands.coinflip.description": "Flip a coin",
+  "commands.helpful_commands.fireball.description": "Launch a fireball",
   "commands.helpful_commands.killitems.description": "Delete items lying on the ground",
   "commands.helpful_commands.day.description": "Set the time to day",
   "commands.helpful_commands.night.description": "Set the time to night",
@@ -174,11 +175,11 @@
   "commands.helpful_commands.warp.output.error.specifyPosition": "Please specify warp's position!",
   "commands.helpful_commands.warp.output.error.specifyDimension": "Please specify warp's dimension!",
 
-  "commands.helpful_commands.coords.output.success.self": "Your coordinates: %s",
-  "commands.helpful_commands.coords.output.success.other": "%s's coordinates: %s",
-  "commands.helpful_commands.coords.share.output.success.other": "Shared your coordinates with %s",
-  "commands.helpful_commands.coords.share.output.success.affected": "%s shared their coordinates with you: %s",
-  "commands.helpful_commands.coords.share.output.success.multiple": "players",
+  "commands.helpful_commands.coords.self": "Your coordinates: %s",
+  "commands.helpful_commands.coords.other": "%s's coordinates: %s",
+  "commands.helpful_commands.coords.share.other": "Shared your coordinates with %s",
+  "commands.helpful_commands.coords.share.affected": "%s shared their coordinates with you: %s",
+  "commands.helpful_commands.coords.share.multiple": "players",
 
   "commands.helpful_commands.extinguish.output.success.affected": "You have been extinguished",
   "commands.helpful_commands.extinguish.output.success.part1": "Extinguished",
@@ -221,13 +222,14 @@
   "commands.helpful_commands.ignite.output.success.duration.part2.singular": "second",
   "commands.helpful_commands.ignite.output.success.duration.part2.plural": "seconds",
 
+  "commands.helpful_commands.coinflip": "%s guessed %s. The coin landed on %s. They %s",
   "commands.helpful_commands.coinflip.heads": "Heads",
   "commands.helpful_commands.coinflip.tails": "Tails",
   "commands.helpful_commands.coinflip.won": "won",
   "commands.helpful_commands.coinflip.lost": "lost",
-  "commands.helpful_commands.coinflip.output.success.part1": "guessed",
-  "commands.helpful_commands.coinflip.output.success.part2": "The coin landed on",
-  "commands.helpful_commands.coinflip.output.success.part3": "they",
+
+  "commands.helpful_commands.fireball": "Launched a fireball",
+  "commands.helpful_commands.fireball.configValueExceeded": "The power argument should be equal to or less than %s",
 
   "commands.helpful_commands.killitems": "Killed %s %s lying on the ground",
   "commands.helpful_commands.killitems.single": "item",
@@ -236,7 +238,7 @@
 
   "commands.helpful_commands.time.1000": "Day",
   "commands.helpful_commands.time.13000": "Night",
-  "commands.helpful_commands.time.output.success": "Set the time to %s",
+  "commands.helpful_commands.time": "Set the time to %s",
 
 
   "hover.helpful_commands.clickToOpenTheLink": "Click to open the link",

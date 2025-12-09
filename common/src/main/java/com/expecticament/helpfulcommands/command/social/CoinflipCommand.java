@@ -5,6 +5,7 @@ import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager;
+import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
@@ -13,7 +14,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -23,9 +23,9 @@ import net.minecraft.util.RandomSource;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CMD_coinflip extends HelpfulCommandsCommand {
+public class CoinflipCommand extends HelpfulCommandsCommand {
 
-    public CMD_coinflip(ModCommandManager.CommandData commandData) {
+    public CoinflipCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
     }
 
@@ -70,10 +70,6 @@ public class CMD_coinflip extends HelpfulCommandsCommand {
 
         List<ServerPlayer> playerList = new ArrayList<>(sourcePlayer.level().getServer().getPlayerList().getPlayers());
 
-        if (playerList.isEmpty()) {
-            throw EntityArgument.NO_PLAYERS_FOUND.create();
-        }
-
         Component affectedPlayerText = StylingHelper.getAffectedEntityNameText(sourcePlayer);
 
         for (ServerPlayer player : playerList) {
@@ -81,24 +77,12 @@ public class CMD_coinflip extends HelpfulCommandsCommand {
             Component landedCoinSideText = Component.literal(TranslationManager.translate(player, "commands.helpful_commands.coinflip." + landedCoinSide.toString().toLowerCase())).setStyle(textStyles.getPrimary());
             Component resultText = Component.literal(TranslationManager.translate(player, "commands.helpful_commands.coinflip." + (won ? "won" : "lost"))).setStyle(won ? textStyles.getAffectedPositive() : textStyles.getAffectedNegative());
 
-            TranslationManager.DeprecatedTextBuilder textBuilder = new TranslationManager.DeprecatedTextBuilder(player);
-            textBuilder
-                    .appendComponent(affectedPlayerText)
-                    .appendWhitespace()
-                    .appendTranslatable("commands.helpful_commands.coinflip.output.success.part1")
-                    .appendWhitespace()
-                    .appendComponent(guessedCoinSideText)
-                    .appendLiteral(". ")
-                    .appendTranslatable("commands.helpful_commands.coinflip.output.success.part2")
-                    .appendWhitespace()
-                    .appendComponent(landedCoinSideText)
-                    .appendLiteral(" - ")
-                    .appendTranslatable("commands.helpful_commands.coinflip.output.success.part3")
-                    .appendWhitespace()
-                    .appendComponent(resultText);
+            TextBuilder textBuilder = new TextBuilder(player);
+            textBuilder.appendTranslatable("commands.helpful_commands.coinflip", affectedPlayerText, guessedCoinSideText, landedCoinSideText, resultText);
             if (won) {
                 textBuilder.appendLiteral("!");
             }
+
             player.sendSystemMessage(textBuilder.getComponent());
         }
 

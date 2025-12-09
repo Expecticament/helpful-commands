@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class CMD_coords extends HelpfulCommandsCommand {
+public class CoordsCommand extends HelpfulCommandsCommand {
 
-    public CMD_coords(ModCommandManager.CommandData commandData) {
+    public CoordsCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
     }
 
@@ -75,7 +75,7 @@ public class CMD_coords extends HelpfulCommandsCommand {
         String dimensionKey = ServerLevelHelper.getLevelLocation(sourcePlayer.level());
 
         TextBuilder textBuilder = new TextBuilder(src);
-        textBuilder.appendTranslatable("commands.helpful_commands.coords.output.success.self", StylingHelper.getLocationText(sourcePlayer.position(), dimensionKey));
+        textBuilder.appendTranslatable("commands.helpful_commands.coords.self", StylingHelper.getLocationText(sourcePlayer.position(), dimensionKey));
 
         src.sendSuccess(textBuilder::getComponent, true);
 
@@ -109,13 +109,13 @@ public class CMD_coords extends HelpfulCommandsCommand {
 
         for (ServerPlayer plr : playerList) {
             TextBuilder textBuilder = new TextBuilder(plr);
-            textBuilder.appendTranslatable("commands.helpful_commands.coords.output.success.other", StylingHelper.getAffectedEntityNameText(player), StylingHelper.getLocationText(player.position(), dimensionKey));
+            textBuilder.appendTranslatable("commands.helpful_commands.coords.other", StylingHelper.getAffectedEntityNameText(player), StylingHelper.getLocationText(player.position(), dimensionKey));
             plr.sendSystemMessage(textBuilder.getComponent());
         }
 
         if (sourcePlayer == null) {
             TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.coords.output.success.other", StylingHelper.getAffectedEntityNameText(player), StylingHelper.getLocationText(player.position(), dimensionKey));
+            textBuilder.appendTranslatable("commands.helpful_commands.coords.other", StylingHelper.getAffectedEntityNameText(player), StylingHelper.getLocationText(player.position(), dimensionKey));
             src.sendSystemMessage(textBuilder.getComponent());
         }
 
@@ -139,7 +139,7 @@ public class CMD_coords extends HelpfulCommandsCommand {
         String dimensionKey = ServerLevelHelper.getLevelLocation(sourcePlayer.level());
         for (ServerPlayer player : playerList) {
             TextBuilder textBuilder = new TextBuilder(player);
-            textBuilder.appendTranslatable("commands.helpful_commands.coords.share.output.success.affected", StylingHelper.getAffectedEntityNameText(sourcePlayer), StylingHelper.getLocationText(sourcePlayer.position(), dimensionKey));
+            textBuilder.appendTranslatable("commands.helpful_commands.coords.share.affected", StylingHelper.getAffectedEntityNameText(sourcePlayer), StylingHelper.getLocationText(sourcePlayer.position(), dimensionKey));
             player.sendSystemMessage(textBuilder.getComponent());
         }
 
@@ -152,10 +152,10 @@ public class CMD_coords extends HelpfulCommandsCommand {
         } else {
             affected
                     .append(StylingHelper.getAffectedEntitiesNumberText(playerList))
-                    .append(TranslationManager.translate(src, "commands.helpful_commands.coords.share.output.success.multiple"));
+                    .append(TranslationManager.translate(src, "commands.helpful_commands.coords.share.multiple"));
         }
 
-        textBuilder.appendTranslatable("commands.helpful_commands.coords.share.output.success.other", affected);
+        textBuilder.appendTranslatable("commands.helpful_commands.coords.share.other", affected);
 
         src.sendSuccess(textBuilder::getComponent, true);
 
@@ -174,7 +174,7 @@ public class CMD_coords extends HelpfulCommandsCommand {
         String dimensionKey = ServerLevelHelper.getLevelLocation(player.level());
 
         TextBuilder textBuilder = new TextBuilder(src);
-        textBuilder.appendTranslatable("commands.helpful_commands.coords.output.success.other", StylingHelper.getAffectedEntityNameText(player), StylingHelper.getLocationText(player.position(), dimensionKey));
+        textBuilder.appendTranslatable("commands.helpful_commands.coords.other", StylingHelper.getAffectedEntityNameText(player), StylingHelper.getLocationText(player.position(), dimensionKey));
 
         src.sendSuccess(textBuilder::getComponent, true);
 

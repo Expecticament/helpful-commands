@@ -41,7 +41,7 @@ public class TimeCommand extends HelpfulCommandsCommand {
         return canExecute(source);
     }
 
-    private int execute(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+    private int execute(CommandContext<CommandSourceStack> ctx) {
         CommandSourceStack src = ctx.getSource();
 
         validateAnySource(src);
@@ -61,7 +61,7 @@ public class TimeCommand extends HelpfulCommandsCommand {
         Component timeValueText = Component.literal(String.valueOf(time)).setStyle(textStyles.getPrimary().withHoverEvent(new HoverEvent.ShowText(hoverTextBuilder.getComponent())));
 
         TextBuilder messageTextBuilder = new TextBuilder(src);
-        messageTextBuilder.appendTranslatable("commands.helpful_commands.time.output.success", timeValueText).setStyle(textStyles.getSuccess());
+        messageTextBuilder.appendTranslatable("commands.helpful_commands.time", timeValueText).setStyle(textStyles.getSuccess());
 
         src.sendSuccess(messageTextBuilder::getComponent, true);
 

@@ -37,6 +37,10 @@ public class ModCommandManager {
             this(name, category, defaultState, 2);
         }
 
+        public CommandData(String name, CommandCategory category, int defaultOpLevel) {
+            this(name, category, true, defaultOpLevel);
+        }
+
         public CommandData(String name, CommandCategory category, boolean defaultState, int defaultOpLevel) {
             this.name = name;
             this.category = category;
@@ -77,21 +81,22 @@ public class ModCommandManager {
         commands.add(new CMD_dimension(new CommandData("dimension", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
         commands.add(new CMD_home(new CommandData("home", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
         commands.add(new CMD_spawn(new CommandData("spawn", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
-        commands.add(new CMD_warp(new CommandData("warp", CommandCategory.MOVEMENT_AND_TELEPORTATION, true, 0)));
+        commands.add(new CMD_warp(new CommandData("warp", CommandCategory.MOVEMENT_AND_TELEPORTATION, 0)));
 
-        commands.add(new CMD_coords(new CommandData("coords", CommandCategory.PLAYERS_AND_ENTITIES, true, 0)));
+        commands.add(new CoordsCommand(new CommandData("coords", CommandCategory.PLAYERS_AND_ENTITIES, 0)));
         commands.add(new CMD_extinguish(new CommandData("extinguish", CommandCategory.PLAYERS_AND_ENTITIES)));
         commands.add(new CMD_feed(new CommandData("feed", CommandCategory.PLAYERS_AND_ENTITIES)));
         commands.add(new CMD_gm(new CommandData("gm", CommandCategory.PLAYERS_AND_ENTITIES)));
-        commands.add(new CMD_hat(new CommandData("hat", CommandCategory.PLAYERS_AND_ENTITIES, true, 0)));
+        commands.add(new CMD_hat(new CommandData("hat", CommandCategory.PLAYERS_AND_ENTITIES, 0)));
         commands.add(new CMD_heal(new CommandData("heal", CommandCategory.PLAYERS_AND_ENTITIES)));
         commands.add(new CMD_ignite(new CommandData("ignite", CommandCategory.PLAYERS_AND_ENTITIES)));
 
-        commands.add(new CMD_coinflip(new CommandData("coinflip", CommandCategory.SOCIAL, true, 0)));
+        commands.add(new CoinflipCommand(new CommandData("coinflip", CommandCategory.SOCIAL, 0)));
 
         commands.add(new TimeCommand(new CommandData("day", CommandCategory.WORLD), 1000));
         commands.add(new TimeCommand(new CommandData("night", CommandCategory.WORLD), 13000));
-        commands.add(new CMD_killitems(new CommandData("killitems", CommandCategory.WORLD)));
+        commands.add(new FireballCommand(new CommandData("fireball", CommandCategory.WORLD, false)));
+        commands.add(new KillitemsCommand(new CommandData("killitems", CommandCategory.WORLD)));
 
         for (HelpfulCommandsCommand command : commands) {
             command.register(dispatcher, buildContext, selection);
