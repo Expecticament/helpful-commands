@@ -25,17 +25,16 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Relative;
-import com.expecticament.helpfulcommands.manager.TranslationManager.DeprecatedTextBuilder;
 import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 
-public class CMD_home extends HelpfulCommandsCommand {
+public class HomeCommand extends HelpfulCommandsCommand {
 
     protected static final SimpleCommandExceptionType HOME_DOESNT_EXIST = new SimpleCommandExceptionType(Component.empty());
     protected static final SimpleCommandExceptionType HOME_ALREADY_EXISTS = new SimpleCommandExceptionType(Component.empty());
     protected static final SimpleCommandExceptionType HOME_LIMIT_EXCEEDED = new SimpleCommandExceptionType(Component.empty());
     protected static final SimpleCommandExceptionType SAME_NAME_PROVIDED = new SimpleCommandExceptionType(Component.empty());
 
-    public CMD_home(ModCommandManager.CommandData commandData) {
+    public HomeCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
     }
 
@@ -105,14 +104,10 @@ public class CMD_home extends HelpfulCommandsCommand {
                 ServerLevel level = ServerLevelHelper.getLevel(home.dimension);
                 sourcePlayer.teleportTo(level, home.x, home.y, home.z, Relative.DELTA, sourcePlayer.getYRot(), sourcePlayer.getXRot(), false);
 
-                DeprecatedTextBuilder textBuilder = new DeprecatedTextBuilder(sourcePlayer);
-                textBuilder
-                        .appendTranslatable("commands.helpful_commands.home.teleport.output.success.part1")
-                        .appendWhitespace()
-                        .appendLiteral(homeName, textStyles.getPrimary())
-                        .appendWhitespace()
-                        .appendTranslatable("commands.helpful_commands.home.teleport.output.success.part2");
+                TextBuilder textBuilder = new TextBuilder(sourcePlayer);
+                textBuilder.appendTranslatable("commands.helpful_commands.home.teleport", Component.literal(homeName).setStyle(textStyles.getPrimary()));
                 textBuilder.setStyle(textStyles.getSuccess());
+
                 src.sendSuccess(textBuilder::getComponent, true);
             } catch (ServerLevelHelper.UnknownServerLevelException e) {
                 TextBuilder textBuilder = new TranslationManager.TextBuilder(src);
@@ -120,10 +115,8 @@ public class CMD_home extends HelpfulCommandsCommand {
                 throw new CommandSyntaxException(UNKNOWN_DIMENSION, textBuilder.getComponent());
             }
         } catch (HomeManager.HomeDoesntExistException e) {
-            DeprecatedTextBuilder textBuilder = new DeprecatedTextBuilder(sourcePlayer);
-            textBuilder
-                    .appendLiteral(homeName, textStyles.getPrimary())
-                    .appendTranslatable("commands.helpful_commands.home.output.error.homeDoesntExist");
+            TextBuilder textBuilder = new TextBuilder(src);
+            textBuilder.appendTranslatable("commands.helpful_commands.home.error.homeDoesntExist", Component.literal(homeName).setStyle(textStyles.getPrimary()));
             throw new CommandSyntaxException(HOME_DOESNT_EXIST, textBuilder.getComponent());
         }
 
@@ -139,22 +132,19 @@ public class CMD_home extends HelpfulCommandsCommand {
 
         try {
             HomeManager.addHome(sourcePlayer, homeName);
-            DeprecatedTextBuilder textBuilder = new DeprecatedTextBuilder(sourcePlayer);
-            textBuilder
-                    .appendTranslatable("commands.helpful_commands.home.add.output.success")
-                    .appendWhitespace()
-                    .appendLiteral(homeName, textStyles.getPrimary());
+
+            TextBuilder textBuilder = new TextBuilder(sourcePlayer);
+            textBuilder.appendTranslatable("commands.helpful_commands.home.add", Component.literal(homeName).setStyle(textStyles.getPrimary()));
             textBuilder.setStyle(textStyles.getSuccess());
+
             src.sendSuccess(textBuilder::getComponent, true);
         } catch (HomeManager.HomeAlreadyExistsException e) {
-            DeprecatedTextBuilder textBuilder = new DeprecatedTextBuilder(sourcePlayer);
-            textBuilder
-                    .appendLiteral(homeName, textStyles.getPrimary())
-                    .appendTranslatable("commands.helpful_commands.home.output.error.homeAlreadyExists");
+            TextBuilder textBuilder = new TextBuilder(src);
+            textBuilder.appendTranslatable("commands.helpful_commands.home.error.homeAlreadyExists", Component.literal(homeName).setStyle(textStyles.getPrimary()));
             throw new CommandSyntaxException(HOME_ALREADY_EXISTS, textBuilder.getComponent());
         } catch (HomeManager.HomeLimitExceededException e) {
-            DeprecatedTextBuilder textBuilder = new DeprecatedTextBuilder(sourcePlayer);
-            textBuilder.appendTranslatable("commands.helpful_commands.home.add.output.error.homeLimitExceeded");
+            TextBuilder textBuilder = new TextBuilder(src);
+            textBuilder.appendTranslatable("commands.helpful_commands.home.error.homeLimitExceeded", Component.literal(homeName).setStyle(textStyles.getPrimary()));
             throw new CommandSyntaxException(HOME_LIMIT_EXCEEDED, textBuilder.getComponent());
         }
 
@@ -170,18 +160,15 @@ public class CMD_home extends HelpfulCommandsCommand {
 
         try {
             HomeManager.removeHome(sourcePlayer, homeName);
-            DeprecatedTextBuilder textBuilder = new DeprecatedTextBuilder(sourcePlayer);
-            textBuilder
-                    .appendTranslatable("commands.helpful_commands.home.remove.output.success")
-                    .appendWhitespace()
-                    .appendLiteral(homeName, textStyles.getPrimary());
+
+            TextBuilder textBuilder = new TextBuilder(sourcePlayer);
+            textBuilder.appendTranslatable("commands.helpful_commands.home.remove", Component.literal(homeName).setStyle(textStyles.getPrimary()));
             textBuilder.setStyle(textStyles.getSuccess());
+
             src.sendSuccess(textBuilder::getComponent, true);
         } catch (HomeManager.HomeDoesntExistException e) {
-            DeprecatedTextBuilder textBuilder = new DeprecatedTextBuilder(sourcePlayer);
-            textBuilder
-                    .appendLiteral(homeName, textStyles.getPrimary())
-                    .appendTranslatable("commands.helpful_commands.home.output.error.homeDoesntExist");
+            TextBuilder textBuilder = new TextBuilder(src);
+            textBuilder.appendTranslatable("commands.helpful_commands.home.error.homeDoesntExist", Component.literal(homeName).setStyle(textStyles.getPrimary()));
             throw new CommandSyntaxException(HOME_DOESNT_EXIST, textBuilder.getComponent());
         }
 
@@ -197,34 +184,23 @@ public class CMD_home extends HelpfulCommandsCommand {
 
         try {
             HomeManager.editHomeName(sourcePlayer, homeName, newName);
-            DeprecatedTextBuilder textBuilder = new DeprecatedTextBuilder(sourcePlayer);
-            textBuilder
-                    .appendTranslatable("commands.helpful_commands.home.edit.name.output.success.part1")
-                    .appendWhitespace()
-                    .appendLiteral(homeName, textStyles.getPrimary())
-                    .appendWhitespace()
-                    .appendTranslatable("commands.helpful_commands.home.edit.name.output.success.part2")
-                    .appendWhitespace()
-                    .appendLiteral(newName, textStyles.getPrimary());
+
+            TextBuilder textBuilder = new TextBuilder(sourcePlayer);
+            textBuilder.appendTranslatable("commands.helpful_commands.home.edit.name", Component.literal(homeName).setStyle(textStyles.getPrimary()), Component.literal(newName).setStyle(textStyles.getPrimary()));
             textBuilder.setStyle(textStyles.getSuccess());
+
             src.sendSuccess(textBuilder::getComponent, true);
         } catch (HomeManager.HomeDoesntExistException e) {
-            DeprecatedTextBuilder textBuilder = new DeprecatedTextBuilder(sourcePlayer);
-            textBuilder
-                    .appendLiteral(homeName, textStyles.getPrimary())
-                    .appendTranslatable("commands.helpful_commands.home.output.error.homeDoesntExist");
+            TextBuilder textBuilder = new TextBuilder(src);
+            textBuilder.appendTranslatable("commands.helpful_commands.home.error.homeDoesntExist", Component.literal(homeName).setStyle(textStyles.getPrimary()));
             throw new CommandSyntaxException(HOME_DOESNT_EXIST, textBuilder.getComponent());
         } catch (HomeManager.SameHomeNameProvided e) {
-            DeprecatedTextBuilder textBuilder = new DeprecatedTextBuilder(sourcePlayer);
-            textBuilder
-                    .appendLiteral(homeName, textStyles.getPrimary())
-                    .appendTranslatable("commands.helpful_commands.home.edit.name.output.error.sameName");
+            TextBuilder textBuilder = new TextBuilder(src);
+            textBuilder.appendTranslatable("commands.helpful_commands.home.edit.name.error.sameName", Component.literal(newName).setStyle(textStyles.getPrimary()));
             throw new CommandSyntaxException(SAME_NAME_PROVIDED, textBuilder.getComponent());
         } catch (HomeManager.HomeAlreadyExistsException e) {
-            DeprecatedTextBuilder textBuilder = new DeprecatedTextBuilder(sourcePlayer);
-            textBuilder
-                    .appendLiteral(newName, textStyles.getPrimary())
-                    .appendTranslatable("commands.helpful_commands.home.output.error.homeAlreadyExists");
+            TextBuilder textBuilder = new TextBuilder(src);
+            textBuilder.appendTranslatable("commands.helpful_commands.home.error.homeAlreadyExists", Component.literal(newName).setStyle(textStyles.getPrimary()));
             throw new CommandSyntaxException(HOME_ALREADY_EXISTS, textBuilder.getComponent());
         }
 
@@ -240,20 +216,15 @@ public class CMD_home extends HelpfulCommandsCommand {
 
         try {
             HomeManager.editHomeLocation(sourcePlayer, homeName, sourcePlayer.position(), sourcePlayer.level());
-            DeprecatedTextBuilder textBuilder = new DeprecatedTextBuilder(sourcePlayer);
-            textBuilder
-                    .appendTranslatable("commands.helpful_commands.home.edit.location.output.success.part1")
-                    .appendWhitespace()
-                    .appendLiteral(homeName, textStyles.getPrimary())
-                    .appendWhitespace()
-                    .appendTranslatable("commands.helpful_commands.home.edit.location.output.success.part2");
+
+            TextBuilder textBuilder = new TextBuilder(sourcePlayer);
+            textBuilder.appendTranslatable("commands.helpful_commands.home.edit.location", Component.literal(homeName).setStyle(textStyles.getPrimary()));
             textBuilder.setStyle(textStyles.getSuccess());
+
             src.sendSuccess(textBuilder::getComponent, true);
         } catch (HomeManager.HomeDoesntExistException e) {
-            DeprecatedTextBuilder textBuilder = new DeprecatedTextBuilder(sourcePlayer);
-            textBuilder
-                    .appendLiteral(homeName, textStyles.getPrimary())
-                    .appendTranslatable("commands.helpful_commands.home.output.error.homeDoesntExist");
+            TextBuilder textBuilder = new TextBuilder(src);
+            textBuilder.appendTranslatable("commands.helpful_commands.home.error.homeDoesntExist", Component.literal(homeName).setStyle(textStyles.getPrimary()));
             throw new CommandSyntaxException(HOME_DOESNT_EXIST, textBuilder.getComponent());
         }
 
@@ -270,7 +241,7 @@ public class CMD_home extends HelpfulCommandsCommand {
 
         try {
             HomeManager.Home home = HomeManager.getHome(sourcePlayer, homeName);
-            DeprecatedTextBuilder textBuilder = new DeprecatedTextBuilder(sourcePlayer);
+            TextBuilder textBuilder = new TextBuilder(sourcePlayer);
 
             HoverEvent tpBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(sourcePlayer, "hover.helpful_commands.clickToTeleport")));
             ClickEvent tpBtnClickEvent = new ClickEvent.RunCommand("/home tp " + homeName);
@@ -285,15 +256,15 @@ public class CMD_home extends HelpfulCommandsCommand {
             textBuilder
                     .appendComponent(StylingHelper.getTitle(Component.literal(TranslationManager.translate(sourcePlayer, "commands.helpful_commands.home.info.title")), Component.literal(homeName)))
                     .appendNewline()
-                    .appendLiteral(textDecorators.getBulletPoint(), textStyles.getTertiary())
-                    .appendTranslatable("helpful_commands.common.position", textStyles.getTertiary())
-                    .appendLiteral(": ", textStyles.getTertiary())
+                    .appendComponent(Component.literal(textDecorators.getBulletPoint()).setStyle(textStyles.getTertiary()))
+                    .appendComponent(Component.literal(TranslationManager.translate(sourcePlayer, "helpful_commands.common.position")).setStyle(textStyles.getTertiary()))
+                    .appendComponent(Component.literal(": ").setStyle(textStyles.getTertiary()))
                     .appendComponent(StylingHelper.getPositionText(home.x, home.y, home.z))
                     .appendNewline()
-                    .appendLiteral(textDecorators.getBulletPoint(), textStyles.getTertiary())
-                    .appendTranslatable("helpful_commands.common.dimension", textStyles.getTertiary())
-                    .appendLiteral(": ", textStyles.getTertiary())
-                    .appendLiteral(home.dimension, textStyles.getSecondary())
+                    .appendComponent(Component.literal(textDecorators.getBulletPoint()).setStyle(textStyles.getTertiary()))
+                    .appendComponent(Component.literal(TranslationManager.translate(sourcePlayer, "helpful_commands.common.dimension")).setStyle(textStyles.getTertiary()))
+                    .appendComponent(Component.literal(": ").setStyle(textStyles.getTertiary()))
+                    .appendComponent(Component.literal(home.dimension).setStyle(textStyles.getSecondary()))
                     .appendNewline()
                     .appendNewline();
 
@@ -310,10 +281,8 @@ public class CMD_home extends HelpfulCommandsCommand {
 
             src.sendSystemMessage(textBuilder.getComponent());
         } catch (HomeManager.HomeDoesntExistException e) {
-            DeprecatedTextBuilder textBuilder = new DeprecatedTextBuilder(sourcePlayer);
-            textBuilder
-                    .appendLiteral(homeName, textStyles.getPrimary())
-                    .appendTranslatable("commands.helpful_commands.home.output.error.homeDoesntExist");
+            TextBuilder textBuilder = new TextBuilder(src);
+            textBuilder.appendTranslatable("commands.helpful_commands.home.error.homeDoesntExist", Component.literal(homeName).setStyle(textStyles.getPrimary()));
             throw new CommandSyntaxException(HOME_DOESNT_EXIST, textBuilder.getComponent());
         }
 

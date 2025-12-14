@@ -67,7 +67,7 @@ public class ModCommandManager {
         commands = new ArrayList<>();
         commandsByCategory = new LinkedHashMap<>();
 
-        commands.add(new CMD_hc(new CommandData("hc", CommandCategory.MAIN)));
+        commands.add(new HcCommand(new CommandData("hc", CommandCategory.MAIN)));
 
         commands.add(new FlyCommand(new CommandData("fly", CommandCategory.ABILITIES)));
         commands.add(new GodCommand(new CommandData("god", CommandCategory.ABILITIES)));
@@ -79,7 +79,7 @@ public class ModCommandManager {
 
         commands.add(new DeathposCommand(new CommandData("deathpos", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
         commands.add(new DimensionCommand(new CommandData("dimension", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
-        commands.add(new CMD_home(new CommandData("home", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
+        commands.add(new HomeCommand(new CommandData("home", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
         commands.add(new SpawnCommand(new CommandData("spawn", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
         commands.add(new WarpCommand(new CommandData("warp", CommandCategory.MOVEMENT_AND_TELEPORTATION, 0)));
 

@@ -26,7 +26,6 @@ import com.mojang.brigadier.tree.CommandNode;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import com.expecticament.helpfulcommands.manager.TranslationManager.DeprecatedTextBuilder;
 import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 import net.minecraft.network.chat.*;
 
@@ -34,14 +33,14 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
-public class CMD_hc extends HelpfulCommandsCommand {
+public class HcCommand extends HelpfulCommandsCommand {
 
     protected static final SimpleCommandExceptionType INVALID_HC_COMMAND = new SimpleCommandExceptionType(Component.empty());
     protected static final SimpleCommandExceptionType STYLE_DOESNT_EXIST = new SimpleCommandExceptionType(Component.empty());
     protected static final SimpleCommandExceptionType STYLE_ALREADY_IN_USE = new SimpleCommandExceptionType(Component.empty());
     protected static final SimpleCommandExceptionType COMMAND_NOT_CONFIGURABLE = new SimpleCommandExceptionType(Component.empty());
 
-    public CMD_hc(CommandData commandData) {
+    public HcCommand(CommandData commandData) {
         super(commandData);
     }
 
@@ -89,6 +88,7 @@ public class CMD_hc extends HelpfulCommandsCommand {
         }
 
         dispatcher.register(Commands.literal(commandData.getName())
+                .executes(this::about)
                 .then(Commands.literal("about")
                         .executes(this::about)
                 )
@@ -104,11 +104,11 @@ public class CMD_hc extends HelpfulCommandsCommand {
                                 .then(Commands.literal("state")
                                         .then(Commands.argument("command", StringArgumentType.word())
                                                 .requires(src -> PermissionHelper.canConfigure(src, "command.state"))
+                                                .executes(ctx -> queryCommandState(ctx, StringArgumentType.getString(ctx, "command")))
                                                 .suggests(new HelpfulCommandsCommandSuggestionProvider())
                                                 .then(Commands.argument("new_state", BoolArgumentType.bool())
                                                         .executes(ctx -> setCommandState(ctx, StringArgumentType.getString(ctx, "command"), BoolArgumentType.getBool(ctx, "new_state")))
                                                 )
-                                                .executes(ctx -> queryCommandState(ctx, StringArgumentType.getString(ctx, "command")))
                                         )
                                 )
                         )
@@ -127,7 +127,6 @@ public class CMD_hc extends HelpfulCommandsCommand {
                                 )
                         )
                 )
-                .executes(this::about)
         );
     }
 
@@ -175,7 +174,7 @@ public class CMD_hc extends HelpfulCommandsCommand {
             modrinthComponent = Component.literal("Modrinth: %s".formatted(modrinthLink));
         }
 
-        DeprecatedTextBuilder textBuilder = new DeprecatedTextBuilder(src);
+        TextBuilder textBuilder = new TextBuilder(src);
         textBuilder
                 .appendComponent(StylingHelper.getTitle(Component.literal("Helpful Commands"), Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.title"))))
                 .appendNewline()
@@ -183,19 +182,19 @@ public class CMD_hc extends HelpfulCommandsCommand {
                 .appendTranslatable("modmenu.descriptionTranslation.helpful_commands")
                 .appendNewline()
                 .appendNewline()
-                .appendLiteral(textDecorators.getBulletPoint(), textStyles.getTertiary())
-                .appendTranslatable("commands.helpful_commands.hc.about.version", textStyles.getTertiary())
+                .appendComponent(Component.literal(textDecorators.getBulletPoint()).setStyle(textStyles.getTertiary()))
+                .appendComponent(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.version")).setStyle(textStyles.getTertiary()))
                 .appendWhitespace()
-                .appendLiteral(HelpfulCommands.getModVersion(), textStyles.getSecondary())
+                .appendComponent(Component.literal(HelpfulCommands.getModVersion()).setStyle(textStyles.getSecondary()))
                 .appendNewline()
-                .appendLiteral(textDecorators.getBulletPoint(), textStyles.getTertiary())
-                .appendTranslatable("commands.helpful_commands.hc.about.author", textStyles.getTertiary())
+                .appendComponent(Component.literal(textDecorators.getBulletPoint()).setStyle(textStyles.getTertiary()))
+                .appendComponent(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.author")).setStyle(textStyles.getTertiary()))
                 .appendWhitespace()
                 .appendComponent(authorComponent)
                 .appendNewline()
                 .appendNewline()
-                .appendLiteral(textDecorators.getBulletPoint(), textStyles.getTertiary())
-                .appendTranslatable("commands.helpful_commands.hc.about.links", textStyles.getTertiary())
+                .appendComponent(Component.literal(textDecorators.getBulletPoint()).setStyle(textStyles.getTertiary()))
+                .appendComponent(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.links")).setStyle(textStyles.getTertiary()))
                 .appendWhitespace()
                 .appendComponent(docsComponent)
                 .appendLiteral(linkSeparator)
@@ -206,8 +205,8 @@ public class CMD_hc extends HelpfulCommandsCommand {
                 .appendComponent(modrinthComponent)
                 .appendNewline()
                 .appendNewline()
-                .appendLiteral(textDecorators.getBulletPoint(), textStyles.getTertiary())
-                .appendTranslatable("commands.helpful_commands.hc.about.actions", textStyles.getTertiary());
+                .appendComponent(Component.literal(textDecorators.getBulletPoint()).setStyle(textStyles.getTertiary()))
+                .appendComponent(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.actions")).setStyle(textStyles.getTertiary()));
 
         if (isPlayer) {
             textBuilder
@@ -244,7 +243,7 @@ public class CMD_hc extends HelpfulCommandsCommand {
         Style categoryStyle = textStyles.getTertiary();
         boolean toggleStateCommandPermission = PermissionHelper.canConfigure(src, "command.state");
 
-        DeprecatedTextBuilder textBuilder = new DeprecatedTextBuilder(src);
+        TextBuilder textBuilder = new TextBuilder(src);
         textBuilder.appendComponent(StylingHelper.getTitle(Component.literal("Helpful Commands"), Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.commandList.title"))));
 
         ConfigManager.HelpfulCommandsConfig config = ConfigManager.readConfig();
@@ -256,8 +255,8 @@ public class CMD_hc extends HelpfulCommandsCommand {
 
             textBuilder
                     .appendNewline()
-                    .appendLiteral(textDecorators.getCategoryStartingChar(), categoryStyle)
-                    .appendTranslatable("command.category.helpful_commands." + entry.getKey().toString().toLowerCase(), categoryStyle);
+                    .appendComponent(Component.literal(textDecorators.getCategoryStartingChar()).setStyle(categoryStyle))
+                    .appendComponent(Component.literal(TranslationManager.translate(src, "command.category.helpful_commands." + entry.getKey().toString().toLowerCase())).setStyle(categoryStyle));
 
             HelpfulCommandsCommand lastCommand = entry.getValue().getLast();
 
@@ -269,7 +268,7 @@ public class CMD_hc extends HelpfulCommandsCommand {
 
                 textBuilder
                         .appendNewline()
-                        .appendLiteral(command.equals(lastCommand) ? textDecorators.getCategoryEndingChar() : textDecorators.getCategoryTrailingChar(), categoryStyle);
+                        .appendComponent(Component.literal(command.equals(lastCommand) ? textDecorators.getCategoryEndingChar() : textDecorators.getCategoryTrailingChar()).setStyle(categoryStyle));
 
                 if (toggleStateCommandPermission) {
                     HoverEvent cmdStateHoverEvent = getCommandStateHoverEvent(src, textStyles, cmdData.getName(), enabled);
@@ -285,7 +284,7 @@ public class CMD_hc extends HelpfulCommandsCommand {
                 ClickEvent cmdNameClickEvent = canUse ? new ClickEvent.SuggestCommand("/" + cmdData.getName() + " ") : null;
                 Style cmdNameStyle = (canUse ? textStyles.getAvailable() : textStyles.getUnavailable()).withHoverEvent(cmdNameHoverEvent).withClickEvent(cmdNameClickEvent);
 
-                textBuilder.appendLiteral("/" + cmdData.getName(), cmdNameStyle);
+                textBuilder.appendComponent(Component.literal("/" + cmdData.getName()).setStyle(cmdNameStyle));
             }
         }
 
@@ -299,9 +298,9 @@ public class CMD_hc extends HelpfulCommandsCommand {
 
         boolean canUse = enabled && hasPerms;
 
-        DeprecatedTextBuilder textBuilder = new DeprecatedTextBuilder(src);
+        TextBuilder textBuilder = new TextBuilder(src);
         textBuilder
-                .appendLiteral("/" + commandName, canUse ? textStyles.getAvailable() : textStyles.getUnavailable())
+                .appendComponent(Component.literal("/" + commandName).setStyle(canUse ? textStyles.getAvailable() : textStyles.getUnavailable()))
                 .appendNewline()
                 .appendTranslatable("commands.helpful_commands." + commandName + ".description");
 
@@ -324,27 +323,21 @@ public class CMD_hc extends HelpfulCommandsCommand {
             textBuilder
                     .appendNewline()
                     .appendNewline()
-                    .appendTranslatable("commands.helpful_commands.hc.commandList.cantUse", textStyles.getUnavailable())
+                    .appendComponent(Component.literal(TranslationManager.translate(src,"commands.helpful_commands.hc.commandList.cantUse")).setStyle(textStyles.getUnavailable()))
                     .appendWhitespace()
-                    .appendLiteral(TranslationManager.translate(src, !enabled ? "error.helpful_commands.commandDisabled" : "error.helpful_commands.notPermitted").toLowerCase(), textStyles.getUnavailable());
+                    .appendComponent(Component.literal(TranslationManager.translate(src, !enabled ? "error.helpful_commands.commandDisabled" : "error.helpful_commands.notPermitted").toLowerCase()).setStyle(textStyles.getUnavailable()));
         }
 
         return new HoverEvent.ShowText(textBuilder.getComponent());
     }
 
     private HoverEvent getCommandStateHoverEvent(CommandSourceStack source, HelpfulCommandsStyle.TextStyles textStyles, String commandName, boolean currentState) {
-        DeprecatedTextBuilder textBuilder = new DeprecatedTextBuilder(source);
+        TextBuilder textBuilder = new TextBuilder(source);
         textBuilder
-                .appendTranslatable("helpful_commands.common." + (currentState ? "enabled" : "disabled"), currentState ? textStyles.getEnabled() : textStyles.getDisabled())
+                .appendComponent(Component.literal(TranslationManager.translate(source, "helpful_commands.common." + (currentState ? "enabled" : "disabled"))).setStyle(currentState ? textStyles.getEnabled() : textStyles.getDisabled()))
                 .appendNewline()
                 .appendNewline()
-                .appendTranslatable("commands.helpful_commands.hc.commandList.clickToToggleCommand.part1")
-                .appendWhitespace()
-                .appendTranslatable("commands.helpful_commands.hc.commandList.clickToToggleCommand.part2." + String.valueOf(currentState).toLowerCase())
-                .appendWhitespace()
-                .appendLiteral("/" + commandName, textStyles.getPrimary())
-                .appendWhitespace()
-                .appendTranslatable("commands.helpful_commands.hc.commandList.clickToToggleCommand.part3");
+                .appendTranslatable("commands.helpful_commands.hc.commandList.clickToToggleCommand", Component.literal(TranslationManager.translate(source, "commands.helpful_commands.hc.commandList.clickToToggleCommand." + String.valueOf(currentState).toLowerCase())), Component.literal("/" + commandName).setStyle(textStyles.getPrimary()));
 
         return new HoverEvent.ShowText(textBuilder.getComponent());
     }

@@ -163,7 +163,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
                             if (e.isAlwaysTicking() && e != sourcePlayer && commandFeedback) {
                                 ServerPlayer plr = (ServerPlayer) e;
                                 TextBuilder affectedMsgTextBuilder = new TextBuilder(src);
-                                affectedMsgTextBuilder.appendTranslatable("commands.helpful_commands.warp.teleport.output.success.affected", Component.literal(warpName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getAffectedNeutral());
+                                affectedMsgTextBuilder.appendTranslatable("commands.helpful_commands.warp.teleport.affected", Component.literal(warpName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getAffectedNeutral());
                                 plr.sendSystemMessage(affectedMsgTextBuilder.getComponent());
                             }
                         })
@@ -185,7 +185,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
             }
         } catch (WarpManager.WarpDoesntExistException e) {
             TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.output.error.warpDoesntExist", Component.literal(warpName).setStyle(textStyles.getPrimary()));
+            textBuilder.appendTranslatable("commands.helpful_commands.warp.error.warpDoesntExist", Component.literal(warpName).setStyle(textStyles.getPrimary()));
             throw new CommandSyntaxException(WARP_DOESNT_EXIST, textBuilder.getComponent());
         }
     }
@@ -197,11 +197,11 @@ public class WarpCommand extends HelpfulCommandsCommand {
         TextBuilder textBuilder = new TextBuilder(src);
 
         if (multiple) {
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.teleport.output.success.others", StylingHelper.getAffectedEntitiesNumberText(affected), warpNameText);
+            textBuilder.appendTranslatable("commands.helpful_commands.warp.teleport.others", StylingHelper.getAffectedEntitiesNumberText(affected), warpNameText);
         } else if (self) {
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.teleport.output.success.self", warpNameText);
+            textBuilder.appendTranslatable("commands.helpful_commands.warp.teleport.self", warpNameText);
         } else {
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.teleport.output.success.others", StylingHelper.getAffectedEntityNameText(affected.getFirst()), warpNameText);
+            textBuilder.appendTranslatable("commands.helpful_commands.warp.teleport.others", StylingHelper.getAffectedEntityNameText(affected.getFirst()), warpNameText);
         }
 
         textBuilder.setStyle(textStyles.getSuccess());
@@ -229,7 +229,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
         if (position == null) {
             if (sourcePlayer == null) {
                 TextBuilder textBuilder = new TranslationManager.TextBuilder(src);
-                textBuilder.appendTranslatable("commands.helpful_commands.warp.output.error.specifyPosition");
+                textBuilder.appendTranslatable("commands.helpful_commands.warp.error.specifyPosition");
                 throw new CommandSyntaxException(NO_POSITION_PROVIDED, textBuilder.getComponent());
             } else {
                 position = sourcePlayer.position();
@@ -239,7 +239,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
         if (serverLevel == null) {
             if (sourcePlayer == null) {
                 TextBuilder textBuilder = new TranslationManager.TextBuilder(src);
-                textBuilder.appendTranslatable("commands.helpful_commands.warp.output.error.specifyDimension");
+                textBuilder.appendTranslatable("commands.helpful_commands.warp.error.specifyDimension");
                 throw new CommandSyntaxException(NO_DIMENSION_PROVIDED, textBuilder.getComponent());
             } else {
                 serverLevel = sourcePlayer.level();
@@ -251,11 +251,11 @@ public class WarpCommand extends HelpfulCommandsCommand {
         try {
             WarpManager.addWarp(warpName, warpDescription, position, serverLevel);
             TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.add.output.success", Component.literal(warpName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
+            textBuilder.appendTranslatable("commands.helpful_commands.warp.add", Component.literal(warpName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
             src.sendSuccess(textBuilder::getComponent, true);
         } catch (WarpManager.WarpAlreadyExistsException e) {
             TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.output.error.warpAlreadyExists", Component.literal(warpName).setStyle(textStyles.getPrimary()));
+            textBuilder.appendTranslatable("commands.helpful_commands.warp.error.warpAlreadyExists", Component.literal(warpName).setStyle(textStyles.getPrimary()));
             throw new CommandSyntaxException(WARP_ALREADY_EXISTS, textBuilder.getComponent());
         }
 
@@ -272,11 +272,11 @@ public class WarpCommand extends HelpfulCommandsCommand {
         try {
             WarpManager.removeWarp(warpName);
             TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.remove.output.success", Component.literal(warpName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
+            textBuilder.appendTranslatable("commands.helpful_commands.warp.remove", Component.literal(warpName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
             src.sendSuccess(textBuilder::getComponent, true);
         } catch (WarpManager.WarpDoesntExistException e) {
             TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.output.error.warpDoesntExist", Component.literal(warpName).setStyle(textStyles.getPrimary()));
+            textBuilder.appendTranslatable("commands.helpful_commands.warp.error.warpDoesntExist", Component.literal(warpName).setStyle(textStyles.getPrimary()));
             throw new CommandSyntaxException(WARP_DOESNT_EXIST, textBuilder.getComponent());
         }
 
@@ -293,19 +293,19 @@ public class WarpCommand extends HelpfulCommandsCommand {
         try {
             WarpManager.editWarpName(warpName, newName);
             TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.edit.name.output.success", Component.literal(warpName).setStyle(textStyles.getPrimary()), Component.literal(newName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
+            textBuilder.appendTranslatable("commands.helpful_commands.warp.edit.name", Component.literal(warpName).setStyle(textStyles.getPrimary()), Component.literal(newName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
             src.sendSuccess(textBuilder::getComponent, true);
         } catch (WarpManager.WarpDoesntExistException e) {
             TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.output.error.warpDoesntExist", Component.literal(warpName).setStyle(textStyles.getPrimary()));
+            textBuilder.appendTranslatable("commands.helpful_commands.warp.error.warpDoesntExist", Component.literal(warpName).setStyle(textStyles.getPrimary()));
             throw new CommandSyntaxException(WARP_DOESNT_EXIST, textBuilder.getComponent());
         } catch (WarpManager.SameWarpNameProvided e) {
             TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.edit.name.output.error.sameName", Component.literal(warpName).setStyle(textStyles.getPrimary()));
+            textBuilder.appendTranslatable("commands.helpful_commands.warp.edit.name.error.sameName", Component.literal(newName).setStyle(textStyles.getPrimary()));
             throw new CommandSyntaxException(SAME_NAME_PROVIDED, textBuilder.getComponent());
         } catch (WarpManager.WarpAlreadyExistsException e) {
             TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.output.error.warpAlreadyExists", Component.literal(warpName).setStyle(textStyles.getPrimary()));
+            textBuilder.appendTranslatable("commands.helpful_commands.warp.error.warpAlreadyExists", Component.literal(newName).setStyle(textStyles.getPrimary()));
             throw new CommandSyntaxException(WARP_ALREADY_EXISTS, textBuilder.getComponent());
         }
 
@@ -322,11 +322,11 @@ public class WarpCommand extends HelpfulCommandsCommand {
         try {
             WarpManager.editWarpDescription(warpName, newDescription);
             TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.edit.description.output.success", Component.literal(warpName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
+            textBuilder.appendTranslatable("commands.helpful_commands.warp.edit.description", Component.literal(warpName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
             src.sendSuccess(textBuilder::getComponent, true);
         } catch (WarpManager.WarpDoesntExistException e) {
             TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.output.error.warpDoesntExist", Component.literal(warpName).setStyle(textStyles.getPrimary()));
+            textBuilder.appendTranslatable("commands.helpful_commands.warp.error.warpDoesntExist", Component.literal(warpName).setStyle(textStyles.getPrimary()));
             throw new CommandSyntaxException(WARP_DOESNT_EXIST, textBuilder.getComponent());
         }
 
@@ -349,7 +349,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
         if (newPosition == null) {
             if (sourcePlayer == null) {
                 TextBuilder textBuilder = new TranslationManager.TextBuilder(src);
-                textBuilder.appendTranslatable("commands.helpful_commands.warp.output.error.specifyPosition");
+                textBuilder.appendTranslatable("commands.helpful_commands.warp.error.specifyPosition");
                 throw new CommandSyntaxException(NO_POSITION_PROVIDED, textBuilder.getComponent());
             } else {
                 newPosition = sourcePlayer.position();
@@ -359,7 +359,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
         if (newServerLevel == null) {
             if (sourcePlayer == null) {
                 TextBuilder textBuilder = new TranslationManager.TextBuilder(src);
-                textBuilder.appendTranslatable("commands.helpful_commands.warp.output.error.specifyDimension");
+                textBuilder.appendTranslatable("commands.helpful_commands.warp.error.specifyDimension");
                 throw new CommandSyntaxException(NO_DIMENSION_PROVIDED, textBuilder.getComponent());
             } else {
                 newServerLevel = sourcePlayer.level();
@@ -371,11 +371,11 @@ public class WarpCommand extends HelpfulCommandsCommand {
         try {
             WarpManager.editWarpLocation(warpName, newPosition, newServerLevel);
             TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.edit.location.output.success", Component.literal(warpName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
+            textBuilder.appendTranslatable("commands.helpful_commands.warp.edit.location", Component.literal(warpName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
             src.sendSuccess(textBuilder::getComponent, true);
         } catch (WarpManager.WarpDoesntExistException e) {
             TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.output.error.warpDoesntExist", Component.literal(warpName).setStyle(textStyles.getPrimary()));
+            textBuilder.appendTranslatable("commands.helpful_commands.warp.error.warpDoesntExist", Component.literal(warpName).setStyle(textStyles.getPrimary()));
             throw new CommandSyntaxException(WARP_DOESNT_EXIST, textBuilder.getComponent());
         }
 
@@ -460,7 +460,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
             src.sendSystemMessage(textBuilder.getComponent());
         } catch (WarpManager.WarpDoesntExistException e) {
             TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.output.error.warpDoesntExist", Component.literal(warpName).setStyle(textStyles.getPrimary()));
+            textBuilder.appendTranslatable("commands.helpful_commands.warp.error.warpDoesntExist", Component.literal(warpName).setStyle(textStyles.getPrimary()));
             throw new CommandSyntaxException(WARP_DOESNT_EXIST, textBuilder.getComponent());
         }
 
