@@ -69,27 +69,27 @@ public class ModCommandManager {
 
         commands.add(new CMD_hc(new CommandData("hc", CommandCategory.MAIN)));
 
-        commands.add(new CMD_fly(new CommandData("fly", CommandCategory.ABILITIES)));
-        commands.add(new CMD_god(new CommandData("god", CommandCategory.ABILITIES)));
+        commands.add(new FlyCommand(new CommandData("fly", CommandCategory.ABILITIES)));
+        commands.add(new GodCommand(new CommandData("god", CommandCategory.ABILITIES)));
 
-        commands.add(new CMD_invsee(new CommandData("invsee", CommandCategory.ITEMS_AND_INVENTORY)));
-        commands.add(new CMD_rename(new CommandData("rename", CommandCategory.ITEMS_AND_INVENTORY)));
-        commands.add(new CMD_repair(new CommandData("repair", CommandCategory.ITEMS_AND_INVENTORY)));
-        commands.add(new CMD_smelt(new CommandData("smelt", CommandCategory.ITEMS_AND_INVENTORY)));
+        commands.add(new InvseeCommand(new CommandData("invsee", CommandCategory.ITEMS_AND_INVENTORY)));
+        commands.add(new RenameCommand(new CommandData("rename", CommandCategory.ITEMS_AND_INVENTORY)));
+        commands.add(new RepairCommand(new CommandData("repair", CommandCategory.ITEMS_AND_INVENTORY)));
+        commands.add(new SmeltCommand(new CommandData("smelt", CommandCategory.ITEMS_AND_INVENTORY)));
 
-        commands.add(new CMD_deathpos(new CommandData("deathpos", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
-        commands.add(new CMD_dimension(new CommandData("dimension", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
+        commands.add(new DeathposCommand(new CommandData("deathpos", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
+        commands.add(new DimensionCommand(new CommandData("dimension", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
         commands.add(new CMD_home(new CommandData("home", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
-        commands.add(new CMD_spawn(new CommandData("spawn", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
-        commands.add(new CMD_warp(new CommandData("warp", CommandCategory.MOVEMENT_AND_TELEPORTATION, 0)));
+        commands.add(new SpawnCommand(new CommandData("spawn", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
+        commands.add(new WarpCommand(new CommandData("warp", CommandCategory.MOVEMENT_AND_TELEPORTATION, 0)));
 
         commands.add(new CoordsCommand(new CommandData("coords", CommandCategory.PLAYERS_AND_ENTITIES, 0)));
-        commands.add(new CMD_extinguish(new CommandData("extinguish", CommandCategory.PLAYERS_AND_ENTITIES)));
-        commands.add(new CMD_feed(new CommandData("feed", CommandCategory.PLAYERS_AND_ENTITIES)));
-        commands.add(new CMD_gm(new CommandData("gm", CommandCategory.PLAYERS_AND_ENTITIES)));
-        commands.add(new CMD_hat(new CommandData("hat", CommandCategory.PLAYERS_AND_ENTITIES, 0)));
-        commands.add(new CMD_heal(new CommandData("heal", CommandCategory.PLAYERS_AND_ENTITIES)));
-        commands.add(new CMD_ignite(new CommandData("ignite", CommandCategory.PLAYERS_AND_ENTITIES)));
+        commands.add(new ExtinguishCommand(new CommandData("extinguish", CommandCategory.PLAYERS_AND_ENTITIES)));
+        commands.add(new FeedCommand(new CommandData("feed", CommandCategory.PLAYERS_AND_ENTITIES)));
+        commands.add(new GmCommand(new CommandData("gm", CommandCategory.PLAYERS_AND_ENTITIES)));
+        commands.add(new HatCommand(new CommandData("hat", CommandCategory.PLAYERS_AND_ENTITIES, 0)));
+        commands.add(new HealCommand(new CommandData("heal", CommandCategory.PLAYERS_AND_ENTITIES)));
+        commands.add(new IgniteCommand(new CommandData("ignite", CommandCategory.PLAYERS_AND_ENTITIES)));
 
         commands.add(new CoinflipCommand(new CommandData("coinflip", CommandCategory.SOCIAL, 0)));
 

@@ -1,6 +1,7 @@
 package com.expecticament.helpfulcommands.command.movementAndTeleportation;
 
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
+import com.expecticament.helpfulcommands.helper.GameRulesHelper;
 import com.expecticament.helpfulcommands.helper.ServerLevelHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
@@ -23,19 +24,18 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-public class CMD_dimension extends HelpfulCommandsCommand {
+public class DimensionCommand extends HelpfulCommandsCommand {
 
     protected static final SimpleCommandExceptionType FAILED_TO_TELEPORT = new SimpleCommandExceptionType(Component.empty());
     protected static final SimpleCommandExceptionType ALREADY_IN_DIMENSION = new SimpleCommandExceptionType(Component.empty());
 
-    public CMD_dimension(ModCommandManager.CommandData commandData) {
+    public DimensionCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
     }
 
@@ -81,7 +81,7 @@ public class CMD_dimension extends HelpfulCommandsCommand {
             throw new CommandSyntaxException(FAILED_TO_TELEPORT, textBuilder.getComponent());
         }
 
-        textBuilder.appendTranslatable("commands.helpful_commands.dimension.success.self", dimensionText);
+        textBuilder.appendTranslatable("commands.helpful_commands.dimension.self", dimensionText);
         textBuilder.setStyle(textStyles.getSuccess());
 
         src.sendSuccess(textBuilder::getComponent, true);
@@ -99,7 +99,7 @@ public class CMD_dimension extends HelpfulCommandsCommand {
         }
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
-        boolean commandFeedback = src.getLevel().getGameRules().get(GameRules.SEND_COMMAND_FEEDBACK);
+        boolean commandFeedback = GameRulesHelper.commandFeedbackEnabled(src.getLevel());
 
         Component dimensionText = getDimensionText(serverLevel, textStyles);
 
@@ -110,7 +110,7 @@ public class CMD_dimension extends HelpfulCommandsCommand {
                         ServerPlayer player = (ServerPlayer) entity;
                         if (player != sourcePlayer) {
                             TextBuilder textBuilder = new TextBuilder(player);
-                            textBuilder.appendTranslatable("commands.helpful_commands.dimension.success.affected", dimensionText).setStyle(textStyles.getAffectedNeutral());
+                            textBuilder.appendTranslatable("commands.helpful_commands.dimension.affected", dimensionText).setStyle(textStyles.getAffectedNeutral());
                             player.sendSystemMessage(textBuilder.getComponent());
                         }
                     }
@@ -128,11 +128,11 @@ public class CMD_dimension extends HelpfulCommandsCommand {
             affectedText
                     .append(StylingHelper.getAffectedEntitiesNumberText(affected))
                     .append(" ")
-                    .append(TranslationManager.translate(src, "commands.helpful_commands.dimension.success.other.multiple"));
+                    .append(TranslationManager.translate(src, "commands.helpful_commands.dimension.other.multiple"));
         }
 
         TextBuilder textBuilder = new TextBuilder(src);
-        textBuilder.appendTranslatable("commands.helpful_commands.dimension.success.other", affectedText, dimensionText).setStyle(textStyles.getSuccess());
+        textBuilder.appendTranslatable("commands.helpful_commands.dimension.other", affectedText, dimensionText).setStyle(textStyles.getSuccess());
 
         src.sendSuccess(textBuilder::getComponent, true);
 

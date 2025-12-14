@@ -1,7 +1,6 @@
 package com.expecticament.helpfulcommands.command.movementAndTeleportation;
 
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
-import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.ServerLevelHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;

@@ -28,12 +28,12 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.HashSet;
 
-public class CMD_spawn extends HelpfulCommandsCommand {
+public class SpawnCommand extends HelpfulCommandsCommand {
 
     protected static final SimpleCommandExceptionType FAILED_TO_TELEPORT = new SimpleCommandExceptionType(Component.empty());
     protected static final SimpleCommandExceptionType PLAYER_SPAWN_NOT_SET = new SimpleCommandExceptionType(Component.empty());
 
-    public CMD_spawn(ModCommandManager.CommandData commandData) {
+    public SpawnCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
     }
 

@@ -1,6 +1,7 @@
 package com.expecticament.helpfulcommands.command.playersAndEntities;
 
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
+import com.expecticament.helpfulcommands.helper.GameRulesHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
@@ -25,16 +26,15 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class CMD_hat extends HelpfulCommandsCommand {
+public class HatCommand extends HelpfulCommandsCommand {
 
-    public CMD_hat(ModCommandManager.CommandData commandData) {
+    public HatCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
     }
 
@@ -44,6 +44,7 @@ public class CMD_hat extends HelpfulCommandsCommand {
 
         dispatcher.register(Commands.literal(commandData.getName())
                 .requires(this::canExecuteBaseCommand)
+                .executes(this::executeSelf)
                 .then(Commands.argument("players", EntityArgument.players())
                         .requires(src -> canExecute(src, "other", 2))
                         .executes(ctx -> executeOther(ctx, EntityArgument.getPlayers(ctx, "players"), null))
@@ -52,7 +53,6 @@ public class CMD_hat extends HelpfulCommandsCommand {
                                 .executes(ctx -> executeOther(ctx, EntityArgument.getPlayers(ctx, "players"), ItemArgument.getItem(ctx, "item").createItemStack(1, false)))
                         )
                 )
-                .executes(this::executeSelf)
         );
     }
 
@@ -69,14 +69,14 @@ public class CMD_hat extends HelpfulCommandsCommand {
         return executeSelf(ctx, sourcePlayer.getMainHandItem().copy(), true);
     }
 
-    private int executeSelf(CommandContext<CommandSourceStack> ctx, ItemStack itemStack, boolean itemFromMainhand) throws CommandSyntaxException {
+    private int executeSelf(CommandContext<CommandSourceStack> ctx, ItemStack itemStack, boolean itemFromMainHand) throws CommandSyntaxException {
         CommandSourceStack src = ctx.getSource();
 
         ServerPlayer sourcePlayer = validatePlayerOnly(src);
 
         TextBuilder textBuilder = new TextBuilder(src);
 
-        if (itemFromMainhand) {
+        if (itemFromMainHand) {
             Inventory inventory = sourcePlayer.getInventory();
             inventory.setItem(inventory.getSelectedSlot(), inventory.getItem(39));
         }
@@ -119,7 +119,7 @@ public class CMD_hat extends HelpfulCommandsCommand {
         }
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
-        boolean commandFeedback = src.getLevel().getGameRules().get(GameRules.SEND_COMMAND_FEEDBACK);
+        boolean commandFeedback = GameRulesHelper.commandFeedbackEnabled(src.getLevel());
 
         boolean isAir = itemStack.getItem() == Items.AIR;
 

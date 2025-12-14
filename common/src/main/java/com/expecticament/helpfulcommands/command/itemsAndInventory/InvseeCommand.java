@@ -30,11 +30,11 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
-public class CMD_invsee extends HelpfulCommandsCommand {
+public class InvseeCommand extends HelpfulCommandsCommand {
 
     protected static final SimpleCommandExceptionType OTHER_PLAYER_ONLY = new SimpleCommandExceptionType(Component.empty());
 
-    public CMD_invsee(ModCommandManager.CommandData commandData) {
+    public InvseeCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
     }
 
@@ -64,9 +64,9 @@ public class CMD_invsee extends HelpfulCommandsCommand {
             throw new CommandSyntaxException(OTHER_PLAYER_ONLY, Component.literal(TranslationManager.translate(src, "commands.helpful_commands.invsee.error.otherPlayerOnly")));
         }
 
-        TextBuilder screenTitleTexbuilder = new TextBuilder(src);
-        screenTitleTexbuilder.appendTranslatable("commands.helpful_commands.invsee.screenTitle", Component.literal(player.getName().getString()));
-        sourcePlayer.openMenu(new SimpleMenuProvider((syncId, inv, playerEntity) -> new InvseeAbstractContainerMenu(syncId, inv, player), screenTitleTexbuilder.getComponent()));
+        TextBuilder screenTitleTextBuilder = new TextBuilder(src);
+        screenTitleTextBuilder.appendTranslatable("commands.helpful_commands.invsee.screenTitle", Component.literal(player.getName().getString()));
+        sourcePlayer.openMenu(new SimpleMenuProvider((syncId, inv, playerEntity) -> new InvseeAbstractContainerMenu(syncId, inv, player), screenTitleTextBuilder.getComponent()));
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
         TextBuilder textBuilder = new TextBuilder(src);

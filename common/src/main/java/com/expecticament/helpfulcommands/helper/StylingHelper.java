@@ -7,6 +7,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.HashMap;
@@ -144,5 +145,15 @@ public class StylingHelper {
 
     public static Component getLocationText(Vec3 vec3, String dimensionKey) {
         return getLocationText(vec3.x(), vec3.y(), vec3.z(), dimensionKey);
+    }
+
+    public static Component getItemStackName(ItemStack itemStack) {
+        if (itemStack == null || itemStack.isEmpty()) {
+            return null;
+        }
+
+        HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
+
+        return Component.literal(itemStack.getCustomName() == null ? itemStack.getItemName().getString() : itemStack.getCustomName().getString()).setStyle(textStyles.getPrimary());
     }
 }

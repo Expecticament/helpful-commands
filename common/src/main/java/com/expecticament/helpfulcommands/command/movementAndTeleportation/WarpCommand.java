@@ -1,6 +1,7 @@
 package com.expecticament.helpfulcommands.command.movementAndTeleportation;
 
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
+import com.expecticament.helpfulcommands.helper.GameRulesHelper;
 import com.expecticament.helpfulcommands.helper.ServerLevelHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
@@ -29,14 +30,13 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 import net.minecraft.world.entity.Relative;
-import net.minecraft.world.level.gamerules.GameRules;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-public class CMD_warp extends HelpfulCommandsCommand {
+public class WarpCommand extends HelpfulCommandsCommand {
 
     protected static final SimpleCommandExceptionType WARP_DOESNT_EXIST = new SimpleCommandExceptionType(Component.empty());
     protected static final SimpleCommandExceptionType WARP_ALREADY_EXISTS = new SimpleCommandExceptionType(Component.empty());
@@ -44,7 +44,7 @@ public class CMD_warp extends HelpfulCommandsCommand {
     protected static final SimpleCommandExceptionType NO_POSITION_PROVIDED = new SimpleCommandExceptionType(Component.empty());
     protected static final SimpleCommandExceptionType NO_DIMENSION_PROVIDED = new SimpleCommandExceptionType(Component.empty());
 
-    public CMD_warp(ModCommandManager.CommandData commandData) {
+    public WarpCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
     }
 
@@ -141,7 +141,7 @@ public class CMD_warp extends HelpfulCommandsCommand {
         List<Entity> targets = new ArrayList<>(Objects.requireNonNullElse(entities, List.of()));
 
         if (targets.isEmpty() && sourcePlayer == null) {
-            throw new CommandSyntaxException(SELECTOR_REQUIRED, Component.literal(TranslationManager.translate(src, "error.helpful_commands.selectorRequired")));
+            throw CommandSourceStack.ERROR_NOT_PLAYER.create();
         }
 
         if (entities == null) {
@@ -155,7 +155,7 @@ public class CMD_warp extends HelpfulCommandsCommand {
             try {
                 ServerLevel dimension = ServerLevelHelper.getLevel(warp.dimension);
 
-                boolean commandFeedback = src.getLevel().getGameRules().get(GameRules.SEND_COMMAND_FEEDBACK);
+                boolean commandFeedback = GameRulesHelper.commandFeedbackEnabled(src.getLevel());
 
                 List<Entity> affected = targets.stream()
                         .filter(e -> e.teleportTo(dimension, warp.x, warp.y, warp.z, Relative.DELTA, e.getYRot(), e.getXRot(), false))

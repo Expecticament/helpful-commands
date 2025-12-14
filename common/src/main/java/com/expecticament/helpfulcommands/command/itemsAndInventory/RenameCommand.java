@@ -1,0 +1,201 @@
+package com.expecticament.helpfulcommands.command.itemsAndInventory;
+
+import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
+import com.expecticament.helpfulcommands.helper.GameRulesHelper;
+import com.expecticament.helpfulcommands.helper.StylingHelper;
+import com.expecticament.helpfulcommands.manager.ModCommandManager;
+import com.expecticament.helpfulcommands.manager.StylingManager;
+import com.expecticament.helpfulcommands.manager.TranslationManager;
+import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+
+public class RenameCommand extends HelpfulCommandsCommand {
+
+    protected static final SimpleCommandExceptionType SAME_NAME_PROVIDED = new SimpleCommandExceptionType(Component.empty());
+    protected static final SimpleCommandExceptionType NO_CUSTOM_NAME = new SimpleCommandExceptionType(Component.empty());
+
+    public RenameCommand(ModCommandManager.CommandData commandData) {
+        super(commandData);
+    }
+
+    @Override
+    public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
+        ModCommandManager.CommandData commandData = getCommandData();
+
+        dispatcher.register(Commands.literal(commandData.getName())
+                .requires(this::canExecuteBaseCommand)
+                .then(Commands.argument("new_name", StringArgumentType.string())
+                        .suggests(new SuggestionProvider<CommandSourceStack>() {
+                            @Override
+                            public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> commandContext, SuggestionsBuilder suggestionsBuilder) {
+                                suggestionsBuilder.suggest("\"\"");
+                                return suggestionsBuilder.buildFuture();
+                            }
+                        })
+                        .executes(ctx -> executeSelf(ctx, StringArgumentType.getString(ctx, "new_name")))
+                        .then(Commands.argument("players", EntityArgument.players())
+                                .requires(src -> canExecute(src, "other"))
+                                .executes(ctx -> executeOther(ctx, StringArgumentType.getString(ctx, "new_name"), EntityArgument.getPlayers(ctx, "players")))
+                        )
+                )
+        );
+    }
+
+    @Override
+    public boolean canExecuteBaseCommand(CommandSourceStack source) {
+        return canExecute(source) || canExecute(source, "other");
+    }
+
+    private int executeSelf(CommandContext<CommandSourceStack> ctx, String newName) throws CommandSyntaxException {
+        CommandSourceStack src = ctx.getSource();
+
+        ServerPlayer sourcePlayer = validatePlayerOnly(src);
+
+        HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
+
+        ItemStack mainHandItemStack = sourcePlayer.getMainHandItem();
+        if (mainHandItemStack.isEmpty()) {
+            throw new CommandSyntaxException(EMPTY_ITEM_STACK_MAIN_HAND, Component.literal(TranslationManager.translate(src, "error.helpful_commands.emptyItemStack.mainHand")));
+        }
+
+        Component oldNameComponent = StylingHelper.getItemStackName(mainHandItemStack);
+
+        TextBuilder textBuilder = new TextBuilder(src);
+
+        int result = rename(mainHandItemStack, newName);
+
+        switch (result) {
+            case -1:
+                throw new CommandSyntaxException(SAME_NAME_PROVIDED, Component.literal(TranslationManager.translate(src, "commands.helpful_commands.rename.error.sameNameProvided")));
+            case -2:
+                throw new CommandSyntaxException(NO_CUSTOM_NAME, Component.literal(TranslationManager.translate(src, "commands.helpful_commands.rename.error.noCustomName")));
+            case 1:
+                Component newNameComponent = Component.literal(newName).setStyle(textStyles.getPrimary());
+                textBuilder.appendTranslatable("commands.helpful_commands.rename.self", oldNameComponent, newNameComponent).setStyle(textStyles.getPrimary());
+                break;
+            case 2:
+                textBuilder.appendTranslatable("commands.helpful_commands.rename.remove.self", oldNameComponent).setStyle(textStyles.getPrimary());
+                break;
+        }
+
+        textBuilder.setStyle(textStyles.getSuccess());
+
+        src.sendSuccess(textBuilder::getComponent, true);
+
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int executeOther(CommandContext<CommandSourceStack> ctx, String newName, Collection<ServerPlayer> players) throws CommandSyntaxException {
+        CommandSourceStack src = ctx.getSource();
+
+        ServerPlayer sourcePlayer = validateAnySource(src);
+
+        if (sourcePlayer != null && players.size() == 1 && players.contains(sourcePlayer)) {
+            return executeSelf(ctx, newName);
+        }
+
+        HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
+        boolean commandFeedback = GameRulesHelper.commandFeedbackEnabled(src.getLevel());
+
+        Component newNameComponent = Component.literal(newName).setStyle(textStyles.getPrimary());
+
+        Map<ServerPlayer, String> affected = new HashMap<>();
+        for (ServerPlayer player : players) {
+            ItemStack mainHandItemStack = player.getMainHandItem();
+            if (mainHandItemStack.isEmpty()) {
+                continue;
+            }
+
+            String oldName = StylingHelper.getItemStackName(mainHandItemStack).getString();
+
+            int result = rename(player.getMainHandItem(), newName);
+            if (result < 0) {
+                continue;
+            }
+
+            if (commandFeedback && sourcePlayer != player) {
+                TranslationManager.TextBuilder textBuilder = new TranslationManager.TextBuilder(player);
+                textBuilder.setStyle(textStyles.getAffectedNeutral());
+                Component oldNameComponent = Component.literal(oldName).setStyle(textStyles.getPrimary());
+                switch (result) {
+                    case 1:
+                        textBuilder.appendTranslatable("commands.helpful_commands.rename.affected", oldNameComponent, newNameComponent);
+                        break;
+                    case 2:
+                        textBuilder.appendTranslatable("commands.helpful_commands.rename.remove.affected", oldNameComponent);
+                        break;
+                }
+
+                player.sendSystemMessage(textBuilder.getComponent());
+            }
+
+            affected.put(player, oldName);
+        }
+
+        if (affected.isEmpty()) {
+            throw EntityArgument.NO_PLAYERS_FOUND.create();
+        }
+
+        TextBuilder feedback = new TextBuilder(src);
+        feedback.setStyle(textStyles.getSuccess());
+        if (affected.size() == 1) {
+            Component affectedPlayer = StylingHelper.getAffectedEntityNameText(affected.keySet().iterator().next());
+            Component oldName = Component.literal(affected.values().iterator().next()).setStyle(textStyles.getPrimary());
+            if (newName.isEmpty()) {
+                feedback.appendTranslatable("commands.helpful_commands.rename.remove.other", affectedPlayer, oldName);
+            } else {
+                feedback.appendTranslatable("commands.helpful_commands.rename.other", affectedPlayer, oldName, newNameComponent);
+            }
+        } else {
+            if (newName.isEmpty()) {
+                feedback.appendTranslatable("commands.helpful_commands.rename.remove.others", StylingHelper.getAffectedEntitiesNumberText(affected));
+            } else {
+                feedback.appendTranslatable("commands.helpful_commands.rename.others", StylingHelper.getAffectedEntitiesNumberText(affected), newNameComponent);
+            }
+        }
+
+        src.sendSuccess(feedback::getComponent, true);
+
+        return affected.size();
+    }
+
+    private int rename(ItemStack itemStack, String newName) {
+        if (newName.isEmpty()) {
+            if (itemStack.get(DataComponents.CUSTOM_NAME) == null) {
+                return -2;
+            }
+
+            itemStack.remove(DataComponents.CUSTOM_NAME);
+
+            return 2;
+        } else {
+            if (StylingHelper.getItemStackName(itemStack).getString().equals(newName)) {
+                return -1;
+            }
+
+            itemStack.set(DataComponents.CUSTOM_NAME, Component.literal(newName));
+
+            return 1;
+        }
+    }
+}

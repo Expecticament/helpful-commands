@@ -1,0 +1,131 @@
+package com.expecticament.helpfulcommands.command.playersAndEntities;
+
+import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
+import com.expecticament.helpfulcommands.helper.GameRulesHelper;
+import com.expecticament.helpfulcommands.helper.StylingHelper;
+import com.expecticament.helpfulcommands.manager.ModCommandManager;
+import com.expecticament.helpfulcommands.manager.StylingManager;
+import com.expecticament.helpfulcommands.manager.TranslationManager;
+import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.food.FoodData;
+
+import java.util.Collection;
+import java.util.List;
+
+public class FeedCommand extends HelpfulCommandsCommand {
+
+    public FeedCommand(ModCommandManager.CommandData commandData) {
+        super(commandData);
+    }
+
+    @Override
+    public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
+        ModCommandManager.CommandData commandData = getCommandData();
+
+        dispatcher.register(Commands.literal(commandData.getName())
+                .requires(this::canExecuteBaseCommand)
+                .executes(this::executeSelf)
+                .then(Commands.argument("players", EntityArgument.players())
+                        .requires(src -> canExecute(src, "other"))
+                        .executes(ctx -> executeOther(ctx, EntityArgument.getPlayers(ctx, "players")))
+                )
+        );
+    }
+
+    @Override
+    public boolean canExecuteBaseCommand(CommandSourceStack source) {
+        return canExecute(source) || canExecute(source, "other");
+    }
+
+    private int executeSelf(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        CommandSourceStack src = ctx.getSource();
+
+        ServerPlayer sourcePlayer = validatePlayerOnly(src);
+
+        HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
+
+        TranslationManager.TextBuilder textBuilder = new TranslationManager.TextBuilder(src);
+
+        if (!feed(sourcePlayer)) {
+            return 0;
+        }
+
+        textBuilder.appendTranslatable("commands.helpful_commands.feed.self");
+        textBuilder.setStyle(textStyles.getAffectedPositive());
+
+        src.sendSuccess(textBuilder::getComponent, true);
+
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int executeOther(CommandContext<CommandSourceStack> ctx, Collection<ServerPlayer> players) throws CommandSyntaxException {
+        CommandSourceStack src = ctx.getSource();
+
+        ServerPlayer sourcePlayer = validateAnySource(src);
+
+        if (sourcePlayer != null && players.size() == 1 && players.contains(sourcePlayer)) {
+            return executeSelf(ctx);
+        }
+
+        HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
+        boolean commandFeedback = GameRulesHelper.commandFeedbackEnabled(src.getLevel());
+
+        List<ServerPlayer> affected = players.stream()
+                .filter(this::feed)
+                .peek(player -> {
+                    if (commandFeedback) {
+                        if (player != sourcePlayer) {
+                            TranslationManager.TextBuilder textBuilder = new TranslationManager.TextBuilder(player);
+                            textBuilder.appendTranslatable("commands.helpful_commands.feed.affected").setStyle(textStyles.getAffectedPositive());
+                            player.sendSystemMessage(textBuilder.getComponent());
+                        }
+                    }
+                })
+                .toList();
+
+        if (affected.isEmpty()) {
+            throw EntityArgument.NO_PLAYERS_FOUND.create();
+        }
+
+        MutableComponent affectedText = Component.empty();
+        if (affected.size() == 1) {
+            affectedText.append(StylingHelper.getAffectedEntityNameText(affected.getFirst()));
+        } else {
+            affectedText
+                    .append(StylingHelper.getAffectedEntitiesNumberText(affected))
+                    .append(" ")
+                    .append(TranslationManager.translate(src, "commands.helpful_commands.feed.other.multiple"));
+        }
+
+        TranslationManager.TextBuilder textBuilder = new TranslationManager.TextBuilder(src);
+        textBuilder.appendTranslatable("commands.helpful_commands.feed.other", affectedText).setStyle(textStyles.getSuccess());
+
+        src.sendSuccess(textBuilder::getComponent, true);
+
+        return affected.size();
+    }
+
+    private boolean feed(ServerPlayer player) {
+        FoodData foodData = player.getFoodData();
+
+        if (!(player.isAlive() && foodData.needsFood())) {
+            return false;
+        }
+
+        foodData.setFoodLevel(20);
+        foodData.setSaturation(5);
+
+        return true;
+    }
+}

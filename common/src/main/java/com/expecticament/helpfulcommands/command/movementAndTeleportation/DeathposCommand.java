@@ -21,17 +21,16 @@ import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import com.expecticament.helpfulcommands.manager.TranslationManager.DeprecatedTextBuilder;
 import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 import net.minecraft.world.entity.Relative;
 
 import java.util.Optional;
 
-public class CMD_deathpos extends HelpfulCommandsCommand {
+public class DeathposCommand extends HelpfulCommandsCommand {
 
     protected static final SimpleCommandExceptionType NO_DEATH_POS = new SimpleCommandExceptionType(Component.empty());
 
-    public CMD_deathpos(ModCommandManager.CommandData commandData) {
+    public DeathposCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
     }
 
@@ -76,37 +75,35 @@ public class CMD_deathpos extends HelpfulCommandsCommand {
 
         if (player == null) {
             if (sourcePlayer == null) {
-                throw new CommandSyntaxException(SELECTOR_REQUIRED, Component.literal(TranslationManager.translate(src, "error.helpful_commands.selectorRequired")));
+                throw CommandSourceStack.ERROR_NOT_PLAYER.create();
             }
             player = sourcePlayer;
         }
 
         boolean self = player == sourcePlayer;
-        String trKeyEnd = self ? "self" : "other";
 
         Optional<GlobalPos> deathPos = player.getLastDeathLocation();
 
         if (deathPos.isEmpty()) {
-            DeprecatedTextBuilder textBuilder = new DeprecatedTextBuilder(src);
-            if (!self) {
-                textBuilder.appendComponent(StylingHelper.getAffectedEntityNameText(player));
+            TextBuilder textBuilder = new TextBuilder(src);
+            if (self) {
+                textBuilder.appendTranslatable("commands.helpful_commands.deathpos.error.noDeathPos.self");
+            } else {
+                textBuilder.appendTranslatable("commands.helpful_commands.deathpos.error.noDeathPos.other", StylingHelper.getAffectedEntityNameText(player));
             }
-            textBuilder.appendTranslatable("commands.helpful_commands.deathpos.output.error.noDeathPos." + trKeyEnd);
             throw new CommandSyntaxException(NO_DEATH_POS, textBuilder.getComponent());
         }
 
         GlobalPos globalPos = deathPos.get();
+        Component deathPosComponent = StylingHelper.getLocationText(globalPos);
 
-        DeprecatedTextBuilder textBuilder = new DeprecatedTextBuilder(src);
+        TextBuilder textBuilder = new TextBuilder(src);
 
-        if (!self) {
-            textBuilder.appendComponent(StylingHelper.getAffectedEntityNameText(player));
+        if (self) {
+            textBuilder.appendTranslatable("commands.helpful_commands.deathpos.query.self", deathPosComponent);
+        } else {
+            textBuilder.appendTranslatable("commands.helpful_commands.deathpos.query.other", StylingHelper.getAffectedEntityNameText(player), deathPosComponent);
         }
-
-        textBuilder
-                .appendTranslatable("commands.helpful_commands.deathpos.query.output." + trKeyEnd)
-                .appendWhitespace()
-                .appendComponent(StylingHelper.getLocationText(globalPos));
 
         src.sendSuccess(textBuilder::getComponent, true);
 
@@ -124,22 +121,22 @@ public class CMD_deathpos extends HelpfulCommandsCommand {
 
         if (player == null) {
             if (sourcePlayer == null) {
-                throw new CommandSyntaxException(SELECTOR_REQUIRED, Component.literal(TranslationManager.translate(src, "error.helpful_commands.selectorRequired")));
+                throw CommandSourceStack.ERROR_NOT_PLAYER.create();
             }
             player = sourcePlayer;
         }
 
         boolean self = player == sourcePlayer;
-        String trKeyEnd = self ? "self" : "other";
 
         Optional<GlobalPos> deathPos = player.getLastDeathLocation();
 
         if (deathPos.isEmpty()) {
-            DeprecatedTextBuilder textBuilder = new DeprecatedTextBuilder(src);
-            if (!self) {
-                textBuilder.appendComponent(StylingHelper.getAffectedEntityNameText(player));
+            TextBuilder textBuilder = new TextBuilder(src);
+            if (self) {
+                textBuilder.appendTranslatable("commands.helpful_commands.deathpos.error.noDeathPos.self");
+            } else {
+                textBuilder.appendTranslatable("commands.helpful_commands.deathpos.error.noDeathPos.other", StylingHelper.getAffectedEntityNameText(player));
             }
-            textBuilder.appendTranslatable("commands.helpful_commands.deathpos.output.error.noDeathPos." + trKeyEnd);
             throw new CommandSyntaxException(NO_DEATH_POS, textBuilder.getComponent());
         }
 
@@ -154,32 +151,23 @@ public class CMD_deathpos extends HelpfulCommandsCommand {
 
             sourcePlayer.teleportTo(level, blockPos.getX(), blockPos.getY(), blockPos.getZ(), Relative.DELTA, sourcePlayer.getYRot(), sourcePlayer.getXRot(), false);
 
-            DeprecatedTextBuilder textBuilder = new DeprecatedTextBuilder(src);
-
-            textBuilder
-                    .appendTranslatable("commands.helpful_commands.deathpos.teleport.output.success.part1")
-                    .appendWhitespace();
+            TextBuilder textBuilder = new TextBuilder(src);
 
             if (self) {
-                textBuilder.appendTranslatable("commands.helpful_commands.deathpos.teleport.output.success.part2.self");
+                textBuilder.appendTranslatable("commands.helpful_commands.deathpos.teleport.self");
             } else {
-                textBuilder
-                        .appendComponent(StylingHelper.getAffectedEntityNameText(player))
-                        .appendTranslatable("commands.helpful_commands.deathpos.teleport.output.success.part2.other");
+                textBuilder.appendTranslatable("commands.helpful_commands.deathpos.teleport.other", StylingHelper.getAffectedEntityNameText(player));
             }
 
-            textBuilder
-                    .appendWhitespace()
-                    .appendTranslatable("commands.helpful_commands.deathpos.teleport.output.success.part3");
             textBuilder.setStyle(textStyles.getSuccess());
 
             src.sendSuccess(textBuilder::getComponent, true);
-
-            return Command.SINGLE_SUCCESS;
         } catch (ServerLevelHelper.UnknownServerLevelException e) {
             TextBuilder textBuilder = new TextBuilder(src);
             textBuilder.appendTranslatable("error.helpful_commands.unknownDimension", Component.literal(levelLocation).setStyle(textStyles.getPrimary()));
             throw new CommandSyntaxException(UNKNOWN_DIMENSION, textBuilder.getComponent());
         }
+
+        return Command.SINGLE_SUCCESS;
     }
 }

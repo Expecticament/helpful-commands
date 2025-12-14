@@ -92,7 +92,7 @@ public class CoordsCommand extends HelpfulCommandsCommand {
         ServerPlayer sourcePlayer = validateAnySource(src);
 
         if (player == null && sourcePlayer == null) {
-            throw new CommandSyntaxException(SELECTOR_REQUIRED, Component.literal(TranslationManager.translate(src, "error.helpful_commands.selectorRequired")));
+            throw CommandSourceStack.ERROR_NOT_PLAYER.create();
         }
 
         if (player == null) {
