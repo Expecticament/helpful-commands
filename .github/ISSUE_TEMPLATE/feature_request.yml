@@ -1,0 +1,47 @@
+name: Feature Request
+description: Suggest a new feature or command
+labels: ["feature-request"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for contributing and improving Helpful Commands!
+
+  - type: textarea
+    id: feature_description
+    attributes:
+      label: Feature Description
+      description: Clearly describe the feature or command you want added
+    validations:
+      required: true
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Example Usage
+      description: Example command usage, arguments, or output
+      placeholder: "/newawesomecommand @a - makes everyone on the server happy"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Intended Environment
+      options:
+        - Any
+        - Singleplayer / Intergrated Server
+        - Dedicated Server
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmation
+      options:
+        - label: The newest version of the mod doesn't have this feature
+          required: true
+        - label: I searched existing feature requests
+          required: true

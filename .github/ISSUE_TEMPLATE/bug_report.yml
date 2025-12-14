@@ -1,0 +1,90 @@
+name: Bug Report
+description: Report a problem or unexpected behavior
+labels: ["bug"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug!
+        Please provide as much detail as possible so we can reproduce the issue.
+
+  - type: input
+    id: mod_version
+    attributes:
+      label: Mod Version
+      description: Helpful Commands version you are using
+      placeholder: "e.g. 4.0.1"
+    validations:
+      required: true
+
+  - type: input
+    id: mc_version
+    attributes:
+      label: Minecraft Version
+      description: Game version you are using
+      placeholder: "e.g. 1.21.11"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: mod_loader
+    attributes:
+      label: Mod Loader
+      options:
+        - Fabric
+        - NeoForge
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      options:
+        - Singleplayer / Intergrated Server
+        - Dedicated Server
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: To Reproduce
+      description: How can this behavior be reproduced?
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: false
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here if you want. Why do you think this is a bug? You can also upload logs, which might be helpful.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmation
+      options:
+        - label: I am using the latest version of the mod available for my version of the game
+          required: true
+        - label: I checked for existing issues
+          required: true
