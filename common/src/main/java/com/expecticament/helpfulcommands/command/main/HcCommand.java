@@ -30,8 +30,7 @@ import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 import net.minecraft.network.chat.*;
 
 import java.net.URI;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class HcCommand extends HelpfulCommandsCommand {
 
@@ -39,6 +38,12 @@ public class HcCommand extends HelpfulCommandsCommand {
     protected static final SimpleCommandExceptionType STYLE_DOESNT_EXIST = new SimpleCommandExceptionType(Component.empty());
     protected static final SimpleCommandExceptionType STYLE_ALREADY_IN_USE = new SimpleCommandExceptionType(Component.empty());
     protected static final SimpleCommandExceptionType COMMAND_NOT_CONFIGURABLE = new SimpleCommandExceptionType(Component.empty());
+
+    private record CommandListEntry(HelpfulCommandsCommand command, boolean enabled, boolean hasPerms) {
+        private boolean canUse() {
+            return enabled && hasPerms;
+        }
+    }
 
     public HcCommand(CommandData commandData) {
         super(commandData);
@@ -93,7 +98,11 @@ public class HcCommand extends HelpfulCommandsCommand {
                         .executes(this::about)
                 )
                 .then(Commands.literal("commandList")
-                        .executes(ctx -> commandList(ctx, dispatcher))
+                        .executes(ctx -> commandList(ctx, dispatcher, null))
+                        .then(Commands.argument("show_all", BoolArgumentType.bool())
+                                .requires(src -> !PermissionHelper.canConfigure(src, "command.state") && src.isPlayer())
+                                .executes(ctx -> commandList(ctx, dispatcher, BoolArgumentType.getBool(ctx, "show_all")))
+                        )
                 )
                 .then(Commands.literal("config")
                         .requires(PermissionHelper::canConfigure)
@@ -233,18 +242,28 @@ public class HcCommand extends HelpfulCommandsCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    private int commandList(CommandContext<CommandSourceStack> ctx, CommandDispatcher<CommandSourceStack> dispatcher) {
+    private int commandList(CommandContext<CommandSourceStack> ctx, CommandDispatcher<CommandSourceStack> dispatcher, Boolean showAll) {
+        CommandSourceStack src = ctx.getSource();
+
+        if (showAll == null) {
+            showAll = !src.isPlayer() || PermissionHelper.canConfigure(src, "command.state");
+        }
+
+        TextBuilder textBuilder = new TextBuilder(src);
+        textBuilder.appendComponent(StylingHelper.getTitle(Component.literal("Helpful Commands"), Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.commandList.title"))));
+
+        return showAll ? commandListAll(ctx, dispatcher, textBuilder) : commandListAvailableOnly(ctx, dispatcher, textBuilder);
+    }
+
+    private int commandListAll(CommandContext<CommandSourceStack> ctx, CommandDispatcher<CommandSourceStack> dispatcher, TextBuilder textBuilder) {
         CommandSourceStack src = ctx.getSource();
 
         HelpfulCommandsStyle hcStyle = StylingManager.getCurrentStyle();
         HelpfulCommandsStyle.TextStyles textStyles = hcStyle.getTextStyles();
         HelpfulCommandsStyle.TextDecorators textDecorators = hcStyle.getTextDecorators();
-
         Style categoryStyle = textStyles.getTertiary();
-        boolean toggleStateCommandPermission = PermissionHelper.canConfigure(src, "command.state");
 
-        TextBuilder textBuilder = new TextBuilder(src);
-        textBuilder.appendComponent(StylingHelper.getTitle(Component.literal("Helpful Commands"), Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.commandList.title"))));
+        boolean toggleStateCommandPermission = PermissionHelper.canConfigure(src, "command.state");
 
         ConfigManager.HelpfulCommandsConfig config = ConfigManager.readConfig();
 
@@ -253,36 +272,98 @@ public class HcCommand extends HelpfulCommandsCommand {
                 continue;
             }
 
-            textBuilder
-                    .appendNewline()
-                    .appendComponent(Component.literal(textDecorators.getCategoryStartingChar()).setStyle(categoryStyle))
-                    .appendComponent(Component.literal(TranslationManager.translate(src, "command.category.helpful_commands." + entry.getKey().toString().toLowerCase())).setStyle(categoryStyle));
-
+            textBuilder.appendNewline().appendComponent(Component.literal(textDecorators.getCategoryStartingChar()).setStyle(categoryStyle)).appendComponent(Component.literal(TranslationManager.translate(src, "command.category.helpful_commands." + entry.getKey().toString().toLowerCase())).setStyle(categoryStyle));
             HelpfulCommandsCommand lastCommand = entry.getValue().getLast();
 
             for (HelpfulCommandsCommand command : entry.getValue()) {
                 CommandData cmdData = command.getCommandData();
+
                 boolean enabled = config.getCommandState(cmdData.getName());
                 boolean hasPerms = command.canExecuteBaseCommand(src);
                 boolean canUse = enabled && hasPerms;
 
-                textBuilder
-                        .appendNewline()
-                        .appendComponent(Component.literal(command.equals(lastCommand) ? textDecorators.getCategoryEndingChar() : textDecorators.getCategoryTrailingChar()).setStyle(categoryStyle));
+                textBuilder.appendNewline().appendComponent(Component.literal(command.equals(lastCommand) ? textDecorators.getCategoryEndingChar() : textDecorators.getCategoryTrailingChar()).setStyle(categoryStyle));
 
                 if (toggleStateCommandPermission) {
                     HoverEvent cmdStateHoverEvent = getCommandStateHoverEvent(src, textStyles, cmdData.getName(), enabled);
                     ClickEvent cmdStateClickEvent = new ClickEvent.RunCommand("/hc config command state " + cmdData.getName() + " " + String.valueOf(!enabled).toLowerCase());
                     Style cmdStateStyle = (enabled ? textStyles.getEnabled() : textStyles.getDisabled()).withHoverEvent(cmdStateHoverEvent).withClickEvent(cmdStateClickEvent);
 
-                    textBuilder
-                            .appendComponent(StylingHelper.getButton(Component.literal(enabled ? textDecorators.getEnabled() : textDecorators.getDisabled()), cmdStateStyle))
-                            .appendWhitespace();
+                    textBuilder.appendComponent(StylingHelper.getButton(Component.literal(enabled ? textDecorators.getEnabled() : textDecorators.getDisabled()), cmdStateStyle)).appendWhitespace();
                 }
 
                 HoverEvent cmdNameHoverEvent = getCommandHoverEvent(src, dispatcher, textStyles, command, hasPerms, enabled);
                 ClickEvent cmdNameClickEvent = canUse ? new ClickEvent.SuggestCommand("/" + cmdData.getName() + " ") : null;
                 Style cmdNameStyle = (canUse ? textStyles.getAvailable() : textStyles.getUnavailable()).withHoverEvent(cmdNameHoverEvent).withClickEvent(cmdNameClickEvent);
+
+                textBuilder.appendComponent(Component.literal("/" + cmdData.getName()).setStyle(cmdNameStyle));
+            }
+        }
+
+        src.sendSystemMessage(textBuilder.getComponent());
+
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int commandListAvailableOnly(CommandContext<CommandSourceStack> ctx, CommandDispatcher<CommandSourceStack> dispatcher, TextBuilder textBuilder) {
+        CommandSourceStack src = ctx.getSource();
+
+        if (!src.isPlayer()) {
+            return commandListAvailableOnly(ctx, dispatcher, textBuilder);
+        }
+
+        ConfigManager.HelpfulCommandsConfig config = ConfigManager.readConfig();
+        Map<ModCommandManager.CommandCategory, List<HelpfulCommandsCommand>> available = new LinkedHashMap<>();
+
+        int totalCommands = 0;
+        int availableCommands = 0;
+
+        for (Map.Entry<ModCommandManager.CommandCategory, List<HelpfulCommandsCommand>> entry : ModCommandManager.getCommandListByCategory().entrySet()) {
+            if (entry.getKey().equals(ModCommandManager.CommandCategory.MAIN)) {
+                continue;
+            }
+
+            totalCommands += entry.getValue().size();
+
+            List<HelpfulCommandsCommand> filtered = entry.getValue().stream().filter(cmd -> config.getCommandState(cmd.getCommandData().getName())).filter(cmd -> cmd.canExecuteBaseCommand(src)).toList();
+            if (!filtered.isEmpty()) {
+                available.put(entry.getKey(), filtered);
+                availableCommands += filtered.size();
+            }
+        }
+
+        if (available.isEmpty() || availableCommands == totalCommands) {
+            return commandListAll(ctx, dispatcher, textBuilder);
+        }
+
+        HelpfulCommandsStyle hcStyle = StylingManager.getCurrentStyle();
+        HelpfulCommandsStyle.TextStyles textStyles = hcStyle.getTextStyles();
+        HelpfulCommandsStyle.TextDecorators textDecorators = hcStyle.getTextDecorators();
+        Style categoryStyle = textStyles.getTertiary();
+
+        textBuilder
+                .appendNewline()
+                .appendComponent(Component.literal("[!] ").setStyle(textStyles.getWarning()))
+                .appendComponent(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.commandList.availableOnly")).setStyle(textStyles.getWarning()))
+                .appendWhitespace()
+                .appendComponent(StylingHelper.getButton(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.commandList.availableOnly.showAll")), textStyles.getButton().withClickEvent(new ClickEvent.RunCommand("/hc commandList true"))))
+                .appendNewline();
+
+        for (Map.Entry<ModCommandManager.CommandCategory, List<HelpfulCommandsCommand>> entry : available.entrySet()) {
+            if (entry.getValue().isEmpty()) {
+                continue;
+            }
+
+            textBuilder.appendNewline().appendComponent(Component.literal(textDecorators.getCategoryStartingChar()).setStyle(categoryStyle)).appendComponent(Component.literal(TranslationManager.translate(src, "command.category.helpful_commands." + entry.getKey().toString().toLowerCase())).setStyle(categoryStyle));
+            HelpfulCommandsCommand lastCommand = entry.getValue().getLast();
+
+            for (HelpfulCommandsCommand command : entry.getValue()) {
+                CommandData cmdData = command.getCommandData();
+
+                textBuilder.appendNewline().appendComponent(Component.literal(command.equals(lastCommand) ? textDecorators.getCategoryEndingChar() : textDecorators.getCategoryTrailingChar()).setStyle(categoryStyle));
+                HoverEvent cmdNameHoverEvent = getCommandHoverEvent(src, dispatcher, textStyles, command, true, true);
+                ClickEvent cmdNameClickEvent = new ClickEvent.SuggestCommand("/" + cmdData.getName() + " ");
+                Style cmdNameStyle = (textStyles.getAvailable()).withHoverEvent(cmdNameHoverEvent).withClickEvent(cmdNameClickEvent);
 
                 textBuilder.appendComponent(Component.literal("/" + cmdData.getName()).setStyle(cmdNameStyle));
             }

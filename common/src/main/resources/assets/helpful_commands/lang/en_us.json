@@ -49,6 +49,8 @@
   "commands.helpful_commands.hc.about.hover.commandList": "Click to see and manage all the available commands",
   "commands.helpful_commands.hc.about.hover.config": "Click to configure Helpful Commands",
   "commands.helpful_commands.hc.commandList.title": "Command List",
+  "commands.helpful_commands.hc.commandList.availableOnly": "Only the commands available to you are shown.",
+  "commands.helpful_commands.hc.commandList.availableOnly.showAll": "Show all",
   "commands.helpful_commands.hc.commandList.clickToToggleCommand": "Click to %s %s command",
   "commands.helpful_commands.hc.commandList.clickToToggleCommand.true": "disable",
   "commands.helpful_commands.hc.commandList.clickToToggleCommand.false": "enable",
@@ -240,6 +242,7 @@
   "error.helpful_commands.noItemsFound": "No items were found",
   "error.helpful_commands.unknownDimension": "Unknown dimension: %s",
   "error.helpful_commands.emptyItemStack.mainHand": "There is nothing in your main hand",
+
 
   "helpful_commands.common.unknown": "Unknown",
   "helpful_commands.common.enabled": "Enabled",
