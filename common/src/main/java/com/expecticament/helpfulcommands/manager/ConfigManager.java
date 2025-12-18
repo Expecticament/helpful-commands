@@ -6,50 +6,55 @@ import com.expecticament.helpfulcommands.io.JsonIO;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 public class ConfigManager {
-
     private static final String FILE_NAME = "config";
 
     private static JsonIO<HelpfulCommandsConfig> io;
 
     public static class HelpfulCommandsConfig {
-        public final CommandConfig command = new CommandConfig();
-        public final StylingConfig styling = new StylingConfig();
-        private final Map<String, Object> fields = new HashMap<>();
+        public CommandConfig command = new CommandConfig();
+        public StylingConfig styling = new StylingConfig();
+        protected final EnumMap<CONFIG_FIELD, Object> fields = new EnumMap<>(CONFIG_FIELD.class);
 
         public HelpfulCommandsConfig() {
-            for (var entry : DEFAULT_FIELDS.entrySet()) {
-                fields.putIfAbsent(entry.getKey(), entry.getValue().defaultValue);
+            for (CONFIG_FIELD field : CONFIG_FIELD.values()) {
+                fields.putIfAbsent(field, field.properties().defaultValue);
             }
         }
 
-        public void writeField(String key, Object value) {
-            fields.put(key, value);
+        public void writeField(CONFIG_FIELD configField, Object value) {
+            fields.put(configField, value);
             io.save(this);
         }
 
-        @SuppressWarnings("unchecked")
-        public <T> T readField(String key) {
-            Object value = fields.get(key);
+        public void writeField(String configField, Object value) {
+            fields.put(CONFIG_FIELD.valueOf(configField.toUpperCase()), value);
+            io.save(this);
+        }
 
-            ConfigFieldProperties properties = DEFAULT_FIELDS.get(key);
-            if (properties == null) {
-                return null;
-            }
+        public <T> T readField(String configField) {
+            return readField(CONFIG_FIELD.valueOf(configField.toUpperCase()));
+        }
+
+        @SuppressWarnings("unchecked")
+        public <T> T readField(CONFIG_FIELD configField) {
+            Object value = fields.get(configField);
+            ConfigFieldProperties properties = configField.properties();
 
             if (value == null) {
                 value = properties.defaultValue;
-                fields.put(key, value);
+                fields.put(configField, value);
             }
 
             switch (properties.valueType) {
                 case Integer -> {
                     if (!(value instanceof Number num)) {
-                        throw invalidType(key, "Integer", value);
+                        throw invalidType(configField, "Integer", value);
                     }
                     int result = (int) Math.clamp(num.intValue(), properties.min.intValue(), properties.max.intValue());
                     return (T) Integer.valueOf(result);
@@ -57,7 +62,7 @@ public class ConfigManager {
 
                 case Double -> {
                     if (!(value instanceof Number num)) {
-                        throw invalidType(key, "Double", value);
+                        throw invalidType(configField, "Double", value);
                     }
                     double result = Math.clamp(num.doubleValue(), properties.min, properties.max);
                     return (T) Double.valueOf(result);
@@ -65,18 +70,18 @@ public class ConfigManager {
 
                 case Boolean -> {
                     if (!(value instanceof Boolean bool)) {
-                        throw invalidType(key, "Boolean", value);
+                        throw invalidType(configField, "Boolean", value);
                     }
                     return (T) bool;
                 }
             }
 
-            throw new IllegalStateException("Unknown valueType for field '" + key + "'");
+            throw new IllegalStateException("Unknown valueType for field '" + configField.name().toLowerCase() + "'");
         }
 
-        private IllegalStateException invalidType(String key, String expected, Object actual) {
+        private IllegalStateException invalidType(CONFIG_FIELD configField, String expected, Object actual) {
             return new IllegalStateException(
-                    "Config field '" + key + "' expected type " + expected + " but found " + actual.getClass().getSimpleName()
+                    "Config field '" + configField.name().toLowerCase() + "' expected type " + expected + " but found " + actual.getClass().getSimpleName()
             );
         }
 
@@ -123,34 +128,110 @@ public class ConfigManager {
     public static class ConfigFieldProperties {
         public enum ValueType { Double, Integer, Boolean }
 
-        public final ValueType valueType;
-        public final Object defaultValue;
+        private final ValueType valueType;
+        private final Object defaultValue;
 
-        public final Double min;
-        public final Double max;
+        private final Double min;
+        private final Double max;
 
-        public ConfigFieldProperties(ValueType valueType, Object defaultValue) {
+        private static ConfigFieldProperties dbl(double defaultValue) {
+            return new ConfigFieldProperties(ValueType.Double, defaultValue, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+        }
+
+        private static ConfigFieldProperties dbl(double defaultValue, double min) {
+            return new ConfigFieldProperties(ValueType.Double, defaultValue, min, Double.POSITIVE_INFINITY);
+        }
+
+        private static ConfigFieldProperties dbl(double defaultValue, double min, double max) {
+            return new ConfigFieldProperties(ValueType.Double, defaultValue, min, max);
+        }
+
+        private static ConfigFieldProperties integer(int defaultValue) {
+            return new ConfigFieldProperties(ValueType.Integer, defaultValue, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        }
+
+        private static ConfigFieldProperties integer(int defaultValue, int min) {
+            return new ConfigFieldProperties(ValueType.Integer, defaultValue, min, Integer.MAX_VALUE);
+        }
+
+        private static ConfigFieldProperties integer(int defaultValue, int min, int max) {
+            return new ConfigFieldProperties(ValueType.Integer, defaultValue, min, max);
+        }
+
+        private static ConfigFieldProperties bool(boolean defaultValue) {
+            return new ConfigFieldProperties(ValueType.Boolean, defaultValue);
+        }
+
+        private ConfigFieldProperties(ValueType valueType, Object defaultValue) {
             this(valueType, defaultValue, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
         }
 
-        public ConfigFieldProperties(ValueType valueType, Object defaultValue, double min) {
-            this(valueType, defaultValue, min, Double.POSITIVE_INFINITY);
-        }
-
-        public ConfigFieldProperties(ValueType valueType, Object defaultValue, double min, double max) {
+        private ConfigFieldProperties(ValueType valueType, Object defaultValue, double min, double max) {
             this.valueType = valueType;
             this.defaultValue = defaultValue;
             this.min = min;
             this.max = max;
+
+            switch (valueType) {
+                case Double -> {
+                    if (!(defaultValue instanceof Double)) {
+                        throw new IllegalArgumentException("Default value must be Double");
+                    }
+                }
+                case Integer -> {
+                    if (!(defaultValue instanceof Integer)) {
+                        throw new IllegalArgumentException("Default value must be Integer");
+                    }
+                }
+                case Boolean -> {
+                    if (!(defaultValue instanceof Boolean)) {
+                        throw new IllegalArgumentException("Default value must be Boolean");
+                    }
+                }
+            }
+        }
+
+        public ValueType getValueType() {
+            return valueType;
+        }
+
+        public Object getDefaultValue() {
+            return defaultValue;
+        }
+
+        public Double getMin() {
+            return min;
+        }
+
+        public Double getMax() {
+            return max;
         }
     }
 
-    public static final Map<String, ConfigFieldProperties> DEFAULT_FIELDS = Map.ofEntries(
-            Map.entry("explosionPowerLimit", new ConfigFieldProperties(ConfigFieldProperties.ValueType.Integer, 5, 1)),
-            Map.entry("fireballPowerLimit", new ConfigFieldProperties(ConfigFieldProperties.ValueType.Integer, 5, 1)),
-            Map.entry("killitemsMaxRange", new ConfigFieldProperties(ConfigFieldProperties.ValueType.Integer, 128, 1)),
-            Map.entry("maxHomes", new ConfigFieldProperties(ConfigFieldProperties.ValueType.Integer, 5, 1))
-    );
+    public enum CONFIG_FIELD {
+        MAX_HOMES(ConfigFieldProperties.integer(5, 1)),
+        HOME_TP_COOLDOWN(ConfigFieldProperties.integer(0, 0)),
+
+        TPR_REQUEST_TIMEOUT(ConfigFieldProperties.integer(60, 1)),
+        TPR_REQUEST_COOLDOWN_ON_ACCEPTED(ConfigFieldProperties.integer(0, 0)),
+        TPR_REQUEST_COOLDOWN_ON_CANCEL(ConfigFieldProperties.integer(0, 0)),
+
+        EXPLOSION_POWER_LIMIT(ConfigFieldProperties.integer(5, 1)),
+
+        FIREBALL_POWER_LIMIT(ConfigFieldProperties.integer(5, 1)),
+
+        KILLITEMS_MAX_RANGE(ConfigFieldProperties.integer(128, 1));
+
+        private final ConfigFieldProperties properties;
+
+        CONFIG_FIELD(ConfigFieldProperties properties) {
+            this.properties = properties;
+        }
+
+        public ConfigFieldProperties properties() {
+            return properties;
+        }
+    }
 
     public static void initialize(MinecraftServer server) {
         io = new JsonIO<>(server.getWorldPath(LevelResource.ROOT).resolve(HelpfulCommands.FOLDER_NAME), FILE_NAME, HelpfulCommandsConfig.class);

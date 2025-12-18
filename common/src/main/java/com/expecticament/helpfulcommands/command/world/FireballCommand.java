@@ -58,7 +58,7 @@ public class FireballCommand extends HelpfulCommandsCommand {
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
-        int maxPower = ConfigManager.readConfig().readField("fireballPowerLimit");
+        int maxPower = ConfigManager.readConfig().readField(ConfigManager.CONFIG_FIELD.FIREBALL_POWER_LIMIT);
         if (power < 1) {
             power = Math.min(5, maxPower);
         } else if (power > maxPower) {

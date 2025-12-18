@@ -73,7 +73,7 @@ public class KillitemsCommand extends HelpfulCommandsCommand {
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
         ConfigManager.HelpfulCommandsConfig config = ConfigManager.readConfig();
-        int maxRange = config.readField("killitemsMaxRange");
+        int maxRange = config.readField(ConfigManager.CONFIG_FIELD.KILLITEMS_MAX_RANGE);
 
         if (range < 1) {
             range = Math.clamp(64, 1, maxRange);

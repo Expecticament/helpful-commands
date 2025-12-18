@@ -1,5 +1,7 @@
 package com.expecticament.helpfulcommands.io;
 
+import com.expecticament.helpfulcommands.HelpfulCommands;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,7 +36,7 @@ public class GenericIO {
             Files.write(fullPath, data);
             cachedData = Arrays.copyOf(data, data.length);
         } catch (IOException e) {
-            e.printStackTrace();
+            HelpfulCommands.LOGGER.error(e.getMessage());
         }
     }
 
@@ -50,7 +52,7 @@ public class GenericIO {
             cachedData = Files.readAllBytes(fullPath);
             return cachedData;
         } catch (IOException e) {
-            e.printStackTrace();
+            HelpfulCommands.LOGGER.error(e.getMessage());
         }
 
         return null;

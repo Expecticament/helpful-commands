@@ -36,25 +36,25 @@ public class HomeManager {
 
     private static JsonIO<Homes> io;
 
-    public static class HomeAlreadyExistsException extends Exception {
+    public static class HomeAlreadyExistsException extends RuntimeException {
         public HomeAlreadyExistsException(ServerPlayer player, String homeName) {
             super("Player %s (%s) already has a home with this name: %s".formatted(player.getName().getString(), player.getStringUUID(), homeName));
         }
-    };
+    }
 
-    public static class HomeDoesntExistException extends Exception {
+    public static class HomeDoesntExistException extends RuntimeException {
         public HomeDoesntExistException(ServerPlayer player, String homeName) {
             super("Player %s (%s) doesn't have a home with this name: %s".formatted(player.getName().getString(), player.getStringUUID(), homeName));
         }
-    };
+    }
 
-    public static class HomeLimitExceededException extends Exception {
+    public static class HomeLimitExceededException extends RuntimeException {
         public HomeLimitExceededException(ServerPlayer player) {
             super("Player %s (%s) can't create any more homes".formatted(player.getName().getString(), player.getStringUUID()));
         }
-    };
+    }
 
-    public static class SameHomeNameProvided extends Exception {
+    public static class SameHomeNameProvided extends RuntimeException {
         public SameHomeNameProvided(String newName) {
             super("The new home name is the same as the old one: %s".formatted(newName));
         }
@@ -69,7 +69,7 @@ public class HomeManager {
         Map<String, Home> playerHomes = getHomesForPlayer(player, homes);
 
         ConfigManager.HelpfulCommandsConfig config = ConfigManager.readConfig();
-        int maxHomes = config.readField("maxHomes");
+        int maxHomes = config.readField(ConfigManager.CONFIG_FIELD.MAX_HOMES);
 
         if (playerHomes.size() >= maxHomes) {
             throw new HomeLimitExceededException(player);

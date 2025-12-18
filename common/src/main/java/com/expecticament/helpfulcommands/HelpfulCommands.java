@@ -29,6 +29,7 @@ public final class HelpfulCommands {
         WarpManager.initialize(server);
         TranslationManager.initialize();
         ServerLevelHelper.initialize(server);
+        CooldownManager.initialize(server);
 
         LOGGER.info("");
         LOGGER.info("H   H  CCCCC  | ");
@@ -43,6 +44,8 @@ public final class HelpfulCommands {
         ConfigManager.writeToDisk();
         HomeManager.writeToDisk();
         WarpManager.writeToDisk();
+        CooldownManager.removeExpired();
+        CooldownManager.writeToDisk();
     }
 
     public static String getModVersion() { return modVersion; }

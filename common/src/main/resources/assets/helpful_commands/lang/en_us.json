@@ -23,6 +23,7 @@
   "commands.helpful_commands.dimension.description": "Teleport entities to another dimension",
   "commands.helpful_commands.home.description": "Manage, query, or teleport to your homes",
   "commands.helpful_commands.spawn.description": "Query or teleport to the world spawn or player's spawn point",
+  "commands.helpful_commands.tpr.description": "Make, accept, deny, cancel teleport requests",
   "commands.helpful_commands.warp.description": "Manage, query, or teleport to warps",
   "commands.helpful_commands.coords.description": "Query, share, or broadcast player's coordinates",
   "commands.helpful_commands.extinguish.description": "Extinguish entities that are on fire",
@@ -153,6 +154,28 @@
   "commands.helpful_commands.spawn.error.playerSpawnNotSet.self": "Your spawn point hasn't been set yet",
   "commands.helpful_commands.spawn.error.playerSpawnNotSet.other": "%s's spawn point hasn't been set yet",
 
+  "commands.helpful_commands.tpr.request": "Sent teleport request to %s. They have %s to respond",
+  "commands.helpful_commands.tpr.request.title": "Teleport request",
+  "commands.helpful_commands.tpr.request.from": "From:",
+  "commands.helpful_commands.tpr.request.comment": "Comment:",
+  "commands.helpful_commands.tpr.request.timeout": "You have %s to respond",
+  "commands.helpful_commands.tpr.request.accept": "Accept",
+  "commands.helpful_commands.tpr.request.deny": "Deny",
+  "commands.helpful_commands.tpr.request.error.selfRequest": "You can't send a teleport request to yourself",
+  "commands.helpful_commands.tpr.request.error.cantAccept": "%s can't accept teleport requests",
+  "commands.helpful_commands.tpr.request.error.pendingRequestExists": "You already have a pending teleport request! Cancel it before making another one",
+  "commands.helpful_commands.tpr.request.error.onCooldown": "You must wait %s before sending another request",
+  "commands.helpful_commands.tpr.cancel.noPlayer": "Cancelled teleport request",
+  "commands.helpful_commands.tpr.cancel.withPlayer": "Cancelled teleport request to %s",
+  "commands.helpful_commands.tpr.cancel.error.noPendingRequest": "No active teleport request found",
+  "commands.helpful_commands.tpr.accept": "Accepted teleport request from %s",
+  "commands.helpful_commands.tpr.accept.affected": "%s accepted your teleport request",
+  "commands.helpful_commands.tpr.accept.error.noPendingRequest": "No active teleport request from %s found",
+  "commands.helpful_commands.tpr.accept.error.failedToTeleport": "Failed to teleport. Request won't be removed",
+  "commands.helpful_commands.tpr.deny": "Denied teleport request from %s",
+  "commands.helpful_commands.tpr.deny.affected": "%s denied your teleport request",
+  "commands.helpful_commands.tpr.deny.error.noPendingRequest": "No active teleport request from %s found",
+
   "commands.helpful_commands.warp.teleport.self": "Teleported to %s warp",
   "commands.helpful_commands.warp.teleport.affected": "You have been teleported to %s warp",
   "commands.helpful_commands.warp.teleport.other": "Teleported %s to %s warp",
@@ -242,6 +265,7 @@
   "error.helpful_commands.noItemsFound": "No items were found",
   "error.helpful_commands.unknownDimension": "Unknown dimension: %s",
   "error.helpful_commands.emptyItemStack.mainHand": "There is nothing in your main hand",
+  "error.helpful_commands.onCooldown.teleport": "You must wait %s before teleporting",
 
 
   "helpful_commands.common.unknown": "Unknown",
@@ -253,5 +277,9 @@
   "helpful_commands.common.teleport": "Teleport",
   "helpful_commands.common.edit": "Edit",
   "helpful_commands.common.remove": "Remove",
-  "helpful_commands.common.description": "Description"
+  "helpful_commands.common.description": "Description",
+  "helpful_commands.common.second": "%ss",
+  "helpful_commands.common.minute": "%smin",
+  "helpful_commands.common.hour": "%shr",
+  "helpful_commands.common.day": "%sd"
 }

@@ -1,8 +1,12 @@
 package com.expecticament.helpfulcommands.helper;
 
+import com.expecticament.helpfulcommands.HelpfulCommands;
 import com.expecticament.helpfulcommands.manager.StylingManager;
+import com.expecticament.helpfulcommands.manager.TranslationManager;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.*;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.core.BlockPos;
@@ -72,15 +76,30 @@ public class StylingHelper {
         return Component.literal(String.valueOf(affected.size())).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary().withHoverEvent(hoverEvent));
     }
 
+    public static Component getTitle(Component primaryTitle) {
+        return getTitle(primaryTitle, Component.empty());
+    }
+
     public static Component getTitle(Component primaryTitle, Component secondaryTitle) {
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
         HelpfulCommandsStyle.TextDecorators textDecorators = StylingManager.getCurrentStyle().getTextDecorators();
-        return Component.literal("\n")
+
+        MutableComponent component = Component.empty();
+        component
+                .append("\n")
                 .append(Component.literal(textDecorators.getTitlePrefix()).setStyle(textStyles.getTitlePrimary()))
-                .append(Component.literal(primaryTitle.getString()).setStyle(textStyles.getTitlePrimary()))
-                .append(Component.literal(textDecorators.getTitleSeparator()).setStyle(textStyles.getTitleSecondary()))
-                .append(Component.literal(secondaryTitle.getString()).setStyle(textStyles.getTitleSecondary()))
-                .append(Component.literal(textDecorators.getTitleSuffix()).setStyle(textStyles.getTitlePrimary()));
+                .append(Component.literal(primaryTitle.getString()).setStyle(textStyles.getTitlePrimary()));
+
+        String secondaryTitleString = secondaryTitle.getString();
+        if (!secondaryTitleString.isEmpty()) {
+            component
+                    .append(Component.literal(textDecorators.getTitleSeparator()).setStyle(textStyles.getTitleSecondary()))
+                    .append(Component.literal(secondaryTitleString).setStyle(textStyles.getTitleSecondary()));
+        }
+
+        component.append(Component.literal(textDecorators.getTitleSuffix()).setStyle(textStyles.getTitlePrimary()));
+
+        return component;
     }
 
     public static Component getButton(Component label, HoverEvent hoverEvent, ClickEvent clickEvent) {
@@ -155,5 +174,31 @@ public class StylingHelper {
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
         return Component.literal(itemStack.getCustomName() == null ? itemStack.getItemName().getString() : itemStack.getCustomName().getString()).setStyle(textStyles.getPrimary());
+    }
+
+    public static Component formatDuration(long millis, ServerPlayer player) {
+        long seconds = millis / 1000;
+        long days = seconds / 86400;
+        long hours = (seconds % 86400) / 3600;
+        long minutes = (seconds % 3600) / 60;
+        long remainingSeconds = seconds % 60;
+
+        TranslationManager.TextBuilder textBuilder = new TranslationManager.TextBuilder(player);
+        textBuilder.setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary());
+
+        if (days > 0) {
+            textBuilder.appendTranslatable("helpful_commands.common.day", Component.literal(String.valueOf(days)));
+        }
+        if (hours > 0) {
+            textBuilder.appendTranslatable("helpful_commands.common.hour", Component.literal(String.valueOf(hours)));
+        }
+        if (minutes > 0) {
+            textBuilder.appendTranslatable("helpful_commands.common.minute", Component.literal(String.valueOf(minutes)));
+        }
+        if (remainingSeconds > 0 || days + hours + minutes == 0) {
+            textBuilder.appendTranslatable("helpful_commands.common.second", Component.literal(String.valueOf(remainingSeconds)));
+        }
+
+        return textBuilder.getComponent();
     }
 }

@@ -18,6 +18,7 @@ public abstract class HelpfulCommandsCommand {
     protected static final SimpleCommandExceptionType NO_ITEMS_FOUND = new SimpleCommandExceptionType(Component.translatable("error.helpful_commands.noItemsFound"));
     protected static final SimpleCommandExceptionType UNKNOWN_DIMENSION = new SimpleCommandExceptionType(Component.translatable("error.helpful_commands.unknownDimension"));
     protected static final SimpleCommandExceptionType EMPTY_ITEM_STACK_MAIN_HAND = new SimpleCommandExceptionType(Component.translatable("error.helpful_commands.emptyItemStack.mainHand"));
+    protected static final SimpleCommandExceptionType HC_COMMAND_EXCEPTION = new SimpleCommandExceptionType(Component.empty());
 
     private final CommandData data;
 

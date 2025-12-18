@@ -129,11 +129,11 @@ public abstract class HelpfulCommandsStyle {
             return " ";
         }
 
-        public String getDisabled() {
+        public String getCross() {
             return "❌";
         }
 
-        public String getEnabled() {
+        public String getCheckmark() {
             return "✔";
         }
 

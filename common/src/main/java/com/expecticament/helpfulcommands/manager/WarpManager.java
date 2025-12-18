@@ -36,19 +36,19 @@ public class WarpManager {
 
     private static JsonIO<Warps> io;
 
-    public static class WarpAlreadyExistsException extends Exception {
+    public static class WarpAlreadyExistsException extends RuntimeException {
         public WarpAlreadyExistsException(String warpName) {
             super("Warp with this name already exists: %s".formatted(warpName));
         }
     }
 
-    public static class WarpDoesntExistException extends Exception {
+    public static class WarpDoesntExistException extends RuntimeException {
         public WarpDoesntExistException(String warpName) {
             super("Warp with this name doesn't exist: %s".formatted(warpName));
         }
     }
 
-    public static class SameWarpNameProvided extends Exception {
+    public static class SameWarpNameProvided extends RuntimeException {
         public SameWarpNameProvided(String newName) {
             super("The new warp name is the same as the old one: %s".formatted(newName));
         }

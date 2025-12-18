@@ -3,12 +3,9 @@ package com.expecticament.helpfulcommands.command.movementAndTeleportation;
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
 import com.expecticament.helpfulcommands.helper.ServerLevelHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
-import com.expecticament.helpfulcommands.manager.ModCommandManager;
-import com.expecticament.helpfulcommands.manager.StylingManager;
-import com.expecticament.helpfulcommands.manager.TranslationManager;
+import com.expecticament.helpfulcommands.manager.*;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.expecticament.helpfulcommands.suggestionProvider.HomeNameSuggestionProvider;
-import com.expecticament.helpfulcommands.manager.HomeManager;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -98,11 +95,20 @@ public class HomeCommand extends HelpfulCommandsCommand {
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
+        long remainingCooldown = CooldownManager.getRemainingCooldown(sourcePlayer, CooldownManager.CooldownType.HOME_TP);
+        if (remainingCooldown > 0) {
+            TextBuilder textBuilder = new TextBuilder(sourcePlayer);
+            textBuilder.appendTranslatable("error.helpful_commands.onCooldown.teleport", StylingHelper.formatDuration(remainingCooldown, sourcePlayer));
+            throw new CommandSyntaxException(HC_COMMAND_EXCEPTION, textBuilder.getComponent());
+        }
+
         try {
             HomeManager.Home home = HomeManager.getHome(sourcePlayer, homeName);
             try {
                 ServerLevel level = ServerLevelHelper.getLevel(home.dimension);
                 sourcePlayer.teleportTo(level, home.x, home.y, home.z, Relative.DELTA, sourcePlayer.getYRot(), sourcePlayer.getXRot(), false);
+
+                CooldownManager.applyCooldown(sourcePlayer, CooldownManager.CooldownType.HOME_TP, ConfigManager.readConfig().readField(ConfigManager.CONFIG_FIELD.HOME_TP_COOLDOWN));
 
                 TextBuilder textBuilder = new TextBuilder(sourcePlayer);
                 textBuilder.appendTranslatable("commands.helpful_commands.home.teleport", Component.literal(homeName).setStyle(textStyles.getPrimary()));
@@ -144,7 +150,7 @@ public class HomeCommand extends HelpfulCommandsCommand {
             throw new CommandSyntaxException(HOME_ALREADY_EXISTS, textBuilder.getComponent());
         } catch (HomeManager.HomeLimitExceededException e) {
             TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.home.error.homeLimitExceeded", Component.literal(homeName).setStyle(textStyles.getPrimary()));
+            textBuilder.appendTranslatable("commands.helpful_commands.home.add.error.homeLimitExceeded");
             throw new CommandSyntaxException(HOME_LIMIT_EXCEEDED, textBuilder.getComponent());
         }
 

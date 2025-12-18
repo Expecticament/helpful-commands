@@ -39,12 +39,6 @@ public class HcCommand extends HelpfulCommandsCommand {
     protected static final SimpleCommandExceptionType STYLE_ALREADY_IN_USE = new SimpleCommandExceptionType(Component.empty());
     protected static final SimpleCommandExceptionType COMMAND_NOT_CONFIGURABLE = new SimpleCommandExceptionType(Component.empty());
 
-    private record CommandListEntry(HelpfulCommandsCommand command, boolean enabled, boolean hasPerms) {
-        private boolean canUse() {
-            return enabled && hasPerms;
-        }
-    }
-
     public HcCommand(CommandData commandData) {
         super(commandData);
     }
@@ -53,24 +47,24 @@ public class HcCommand extends HelpfulCommandsCommand {
     public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
         CommandData commandData = getCommandData();
 
-        LiteralArgumentBuilder<CommandSourceStack> configField = Commands.literal("field");
-        configField.requires(src -> PermissionHelper.canConfigure(src, "field"));
-        for (Map.Entry<String, ConfigManager.ConfigFieldProperties> entry : ConfigManager.DEFAULT_FIELDS.entrySet()) {
-            String name = entry.getKey();
-            ConfigManager.ConfigFieldProperties properties = entry.getValue();
+        LiteralArgumentBuilder<CommandSourceStack> configFieldArgumentBuilder = Commands.literal("field");
+        configFieldArgumentBuilder.requires(src -> PermissionHelper.canConfigure(src, "field"));
+        for (ConfigManager.CONFIG_FIELD configField : ConfigManager.CONFIG_FIELD.values()) {
+            String name = configField.name().toLowerCase();
+            ConfigManager.ConfigFieldProperties properties = configField.properties();
 
-            LiteralArgumentBuilder<CommandSourceStack> field = Commands.literal(entry.getKey());
+            LiteralArgumentBuilder<CommandSourceStack> field = Commands.literal(name);
 
             LiteralArgumentBuilder<CommandSourceStack> setArgument = Commands.literal("set");
 
-            switch (properties.valueType) {
+            switch (properties.getValueType()) {
                 case ConfigManager.ConfigFieldProperties.ValueType.Double:
-                    setArgument.then(Commands.argument("value", DoubleArgumentType.doubleArg(properties.min, properties.max))
+                    setArgument.then(Commands.argument("value", DoubleArgumentType.doubleArg(properties.getMin(), properties.getMax()))
                             .executes(ctx -> setConfigField(ctx, name, DoubleArgumentType.getDouble(ctx, "value")))
                     );
                     break;
                 case ConfigManager.ConfigFieldProperties.ValueType.Integer:
-                    setArgument.then(Commands.argument("value", IntegerArgumentType.integer(properties.min.intValue(), properties.max.intValue()))
+                    setArgument.then(Commands.argument("value", IntegerArgumentType.integer(properties.getMin().intValue(), properties.getMax().intValue()))
                             .executes(ctx -> setConfigField(ctx, name, IntegerArgumentType.getInteger(ctx, "value")))
                     );
                     break;
@@ -84,12 +78,12 @@ public class HcCommand extends HelpfulCommandsCommand {
             field
                     .then(setArgument)
                     .then(Commands.literal("reset")
-                            .executes(ctx -> setConfigField(ctx, name, properties.defaultValue))
+                            .executes(ctx -> setConfigField(ctx, name, properties.getDefaultValue()))
                     )
                     .then(Commands.literal("query")
                             .executes(ctx -> queryConfigField(ctx, name))
                     );
-            configField.then(field);
+            configFieldArgumentBuilder.then(field);
         }
 
         dispatcher.register(Commands.literal(commandData.getName())
@@ -107,7 +101,7 @@ public class HcCommand extends HelpfulCommandsCommand {
                 .then(Commands.literal("config")
                         .requires(PermissionHelper::canConfigure)
                         .executes(this::config)
-                        .then(configField)
+                        .then(configFieldArgumentBuilder)
                         .then(Commands.literal("command")
                                 .requires(src -> PermissionHelper.canConfigure(src, "command") || PermissionHelper.canConfigure(src, "command.state"))
                                 .then(Commands.literal("state")
@@ -289,7 +283,7 @@ public class HcCommand extends HelpfulCommandsCommand {
                     ClickEvent cmdStateClickEvent = new ClickEvent.RunCommand("/hc config command state " + cmdData.getName() + " " + String.valueOf(!enabled).toLowerCase());
                     Style cmdStateStyle = (enabled ? textStyles.getEnabled() : textStyles.getDisabled()).withHoverEvent(cmdStateHoverEvent).withClickEvent(cmdStateClickEvent);
 
-                    textBuilder.appendComponent(StylingHelper.getButton(Component.literal(enabled ? textDecorators.getEnabled() : textDecorators.getDisabled()), cmdStateStyle)).appendWhitespace();
+                    textBuilder.appendComponent(StylingHelper.getButton(Component.literal(enabled ? textDecorators.getCheckmark() : textDecorators.getCross()), cmdStateStyle)).appendWhitespace();
                 }
 
                 HoverEvent cmdNameHoverEvent = getCommandHoverEvent(src, dispatcher, textStyles, command, hasPerms, enabled);
