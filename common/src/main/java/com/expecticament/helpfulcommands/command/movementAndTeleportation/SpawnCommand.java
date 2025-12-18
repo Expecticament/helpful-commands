@@ -12,7 +12,8 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -29,9 +30,12 @@ import net.minecraft.world.phys.Vec3;
 import java.util.HashSet;
 
 public class SpawnCommand extends HelpfulCommandsCommand {
-
-    protected static final SimpleCommandExceptionType FAILED_TO_TELEPORT = new SimpleCommandExceptionType(Component.empty());
-    protected static final SimpleCommandExceptionType PLAYER_SPAWN_NOT_SET = new SimpleCommandExceptionType(Component.empty());
+    private static final DynamicCommandExceptionType PLAYER_SPAWN_NOT_SET = new DynamicCommandExceptionType(src ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.spawn.error.playerSpawnNotSet.self").getComponent()
+    );
+    private static final Dynamic2CommandExceptionType TARGET_PLAYER_SPAWN_NOT_SET = new Dynamic2CommandExceptionType((src, otherPlayer) ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.spawn.error.playerSpawnNotSet.other", StylingHelper.getAffectedEntityNameText((ServerPlayer) otherPlayer)).getComponent()
+    );
 
     public SpawnCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
@@ -92,20 +96,18 @@ public class SpawnCommand extends HelpfulCommandsCommand {
             self = true;
         }
 
-        int result = teleportToPlayerSpawn(sourcePlayer, otherPlayer);
+        int result = teleportToPlayerSpawn(src, sourcePlayer, otherPlayer);
 
         if (result == 1) {
             if (self) {
-                textBuilder.appendTranslatable("commands.helpful_commands.spawn.error.playerSpawnNotSet.self");
+                throw PLAYER_SPAWN_NOT_SET.create(src);
             } else {
-                textBuilder.appendTranslatable("commands.helpful_commands.spawn.error.playerSpawnNotSet.other", StylingHelper.getAffectedEntityNameText(otherPlayer));
+                throw TARGET_PLAYER_SPAWN_NOT_SET.create(src, otherPlayer);
             }
-            throw new CommandSyntaxException(PLAYER_SPAWN_NOT_SET, textBuilder.getComponent());
         }
 
         if (result == 2) {
-            textBuilder.appendTranslatable("commands.helpful_commands.spawn.error.failedToTeleport");
-            throw new CommandSyntaxException(FAILED_TO_TELEPORT, textBuilder.getComponent());
+            throw FAILED_TO_TELEPORT.create(src);
         }
 
         if (self) {
@@ -130,9 +132,8 @@ public class SpawnCommand extends HelpfulCommandsCommand {
 
         TextBuilder textBuilder = new TextBuilder(src);
 
-        if (!teleportToWorldSpawn(sourcePlayer, sourcePlayer.level())) {
-            textBuilder.appendTranslatable("commands.helpful_commands.spawn.error.failedToTeleport");
-            throw new CommandSyntaxException(FAILED_TO_TELEPORT, textBuilder.getComponent());
+        if (!teleportToWorldSpawn(src, sourcePlayer, sourcePlayer.level())) {
+            throw FAILED_TO_TELEPORT.create(src);
         }
 
         textBuilder.appendTranslatable("commands.helpful_commands.spawn.world.tp").setStyle(textStyles.getSuccess());
@@ -162,11 +163,10 @@ public class SpawnCommand extends HelpfulCommandsCommand {
         ServerPlayer.RespawnConfig respawnConfig = otherPlayer.getRespawnConfig();
         if (respawnConfig == null) {
             if (self) {
-                textBuilder.appendTranslatable("commands.helpful_commands.spawn.error.playerSpawnNotSet.self");
+                throw PLAYER_SPAWN_NOT_SET.create(src);
             } else {
-                textBuilder.appendTranslatable("commands.helpful_commands.spawn.error.playerSpawnNotSet.other", StylingHelper.getAffectedEntityNameText(otherPlayer));
+                throw TARGET_PLAYER_SPAWN_NOT_SET.create(src, otherPlayer);
             }
-            throw new CommandSyntaxException(PLAYER_SPAWN_NOT_SET, textBuilder.getComponent());
         }
 
         src.sendSystemMessage(buildInfoComponent(respawnConfig.respawnData(), src, otherPlayer.getName().getString(), self));
@@ -223,7 +223,7 @@ public class SpawnCommand extends HelpfulCommandsCommand {
         return textBuilder.getComponent();
     }
 
-    private int teleportToPlayerSpawn(ServerPlayer teleportedPlayer, ServerPlayer otherPlayer) throws CommandSyntaxException {
+    private int teleportToPlayerSpawn(CommandSourceStack source, ServerPlayer teleportedPlayer, ServerPlayer otherPlayer) throws CommandSyntaxException {
         ServerPlayer.RespawnConfig respawnConfig = otherPlayer.getRespawnConfig();
         if (respawnConfig == null) {
             return 1;
@@ -234,26 +234,20 @@ public class SpawnCommand extends HelpfulCommandsCommand {
         try {
             serverLevel = ServerLevelHelper.getLevel(dimensionLocation);
         } catch (ServerLevelHelper.UnknownServerLevelException e) {
-            HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
-            TextBuilder eTextBuilder = new TranslationManager.TextBuilder(teleportedPlayer);
-            eTextBuilder.appendTranslatable("error.helpful_commands.unknownDimension", Component.literal(dimensionLocation).setStyle(textStyles.getPrimary()));
-            throw new CommandSyntaxException(UNKNOWN_DIMENSION, eTextBuilder.getComponent());
+            throw UNKNOWN_DIMENSION.create(source, dimensionLocation);
         }
 
         Vec3 pos = respawnData.pos().getCenter();
         return teleportedPlayer.teleportTo(serverLevel, pos.x(), pos.y(), pos.z(), new HashSet<>(), respawnData.yaw(), respawnData.pitch(), false) ? 0 : 2;
     }
 
-    private boolean teleportToWorldSpawn(ServerPlayer teleportedPlayer, ServerLevel serverLevel) throws CommandSyntaxException {
+    private boolean teleportToWorldSpawn(CommandSourceStack source, ServerPlayer teleportedPlayer, ServerLevel serverLevel) throws CommandSyntaxException {
         LevelData.RespawnData respawnData = serverLevel.getRespawnData();
         String dimensionLocation = respawnData.dimension().identifier().toString();
         try {
             serverLevel = ServerLevelHelper.getLevel(dimensionLocation);
         } catch (ServerLevelHelper.UnknownServerLevelException e) {
-            HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
-            TextBuilder eTextBuilder = new TranslationManager.TextBuilder(teleportedPlayer);
-            eTextBuilder.appendTranslatable("error.helpful_commands.unknownDimension", Component.literal(dimensionLocation).setStyle(textStyles.getPrimary()));
-            throw new CommandSyntaxException(UNKNOWN_DIMENSION, eTextBuilder.getComponent());
+            throw UNKNOWN_DIMENSION.create(source, dimensionLocation);
         }
 
         Vec3 pos = respawnData.pos().getCenter();

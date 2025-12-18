@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.List;
 
 public class GmCommand extends HelpfulCommandsCommand {
-
     public GmCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
     }

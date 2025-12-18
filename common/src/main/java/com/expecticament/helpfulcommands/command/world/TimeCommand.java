@@ -7,7 +7,6 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.expecticament.helpfulcommands.manager.ModCommandManager.CommandData;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -18,7 +17,6 @@ import net.minecraft.server.level.ServerLevel;
 import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 
 public class TimeCommand extends HelpfulCommandsCommand {
-
     private final int time;
 
     public TimeCommand(CommandData commandData, int time) {

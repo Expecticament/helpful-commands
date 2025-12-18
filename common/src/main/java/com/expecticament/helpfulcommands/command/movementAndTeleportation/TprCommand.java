@@ -10,6 +10,8 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -24,6 +26,25 @@ import java.util.HashSet;
 import java.util.List;
 
 public class TprCommand extends HelpfulCommandsCommand {
+    private static final Dynamic2CommandExceptionType TARGET_CANT_ACCEPT_REQUESTS = new Dynamic2CommandExceptionType((src, targetPlayer) ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.request.error.targetCantAcceptRequests", StylingHelper.getAffectedEntityNameText((ServerPlayer) targetPlayer)).getComponent()
+    );
+    private static final Dynamic2CommandExceptionType ON_COOLDOWN = new Dynamic2CommandExceptionType((src, remaining) ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.request.error.onCooldown", StylingHelper.formatDuration((long) remaining, (CommandSourceStack) src)).getComponent()
+    );
+    private static final DynamicCommandExceptionType PENDING_REQUEST_EXISTS = new DynamicCommandExceptionType(src ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.request.error.pendingRequestExists").getComponent()
+    );
+    private static final DynamicCommandExceptionType NO_PENDING_REQUEST = new DynamicCommandExceptionType(src ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.cancel.error.noPendingRequest").getComponent()
+    );
+    private static final Dynamic2CommandExceptionType NO_PENDING_INCOMING_REQUEST = new Dynamic2CommandExceptionType((src, otherPlayer) ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.error.noPendingIncomingRequest", StylingHelper.getAffectedEntityNameText((ServerPlayer) otherPlayer)).getComponent()
+    );
+    private static final DynamicCommandExceptionType FAILED_TO_TELEPORT = new DynamicCommandExceptionType(src ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.accept.error.failedToTeleport").getComponent()
+    );
+
     public TprCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
     }
@@ -71,22 +92,17 @@ public class TprCommand extends HelpfulCommandsCommand {
 
         ServerPlayer sourcePlayer = validatePlayerOnly(src);
 
-        TextBuilder textBuilder = new TextBuilder(src);
-
         if (sourcePlayer == otherPlayer) {
-            textBuilder.appendTranslatable("commands.helpful_commands.tpr.request.error.selfRequest");
-            throw new CommandSyntaxException(HC_COMMAND_EXCEPTION, textBuilder.getComponent());
+            throw TARGET_MUST_BE_OTHER_PLAYER.create(src);
         }
 
         if (!canExecuteBaseCommand(otherPlayer.createCommandSourceStack())) {
-            textBuilder.appendTranslatable("commands.helpful_commands.tpr.request.error.cantAccept", StylingHelper.getAffectedEntityNameText(otherPlayer));
-            throw new CommandSyntaxException(HC_COMMAND_EXCEPTION, textBuilder.getComponent());
+            throw TARGET_CANT_ACCEPT_REQUESTS.create(src, otherPlayer);
         }
 
         long remainingCooldown = CooldownManager.getRemainingCooldown(sourcePlayer, CooldownManager.CooldownType.TPR_REQUEST);
         if (remainingCooldown > 0) {
-            textBuilder.appendTranslatable("commands.helpful_commands.tpr.request.error.onCooldown", StylingHelper.formatDuration(remainingCooldown, sourcePlayer));
-            throw new CommandSyntaxException(HC_COMMAND_EXCEPTION, textBuilder.getComponent());
+            throw ON_COOLDOWN.create(src, remainingCooldown);
         }
 
         try {
@@ -127,13 +143,12 @@ public class TprCommand extends HelpfulCommandsCommand {
                     .appendComponent(denyBtn);
             otherPlayer.sendSystemMessage(otherTextBuilder.getComponent());
 
+            TextBuilder textBuilder = new TextBuilder(src);
             textBuilder.appendTranslatable("commands.helpful_commands.tpr.request", StylingHelper.getAffectedEntityNameText(otherPlayer), StylingHelper.formatDuration(timeout, sourcePlayer));
             textBuilder.setStyle(textStyles.getSuccess());
             src.sendSuccess(textBuilder::getComponent, false);
         } catch (TpRequestsManager.PendingRequestExistsException e) {
-            TextBuilder exceptionTextBuilder = new TextBuilder(src);
-            exceptionTextBuilder.appendTranslatable("commands.helpful_commands.tpr.request.error.pendingRequestExists");
-            throw new CommandSyntaxException(HC_COMMAND_EXCEPTION, exceptionTextBuilder.getComponent());
+            throw PENDING_REQUEST_EXISTS.create(src);
         }
 
         return Command.SINGLE_SUCCESS;
@@ -151,8 +166,7 @@ public class TprCommand extends HelpfulCommandsCommand {
         TpRequestsManager.Request request = TpRequestsManager.getSentRequest(sourcePlayer);
 
         if (request == null) {
-            textBuilder.appendTranslatable("commands.helpful_commands.tpr.cancel.error.noPendingRequest");
-            throw new CommandSyntaxException(HC_COMMAND_EXCEPTION, textBuilder.getComponent());
+            throw NO_PENDING_REQUEST.create(src);
         }
 
         TpRequestsManager.removeRequest(sourcePlayer);
@@ -185,8 +199,7 @@ public class TprCommand extends HelpfulCommandsCommand {
         TextBuilder textBuilder = new TextBuilder(src);
 
         if (sourcePlayer == otherPlayer) {
-            textBuilder.appendTranslatable("commands.helpful_commands.tpr.request.error.selfRequest");
-            throw new CommandSyntaxException(HC_COMMAND_EXCEPTION, textBuilder.getComponent());
+            throw TARGET_MUST_BE_OTHER_PLAYER.create(src);
         }
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
@@ -202,8 +215,7 @@ public class TprCommand extends HelpfulCommandsCommand {
         }
 
         if (request == null) {
-            textBuilder.appendTranslatable("commands.helpful_commands.tpr.accept.error.noPendingRequest", StylingHelper.getAffectedEntityNameText(otherPlayer));
-            throw new CommandSyntaxException(HC_COMMAND_EXCEPTION, textBuilder.getComponent());
+            throw NO_PENDING_INCOMING_REQUEST.create(src, otherPlayer);
         }
 
         Vec3 pos = sourcePlayer.position();
@@ -220,8 +232,7 @@ public class TprCommand extends HelpfulCommandsCommand {
             textBuilder.setStyle(textStyles.getSuccess());
             src.sendSuccess(textBuilder::getComponent, true);
         } else {
-            textBuilder.appendTranslatable("commands.helpful_commands.tpr.accept.error.failedToTeleport");
-            throw new CommandSyntaxException(HC_COMMAND_EXCEPTION, textBuilder.getComponent());
+            throw FAILED_TO_TELEPORT.create(src);
         }
 
         return Command.SINGLE_SUCCESS;
@@ -240,8 +251,7 @@ public class TprCommand extends HelpfulCommandsCommand {
         TextBuilder textBuilder = new TextBuilder(src);
 
         if (sourcePlayer == otherPlayer) {
-            textBuilder.appendTranslatable("commands.helpful_commands.tpr.request.error.selfRequest");
-            throw new CommandSyntaxException(HC_COMMAND_EXCEPTION, textBuilder.getComponent());
+            throw TARGET_MUST_BE_OTHER_PLAYER.create(src);
         }
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
@@ -257,8 +267,7 @@ public class TprCommand extends HelpfulCommandsCommand {
         }
 
         if (request == null) {
-            textBuilder.appendTranslatable("commands.helpful_commands.tpr.deny.error.noPendingRequest", StylingHelper.getAffectedEntityNameText(otherPlayer));
-            throw new CommandSyntaxException(HC_COMMAND_EXCEPTION, textBuilder.getComponent());
+            throw NO_PENDING_INCOMING_REQUEST.create(src, otherPlayer);
         }
 
         TpRequestsManager.removeRequest(otherPlayer);

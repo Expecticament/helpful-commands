@@ -21,7 +21,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
 import com.mojang.brigadier.tree.CommandNode;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -33,11 +33,18 @@ import java.net.URI;
 import java.util.*;
 
 public class HcCommand extends HelpfulCommandsCommand {
-
-    protected static final SimpleCommandExceptionType INVALID_HC_COMMAND = new SimpleCommandExceptionType(Component.empty());
-    protected static final SimpleCommandExceptionType STYLE_DOESNT_EXIST = new SimpleCommandExceptionType(Component.empty());
-    protected static final SimpleCommandExceptionType STYLE_ALREADY_IN_USE = new SimpleCommandExceptionType(Component.empty());
-    protected static final SimpleCommandExceptionType COMMAND_NOT_CONFIGURABLE = new SimpleCommandExceptionType(Component.empty());
+    private static final Dynamic2CommandExceptionType INVALID_HC_COMMAND = new Dynamic2CommandExceptionType((src, commandName) ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.hc.config.command.error.invalidHcCommand", Component.literal(commandName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+    );
+    private static final Dynamic2CommandExceptionType COMMAND_NOT_CONFIGURABLE = new Dynamic2CommandExceptionType((src, commandName) ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.hc.config.command.error.commandNotConfigurable", Component.literal(commandName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+    );
+    private static final Dynamic2CommandExceptionType STYLE_DOESNT_EXIST = new Dynamic2CommandExceptionType((src, styleName) ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.hc.config.styling.style.set.error.styleDoesntExist", Component.literal(styleName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+    );
+    private static final Dynamic2CommandExceptionType STYLE_ALREADY_IN_USE = new Dynamic2CommandExceptionType((src, styleName) ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.hc.config.styling.style.set.error.styleAlreadyInUse", Component.literal(styleName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+    );
 
     public HcCommand(CommandData commandData) {
         super(commandData);
@@ -489,7 +496,7 @@ public class HcCommand extends HelpfulCommandsCommand {
         Component styleNameText = Component.literal(styleName).setStyle(textStyles.getPrimary());
 
         if (currentStyle.getDisplayName().equals(styleName)) {
-            throw new CommandSyntaxException(STYLE_ALREADY_IN_USE, new TextBuilder(src).appendTranslatable("commands.helpful_commands.hc.config.styling.style.set.error.styleAlreadyInUse", styleNameText).getComponent());
+            throw STYLE_ALREADY_IN_USE.create(src, styleName);
         }
 
         try {
@@ -505,7 +512,7 @@ public class HcCommand extends HelpfulCommandsCommand {
 
             return Command.SINGLE_SUCCESS;
         } catch (StylingManager.StyleDoesntExistException e) {
-            throw new CommandSyntaxException(STYLE_DOESNT_EXIST, new TextBuilder(src).appendTranslatable("commands.helpful_commands.hc.config.styling.style.set.error.styleDoesntExist", styleNameText).getComponent());
+            throw STYLE_DOESNT_EXIST.create(src, styleName);
         }
     }
 
@@ -537,9 +544,7 @@ public class HcCommand extends HelpfulCommandsCommand {
             CommandData data = hcCmd.getCommandData();
             if (data.getName().equals(command)) {
                 if (data.getCategory() == ModCommandManager.CommandCategory.MAIN) {
-                    TextBuilder textBuilder = new TextBuilder(src);
-                    textBuilder.appendTranslatable("commands.helpful_commands.hc.config.command.error.commandNotConfigurable", Component.literal(command).setStyle(textStyles.getPrimary()));
-                    throw new CommandSyntaxException(COMMAND_NOT_CONFIGURABLE, textBuilder.getComponent());
+                    throw COMMAND_NOT_CONFIGURABLE.create(src, command);
                 }
                 valid = true;
                 break;
@@ -547,9 +552,7 @@ public class HcCommand extends HelpfulCommandsCommand {
         }
 
         if (!valid) {
-            TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.hc.config.command.error.invalidCommand", Component.literal(command).setStyle(textStyles.getPrimary()));
-            throw new CommandSyntaxException(INVALID_HC_COMMAND, textBuilder.getComponent());
+            throw INVALID_HC_COMMAND.create(src, command);
         }
 
         ConfigManager.HelpfulCommandsConfig config = ConfigManager.readConfig();
@@ -581,9 +584,7 @@ public class HcCommand extends HelpfulCommandsCommand {
             CommandData data = hcCmd.getCommandData();
             if (data.getName().equals(command)) {
                 if (data.getCategory() == ModCommandManager.CommandCategory.MAIN) {
-                    TextBuilder textBuilder = new TextBuilder(src);
-                    textBuilder.appendTranslatable("commands.helpful_commands.hc.config.command.error.commandNotConfigurable", Component.literal("/" + command).setStyle(textStyles.getPrimary()));
-                    throw new CommandSyntaxException(COMMAND_NOT_CONFIGURABLE, textBuilder.getComponent());
+                    throw COMMAND_NOT_CONFIGURABLE.create(src, command);
                 }
                 valid = true;
                 break;
@@ -591,9 +592,7 @@ public class HcCommand extends HelpfulCommandsCommand {
         }
 
         if (!valid) {
-            TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.hc.config.command.error.invalidCommand", Component.literal("/" + command).setStyle(textStyles.getPrimary()));
-            throw new CommandSyntaxException(INVALID_HC_COMMAND, textBuilder.getComponent());
+            throw INVALID_HC_COMMAND.create(src, command);
         }
 
         ConfigManager.HelpfulCommandsConfig config = ConfigManager.readConfig();

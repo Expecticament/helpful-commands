@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.List;
 
 public class HealCommand extends HelpfulCommandsCommand {
-
     public HealCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
     }

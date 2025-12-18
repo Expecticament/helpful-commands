@@ -11,7 +11,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -29,8 +29,9 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public class KillitemsCommand extends HelpfulCommandsCommand {
-
-    protected static final SimpleCommandExceptionType RANGE_CONFIG_VALUE_EXCEEDED = new SimpleCommandExceptionType(Component.empty());
+    private static final Dynamic2CommandExceptionType RANGE_CONFIG_VALUE_EXCEEDED = new Dynamic2CommandExceptionType((src, maxRange) ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.killitems.rangeConfigValueExceeded", Component.literal(String.valueOf(maxRange)).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+    );
 
     public KillitemsCommand(CommandData commandData) {
         super(commandData);
@@ -79,9 +80,7 @@ public class KillitemsCommand extends HelpfulCommandsCommand {
             range = Math.clamp(64, 1, maxRange);
         } else {
             if (range > maxRange) {
-                TextBuilder textBuilder = new TextBuilder(src);
-                textBuilder.appendTranslatable("commands.helpful_commands.killitems.configValueExceeded", Component.literal(String.valueOf(maxRange)).setStyle(textStyles.getPrimary()));
-                throw new CommandSyntaxException(RANGE_CONFIG_VALUE_EXCEEDED, textBuilder.getComponent());
+                throw RANGE_CONFIG_VALUE_EXCEEDED.create(src, maxRange);
             }
         }
 
@@ -104,7 +103,7 @@ public class KillitemsCommand extends HelpfulCommandsCommand {
         }
 
         if (itemEntities.isEmpty()) {
-            throw new CommandSyntaxException(NO_ITEMS_FOUND, Component.literal(TranslationManager.translate(src, "error.helpful_commands.noItemsFound")));
+            throw NO_ITEMS_FOUND.create(src);
         }
 
         TextBuilder textBuilder = new TextBuilder(src);

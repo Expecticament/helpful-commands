@@ -12,7 +12,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -31,9 +31,9 @@ import java.util.HashSet;
 import java.util.List;
 
 public class DimensionCommand extends HelpfulCommandsCommand {
-
-    protected static final SimpleCommandExceptionType FAILED_TO_TELEPORT = new SimpleCommandExceptionType(Component.empty());
-    protected static final SimpleCommandExceptionType ALREADY_IN_DIMENSION = new SimpleCommandExceptionType(Component.empty());
+    private static final Dynamic2CommandExceptionType ALREADY_IN_DIMENSION = new Dynamic2CommandExceptionType((src, dimensionName) ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.dimension.error.alreadyInDimension", Component.literal(dimensionName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+    );
 
     public DimensionCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
@@ -73,12 +73,10 @@ public class DimensionCommand extends HelpfulCommandsCommand {
         TextBuilder textBuilder = new TextBuilder(src);
 
         if (result == 1) {
-            textBuilder.appendTranslatable("commands.helpful_commands.dimension.error.alreadyInDimension", dimensionText);
-            throw new CommandSyntaxException(ALREADY_IN_DIMENSION, textBuilder.getComponent());
+            throw ALREADY_IN_DIMENSION.create(src, ServerLevelHelper.getLevelLocation(serverLevel));
         }
         if (result == 2) {
-            textBuilder.appendTranslatable("commands.helpful_commands.dimension.error.failedToTeleport", dimensionText);
-            throw new CommandSyntaxException(FAILED_TO_TELEPORT, textBuilder.getComponent());
+            throw FAILED_TO_TELEPORT.create(src);
         }
 
         textBuilder.appendTranslatable("commands.helpful_commands.dimension.self", dimensionText);

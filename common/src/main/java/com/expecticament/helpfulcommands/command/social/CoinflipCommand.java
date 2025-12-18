@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CoinflipCommand extends HelpfulCommandsCommand {
-
     public CoinflipCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
     }

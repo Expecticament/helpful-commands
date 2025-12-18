@@ -33,7 +33,6 @@ import java.util.Collection;
 import java.util.List;
 
 public class HatCommand extends HelpfulCommandsCommand {
-
     public HatCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
     }

@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.List;
 
 public class IgniteCommand extends HelpfulCommandsCommand {
-
     public IgniteCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
     }

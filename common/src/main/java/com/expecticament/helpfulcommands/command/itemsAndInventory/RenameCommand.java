@@ -13,7 +13,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
@@ -30,9 +30,12 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class RenameCommand extends HelpfulCommandsCommand {
-
-    protected static final SimpleCommandExceptionType SAME_NAME_PROVIDED = new SimpleCommandExceptionType(Component.empty());
-    protected static final SimpleCommandExceptionType NO_CUSTOM_NAME = new SimpleCommandExceptionType(Component.empty());
+    private static final DynamicCommandExceptionType SAME_NAME_PROVIDED = new DynamicCommandExceptionType(src ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.rename.error.sameNameProvided").getComponent()
+    );
+    private static final DynamicCommandExceptionType NO_CUSTOM_NAME = new DynamicCommandExceptionType(src ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.rename.error.noCustomName").getComponent()
+    );
 
     public RenameCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
@@ -75,7 +78,7 @@ public class RenameCommand extends HelpfulCommandsCommand {
 
         ItemStack mainHandItemStack = sourcePlayer.getMainHandItem();
         if (mainHandItemStack.isEmpty()) {
-            throw new CommandSyntaxException(EMPTY_ITEM_STACK_MAIN_HAND, Component.literal(TranslationManager.translate(src, "error.helpful_commands.emptyItemStack.mainHand")));
+            throw EMPTY_ITEM_STACK_MAIN_HAND.create(src);
         }
 
         Component oldNameComponent = StylingHelper.getItemStackName(mainHandItemStack);
@@ -86,9 +89,9 @@ public class RenameCommand extends HelpfulCommandsCommand {
 
         switch (result) {
             case -1:
-                throw new CommandSyntaxException(SAME_NAME_PROVIDED, Component.literal(TranslationManager.translate(src, "commands.helpful_commands.rename.error.sameNameProvided")));
+                throw SAME_NAME_PROVIDED.create(src);
             case -2:
-                throw new CommandSyntaxException(NO_CUSTOM_NAME, Component.literal(TranslationManager.translate(src, "commands.helpful_commands.rename.error.noCustomName")));
+                throw NO_CUSTOM_NAME.create(src);
             case 1:
                 Component newNameComponent = Component.literal(newName).setStyle(textStyles.getPrimary());
                 textBuilder.appendTranslatable("commands.helpful_commands.rename.self", oldNameComponent, newNameComponent).setStyle(textStyles.getPrimary());

@@ -5,13 +5,13 @@ import com.expecticament.helpfulcommands.helper.ServerLevelHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
-import com.expecticament.helpfulcommands.manager.TranslationManager;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -27,8 +27,12 @@ import net.minecraft.world.entity.Relative;
 import java.util.Optional;
 
 public class DeathposCommand extends HelpfulCommandsCommand {
-
-    protected static final SimpleCommandExceptionType NO_DEATH_POS = new SimpleCommandExceptionType(Component.empty());
+    private static final DynamicCommandExceptionType NO_DEATH_POS = new DynamicCommandExceptionType(src ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.deathpos.error.noDeathPos.self").getComponent()
+    );
+    private static final Dynamic2CommandExceptionType NO_DEATH_POS_OTHER = new Dynamic2CommandExceptionType((src, otherPlayer) ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.deathpos.error.noDeathPos.other", StylingHelper.getAffectedEntityNameText((ServerPlayer) otherPlayer)).getComponent()
+    );
 
     public DeathposCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
@@ -85,13 +89,11 @@ public class DeathposCommand extends HelpfulCommandsCommand {
         Optional<GlobalPos> deathPos = player.getLastDeathLocation();
 
         if (deathPos.isEmpty()) {
-            TextBuilder textBuilder = new TextBuilder(src);
             if (self) {
-                textBuilder.appendTranslatable("commands.helpful_commands.deathpos.error.noDeathPos.self");
+                throw NO_DEATH_POS.create(src);
             } else {
-                textBuilder.appendTranslatable("commands.helpful_commands.deathpos.error.noDeathPos.other", StylingHelper.getAffectedEntityNameText(player));
+                throw NO_DEATH_POS_OTHER.create(src, player);
             }
-            throw new CommandSyntaxException(NO_DEATH_POS, textBuilder.getComponent());
         }
 
         GlobalPos globalPos = deathPos.get();
@@ -131,13 +133,11 @@ public class DeathposCommand extends HelpfulCommandsCommand {
         Optional<GlobalPos> deathPos = player.getLastDeathLocation();
 
         if (deathPos.isEmpty()) {
-            TextBuilder textBuilder = new TextBuilder(src);
             if (self) {
-                textBuilder.appendTranslatable("commands.helpful_commands.deathpos.error.noDeathPos.self");
+                throw NO_DEATH_POS.create(src);
             } else {
-                textBuilder.appendTranslatable("commands.helpful_commands.deathpos.error.noDeathPos.other", StylingHelper.getAffectedEntityNameText(player));
+                throw NO_DEATH_POS_OTHER.create(src, player);
             }
-            throw new CommandSyntaxException(NO_DEATH_POS, textBuilder.getComponent());
         }
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
@@ -163,9 +163,7 @@ public class DeathposCommand extends HelpfulCommandsCommand {
 
             src.sendSuccess(textBuilder::getComponent, true);
         } catch (ServerLevelHelper.UnknownServerLevelException e) {
-            TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("error.helpful_commands.unknownDimension", Component.literal(levelLocation).setStyle(textStyles.getPrimary()));
-            throw new CommandSyntaxException(UNKNOWN_DIMENSION, textBuilder.getComponent());
+            throw UNKNOWN_DIMENSION.create(src, levelLocation);
         }
 
         return Command.SINGLE_SUCCESS;

@@ -5,14 +5,13 @@ import com.expecticament.helpfulcommands.helper.GameRulesHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
-import com.expecticament.helpfulcommands.manager.TranslationManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -25,9 +24,12 @@ import net.minecraft.world.item.ItemStack;
 import java.util.*;
 
 public class RepairCommand extends HelpfulCommandsCommand {
-
-    protected static final SimpleCommandExceptionType ITEM_NOT_DAMAGEABLE = new SimpleCommandExceptionType(Component.empty());
-    protected static final SimpleCommandExceptionType ITEM_NOT_DAMAGED = new SimpleCommandExceptionType(Component.empty());
+    private static final DynamicCommandExceptionType ITEM_NOT_DAMAGEABLE = new DynamicCommandExceptionType(src ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.repair.error.itemNotDamageable").getComponent()
+    );
+    private static final DynamicCommandExceptionType ITEM_NOT_DAMAGED = new DynamicCommandExceptionType(src ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.repair.error.itemNotDamaged").getComponent()
+    );
 
     public RepairCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
@@ -61,7 +63,7 @@ public class RepairCommand extends HelpfulCommandsCommand {
 
         ItemStack mainHandItemStack = sourcePlayer.getMainHandItem();
         if (mainHandItemStack.isEmpty()) {
-            throw new CommandSyntaxException(EMPTY_ITEM_STACK_MAIN_HAND, Component.literal(TranslationManager.translate(src, "error.helpful_commands.emptyItemStack.mainHand")));
+            throw EMPTY_ITEM_STACK_MAIN_HAND.create(src);
         }
 
         TextBuilder textBuilder = new TextBuilder(src);
@@ -70,9 +72,9 @@ public class RepairCommand extends HelpfulCommandsCommand {
 
         switch (result) {
             case -2:
-                throw new CommandSyntaxException(ITEM_NOT_DAMAGED, Component.literal(TranslationManager.translate(src, "commands.helpful_commands.repair.error.itemNotDamaged")));
+                throw ITEM_NOT_DAMAGED.create(src);
             case -1:
-                throw new CommandSyntaxException(ITEM_NOT_DAMAGEABLE, Component.literal(TranslationManager.translate(src, "commands.helpful_commands.repair.error.itemNotDamageable")));
+                throw ITEM_NOT_DAMAGEABLE.create(src);
             case 0:
                 textBuilder.appendTranslatable("commands.helpful_commands.repair.self", StylingHelper.getItemStackName(mainHandItemStack)).setStyle(textStyles.getPrimary());
                 break;

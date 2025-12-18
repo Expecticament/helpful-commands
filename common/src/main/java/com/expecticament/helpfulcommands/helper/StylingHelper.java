@@ -177,13 +177,17 @@ public class StylingHelper {
     }
 
     public static Component formatDuration(long millis, ServerPlayer player) {
+        return formatDuration(millis, player.createCommandSourceStack());
+    }
+
+    public static Component formatDuration(long millis, CommandSourceStack source) {
         long seconds = millis / 1000;
         long days = seconds / 86400;
         long hours = (seconds % 86400) / 3600;
         long minutes = (seconds % 3600) / 60;
         long remainingSeconds = seconds % 60;
 
-        TranslationManager.TextBuilder textBuilder = new TranslationManager.TextBuilder(player);
+        TranslationManager.TextBuilder textBuilder = new TranslationManager.TextBuilder(source);
         textBuilder.setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary());
 
         if (days > 0) {

@@ -10,7 +10,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -22,8 +22,9 @@ import net.minecraft.world.phys.Vec3;
 import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 
 public class FireballCommand extends HelpfulCommandsCommand {
-
-    protected static final SimpleCommandExceptionType POWER_CONFIG_VALUE_EXCEEDED = new SimpleCommandExceptionType(Component.empty());
+    private static final Dynamic2CommandExceptionType POWER_CONFIG_VALUE_EXCEEDED = new Dynamic2CommandExceptionType((src, maxPower) ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.fireball.powerConfigValueExceeded", Component.literal(String.valueOf(maxPower)).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+    );
 
     public FireballCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
@@ -62,9 +63,7 @@ public class FireballCommand extends HelpfulCommandsCommand {
         if (power < 1) {
             power = Math.min(5, maxPower);
         } else if (power > maxPower) {
-            TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.fireball.configValueExceeded", Component.literal(String.valueOf(maxPower)).setStyle(textStyles.getPrimary()));
-            throw new CommandSyntaxException(POWER_CONFIG_VALUE_EXCEEDED, textBuilder.getComponent());
+            throw POWER_CONFIG_VALUE_EXCEEDED.create(src, maxPower);
         }
 
         ServerLevel level = player.level();

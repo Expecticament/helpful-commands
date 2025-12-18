@@ -11,7 +11,6 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -31,9 +30,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 public class InvseeCommand extends HelpfulCommandsCommand {
-
-    protected static final SimpleCommandExceptionType OTHER_PLAYER_ONLY = new SimpleCommandExceptionType(Component.empty());
-
     public InvseeCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
     }
@@ -61,7 +57,7 @@ public class InvseeCommand extends HelpfulCommandsCommand {
         ServerPlayer sourcePlayer = validatePlayerOnly(src);
 
         if (sourcePlayer == player) {
-            throw new CommandSyntaxException(OTHER_PLAYER_ONLY, Component.literal(TranslationManager.translate(src, "commands.helpful_commands.invsee.error.otherPlayerOnly")));
+            throw TARGET_MUST_BE_OTHER_PLAYER.create(src);
         }
 
         TextBuilder screenTitleTextBuilder = new TextBuilder(src);

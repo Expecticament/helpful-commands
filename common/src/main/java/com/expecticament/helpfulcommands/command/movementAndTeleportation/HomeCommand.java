@@ -11,7 +11,8 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -25,11 +26,18 @@ import net.minecraft.world.entity.Relative;
 import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 
 public class HomeCommand extends HelpfulCommandsCommand {
-
-    protected static final SimpleCommandExceptionType HOME_DOESNT_EXIST = new SimpleCommandExceptionType(Component.empty());
-    protected static final SimpleCommandExceptionType HOME_ALREADY_EXISTS = new SimpleCommandExceptionType(Component.empty());
-    protected static final SimpleCommandExceptionType HOME_LIMIT_EXCEEDED = new SimpleCommandExceptionType(Component.empty());
-    protected static final SimpleCommandExceptionType SAME_NAME_PROVIDED = new SimpleCommandExceptionType(Component.empty());
+    private static final Dynamic2CommandExceptionType HOME_DOESNT_EXIST = new Dynamic2CommandExceptionType((src, homeName) ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.error.homeDoesntExist", Component.literal(homeName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+    );
+    private static final Dynamic2CommandExceptionType HOME_ALREADY_EXISTS = new Dynamic2CommandExceptionType((src, homeName) ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.error.homeAlreadyExists", Component.literal(homeName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+    );
+    private static final DynamicCommandExceptionType HOME_LIMIT_EXCEEDED = new DynamicCommandExceptionType(src ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.add.error.homeLimitExceeded").getComponent()
+    );
+    private static final Dynamic2CommandExceptionType SAME_HOME_NAME_PROVIDED = new Dynamic2CommandExceptionType((src, homeName) ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.edit.name.error.sameHomeNameProvided", Component.literal(homeName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+    );
 
     public HomeCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
@@ -97,9 +105,7 @@ public class HomeCommand extends HelpfulCommandsCommand {
 
         long remainingCooldown = CooldownManager.getRemainingCooldown(sourcePlayer, CooldownManager.CooldownType.HOME_TP);
         if (remainingCooldown > 0) {
-            TextBuilder textBuilder = new TextBuilder(sourcePlayer);
-            textBuilder.appendTranslatable("error.helpful_commands.onCooldown.teleport", StylingHelper.formatDuration(remainingCooldown, sourcePlayer));
-            throw new CommandSyntaxException(HC_COMMAND_EXCEPTION, textBuilder.getComponent());
+            throw ON_COOLDOWN_TELEPORT.create(src, remainingCooldown);
         }
 
         try {
@@ -116,14 +122,10 @@ public class HomeCommand extends HelpfulCommandsCommand {
 
                 src.sendSuccess(textBuilder::getComponent, true);
             } catch (ServerLevelHelper.UnknownServerLevelException e) {
-                TextBuilder textBuilder = new TranslationManager.TextBuilder(src);
-                textBuilder.appendTranslatable("error.helpful_commands.unknownDimension", Component.literal(home.dimension).setStyle(textStyles.getPrimary()));
-                throw new CommandSyntaxException(UNKNOWN_DIMENSION, textBuilder.getComponent());
+                throw UNKNOWN_DIMENSION.create(src, home.dimension);
             }
         } catch (HomeManager.HomeDoesntExistException e) {
-            TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.home.error.homeDoesntExist", Component.literal(homeName).setStyle(textStyles.getPrimary()));
-            throw new CommandSyntaxException(HOME_DOESNT_EXIST, textBuilder.getComponent());
+            throw HOME_DOESNT_EXIST.create(src, homeName);
         }
 
         return Command.SINGLE_SUCCESS;
@@ -145,13 +147,9 @@ public class HomeCommand extends HelpfulCommandsCommand {
 
             src.sendSuccess(textBuilder::getComponent, true);
         } catch (HomeManager.HomeAlreadyExistsException e) {
-            TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.home.error.homeAlreadyExists", Component.literal(homeName).setStyle(textStyles.getPrimary()));
-            throw new CommandSyntaxException(HOME_ALREADY_EXISTS, textBuilder.getComponent());
+            throw HOME_ALREADY_EXISTS.create(src, homeName);
         } catch (HomeManager.HomeLimitExceededException e) {
-            TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.home.add.error.homeLimitExceeded");
-            throw new CommandSyntaxException(HOME_LIMIT_EXCEEDED, textBuilder.getComponent());
+            throw HOME_LIMIT_EXCEEDED.create(src);
         }
 
         return Command.SINGLE_SUCCESS;
@@ -173,9 +171,7 @@ public class HomeCommand extends HelpfulCommandsCommand {
 
             src.sendSuccess(textBuilder::getComponent, true);
         } catch (HomeManager.HomeDoesntExistException e) {
-            TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.home.error.homeDoesntExist", Component.literal(homeName).setStyle(textStyles.getPrimary()));
-            throw new CommandSyntaxException(HOME_DOESNT_EXIST, textBuilder.getComponent());
+            throw HOME_DOESNT_EXIST.create(src, homeName);
         }
 
         return Command.SINGLE_SUCCESS;
@@ -197,17 +193,11 @@ public class HomeCommand extends HelpfulCommandsCommand {
 
             src.sendSuccess(textBuilder::getComponent, true);
         } catch (HomeManager.HomeDoesntExistException e) {
-            TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.home.error.homeDoesntExist", Component.literal(homeName).setStyle(textStyles.getPrimary()));
-            throw new CommandSyntaxException(HOME_DOESNT_EXIST, textBuilder.getComponent());
+            throw HOME_DOESNT_EXIST.create(src, homeName);
         } catch (HomeManager.SameHomeNameProvided e) {
-            TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.home.edit.name.error.sameName", Component.literal(newName).setStyle(textStyles.getPrimary()));
-            throw new CommandSyntaxException(SAME_NAME_PROVIDED, textBuilder.getComponent());
+            throw SAME_HOME_NAME_PROVIDED.create(src, newName);
         } catch (HomeManager.HomeAlreadyExistsException e) {
-            TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.home.error.homeAlreadyExists", Component.literal(newName).setStyle(textStyles.getPrimary()));
-            throw new CommandSyntaxException(HOME_ALREADY_EXISTS, textBuilder.getComponent());
+            throw HOME_ALREADY_EXISTS.create(src, newName);
         }
 
         return Command.SINGLE_SUCCESS;
@@ -229,9 +219,7 @@ public class HomeCommand extends HelpfulCommandsCommand {
 
             src.sendSuccess(textBuilder::getComponent, true);
         } catch (HomeManager.HomeDoesntExistException e) {
-            TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.home.error.homeDoesntExist", Component.literal(homeName).setStyle(textStyles.getPrimary()));
-            throw new CommandSyntaxException(HOME_DOESNT_EXIST, textBuilder.getComponent());
+            throw HOME_DOESNT_EXIST.create(src, homeName);
         }
 
         return Command.SINGLE_SUCCESS;
@@ -287,9 +275,7 @@ public class HomeCommand extends HelpfulCommandsCommand {
 
             src.sendSystemMessage(textBuilder.getComponent());
         } catch (HomeManager.HomeDoesntExistException e) {
-            TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.home.error.homeDoesntExist", Component.literal(homeName).setStyle(textStyles.getPrimary()));
-            throw new CommandSyntaxException(HOME_DOESNT_EXIST, textBuilder.getComponent());
+            throw HOME_DOESNT_EXIST.create(src, homeName);
         }
 
         return Command.SINGLE_SUCCESS;

@@ -12,7 +12,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -28,8 +28,9 @@ import net.minecraft.world.item.crafting.*;
 import java.util.*;
 
 public class SmeltCommand extends HelpfulCommandsCommand {
-
-    protected static final SimpleCommandExceptionType ITEM_NOT_SMELTABLE = new SimpleCommandExceptionType(Component.empty());
+    private static final DynamicCommandExceptionType ITEM_NOT_SMELTABLE = new DynamicCommandExceptionType(src ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.smelt.error.itemNotSmeltable").getComponent()
+    );
 
     public SmeltCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
@@ -63,11 +64,11 @@ public class SmeltCommand extends HelpfulCommandsCommand {
 
         ItemStack mainHandItemStack = sourcePlayer.getMainHandItem();
         if (mainHandItemStack.isEmpty()) {
-            throw new CommandSyntaxException(EMPTY_ITEM_STACK_MAIN_HAND, Component.literal(TranslationManager.translate(src, "error.helpful_commands.emptyItemStack.mainHand")));
+            throw EMPTY_ITEM_STACK_MAIN_HAND.create(src);
         }
 
         if (!smelt(mainHandItemStack, sourcePlayer)) {
-            throw new CommandSyntaxException(ITEM_NOT_SMELTABLE, Component.literal(TranslationManager.translate(src, "commands.helpful_commands.smelt.error.itemNotSmeltable")));
+            throw ITEM_NOT_SMELTABLE.create(src);
         }
 
         TextBuilder textBuilder = new TextBuilder(src);

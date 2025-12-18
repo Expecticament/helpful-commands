@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.List;
 
 public class CoordsCommand extends HelpfulCommandsCommand {
-
     public CoordsCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
     }

@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.List;
 
 public class GodCommand extends HelpfulCommandsCommand {
-
     public GodCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
     }

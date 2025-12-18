@@ -23,7 +23,6 @@ import net.minecraft.world.entity.Entity;
 import java.util.*;
 
 public class ExtinguishCommand extends HelpfulCommandsCommand {
-
     public ExtinguishCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
     }

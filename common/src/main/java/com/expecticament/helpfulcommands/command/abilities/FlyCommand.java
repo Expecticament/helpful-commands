@@ -25,7 +25,6 @@ import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 import java.util.*;
 
 public class FlyCommand extends HelpfulCommandsCommand {
-
     public FlyCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
     }

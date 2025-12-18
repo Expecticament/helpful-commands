@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.List;
 
 public class FeedCommand extends HelpfulCommandsCommand {
-
     public FeedCommand(ModCommandManager.CommandData commandData) {
         super(commandData);
     }
