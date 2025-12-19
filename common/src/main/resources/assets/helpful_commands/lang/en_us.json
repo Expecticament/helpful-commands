@@ -26,6 +26,7 @@
   "commands.helpful_commands.tpr.description": "Make, accept, deny, cancel teleport requests",
   "commands.helpful_commands.warp.description": "Manage, query, or teleport to warps",
   "commands.helpful_commands.coords.description": "Query, share, or broadcast player's coordinates",
+  "commands.helpful_commands.dmg.description": "An improved version of the /damage command that supports multiple targets",
   "commands.helpful_commands.extinguish.description": "Extinguish entities that are on fire",
   "commands.helpful_commands.feed.description": "Restore hunger for players",
   "commands.helpful_commands.gm.description": "Set game mode for players",
@@ -194,6 +195,9 @@
   "commands.helpful_commands.coords.share.other": "Shared your coordinates with %s",
   "commands.helpful_commands.coords.share.affected": "%s shared their coordinates with you: %s",
   "commands.helpful_commands.coords.share.multiple": "players",
+
+  "commands.helpful_commands.dmg.other.single": "Applied %s damage to %s",
+  "commands.helpful_commands.dmg.other.multiple": "Applied %s damage to %s entities",
 
   "commands.helpful_commands.extinguish.self": "Extinguished yourself",
   "commands.helpful_commands.extinguish.affected": "You have been extinguished",

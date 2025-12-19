@@ -85,6 +85,7 @@ public class ModCommandManager {
         commands.add(new WarpCommand(new CommandData("warp", CommandCategory.MOVEMENT_AND_TELEPORTATION, 0)));
 
         commands.add(new CoordsCommand(new CommandData("coords", CommandCategory.PLAYERS_AND_ENTITIES, 0)));
+        commands.add(new DmgCommand(new CommandData("dmg", CommandCategory.PLAYERS_AND_ENTITIES)));
         commands.add(new ExtinguishCommand(new CommandData("extinguish", CommandCategory.PLAYERS_AND_ENTITIES)));
         commands.add(new FeedCommand(new CommandData("feed", CommandCategory.PLAYERS_AND_ENTITIES)));
         commands.add(new GmCommand(new CommandData("gm", CommandCategory.PLAYERS_AND_ENTITIES)));
