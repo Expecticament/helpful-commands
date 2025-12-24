@@ -80,6 +80,7 @@ public class ModCommandManager {
         commands.add(new DeathposCommand(new CommandData("deathpos", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
         commands.add(new DimensionCommand(new CommandData("dimension", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
         commands.add(new HomeCommand(new CommandData("home", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
+        commands.add(new JumpCommand(new CommandData("jump", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
         commands.add(new SpawnCommand(new CommandData("spawn", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
         commands.add(new TprCommand(new CommandData("tpr", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
         commands.add(new WarpCommand(new CommandData("warp", CommandCategory.MOVEMENT_AND_TELEPORTATION, 0)));

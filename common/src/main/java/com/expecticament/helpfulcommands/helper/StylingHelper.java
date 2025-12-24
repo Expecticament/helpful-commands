@@ -136,9 +136,24 @@ public class StylingHelper {
         return getLocationText(x, y, z, "");
     }
 
+    public static Component getPositionText(Vec3 vec3) {
+        return getLocationText(vec3.x(), vec3.y(), vec3.z(), "");
+    }
+
+    public static Component getLocationText(GlobalPos globalPos) {
+        BlockPos blockPos = globalPos.pos();
+        return getLocationText(blockPos.getX(), blockPos.getY(), blockPos.getZ(), globalPos.dimension().identifier().toString());
+    }
+
+    public static Component getLocationText(Vec3 vec3, String dimensionKey) {
+        return getLocationText(vec3.x(), vec3.y(), vec3.z(), dimensionKey);
+    }
+
     public static Component getLocationText(double x, double y, double z, String dimensionKey) {
         String format = "%.2f";
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
+
+        String tpCommand = "%stp %.2f %.2f %.2f".formatted("/" + (dimensionKey.isEmpty() ? "" : "execute in %s run ".formatted(dimensionKey)), x, y, z);
 
         MutableComponent component = Component.empty();
         component
@@ -154,16 +169,9 @@ public class StylingHelper {
                     .append(Component.literal(")").setStyle(textStyles.getSubtle()));
         }
 
+        component.setStyle(component.getStyle().withClickEvent(new ClickEvent.SuggestCommand(tpCommand)));
+
         return component;
-    }
-
-    public static Component getLocationText(GlobalPos globalPos) {
-        BlockPos blockPos = globalPos.pos();
-        return getLocationText(blockPos.getX(), blockPos.getY(), blockPos.getZ(), globalPos.dimension().identifier().toString());
-    }
-
-    public static Component getLocationText(Vec3 vec3, String dimensionKey) {
-        return getLocationText(vec3.x(), vec3.y(), vec3.z(), dimensionKey);
     }
 
     public static Component getItemStackName(ItemStack itemStack) {

@@ -22,6 +22,7 @@
   "commands.helpful_commands.deathpos.description": "Query or teleport to player's last death position",
   "commands.helpful_commands.dimension.description": "Teleport entities to another dimension",
   "commands.helpful_commands.home.description": "Manage, query, or teleport to your homes",
+  "commands.helpful_commands.jump.description": "Teleport forward in the direction you are looking",
   "commands.helpful_commands.spawn.description": "Query or teleport to the world spawn or player's spawn point",
   "commands.helpful_commands.tpr.description": "Make, accept, deny, cancel teleport requests",
   "commands.helpful_commands.warp.description": "Manage, query, or teleport to warps",
@@ -153,6 +154,9 @@
   "commands.helpful_commands.spawn.error.failedToTeleport": "Failed to teleport",
   "commands.helpful_commands.spawn.error.playerSpawnNotSet.self": "Your spawn point hasn't been set yet",
   "commands.helpful_commands.spawn.error.playerSpawnNotSet.other": "%s's spawn point hasn't been set yet",
+
+  "commands.helpful_commands.jump": "Teleported to %s",
+  "commands.helpful_commands.jump.error.distanceConfigvalueExceeded": "The distance argument should be equal to or less than %s",
 
   "commands.helpful_commands.tpr.request": "Sent teleport request to %s. They have %s to respond",
   "commands.helpful_commands.tpr.request.title": "Teleport request",

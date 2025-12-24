@@ -220,6 +220,8 @@ public class ConfigManager {
 
         FIREBALL_POWER_LIMIT(ConfigFieldProperties.integer(5, 1)),
 
+        JUMP_DISTANCE_LIMIT(ConfigFieldProperties.dbl(128, 0.1)),
+
         KILLITEMS_MAX_RANGE(ConfigFieldProperties.integer(128, 1));
 
         private final ConfigFieldProperties properties;
