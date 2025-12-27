@@ -98,8 +98,10 @@ public class ModCommandManager {
 
         commands.add(new TimeCommand(new CommandData("day", CommandCategory.WORLD), 1000));
         commands.add(new TimeCommand(new CommandData("night", CommandCategory.WORLD), 13000));
+        commands.add(new ExplosionCommand(new CommandData("explosion", CommandCategory.WORLD, false)));
         commands.add(new FireballCommand(new CommandData("fireball", CommandCategory.WORLD, false)));
         commands.add(new KillitemsCommand(new CommandData("killitems", CommandCategory.WORLD)));
+        commands.add(new LightningCommand(new CommandData("lightning", CommandCategory.WORLD)));
 
         for (HelpfulCommandsCommand command : commands) {
             command.register(dispatcher, buildContext, selection);

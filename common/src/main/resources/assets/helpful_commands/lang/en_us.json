@@ -35,8 +35,10 @@
   "commands.helpful_commands.heal.description": "Restore health for entities",
   "commands.helpful_commands.ignite.description": "Set entities on fire for a specified time",
   "commands.helpful_commands.coinflip.description": "Flip a coin",
+  "commands.helpful_commands.explosion.description": "Create an explosion",
   "commands.helpful_commands.fireball.description": "Launch a fireball",
   "commands.helpful_commands.killitems.description": "Delete items lying on the ground",
+  "commands.helpful_commands.lightning.description": "Summon lightning",
   "commands.helpful_commands.day.description": "Set the time to day",
   "commands.helpful_commands.night.description": "Set the time to night",
 
@@ -245,6 +247,9 @@
   "commands.helpful_commands.coinflip.won": "won",
   "commands.helpful_commands.coinflip.lost": "lost",
 
+  "commands.helpful_commands.explosion": "Created an explosion at %s",
+  "commands.helpful_commands.explosion.powerConfigValueExceeded": "The power argument should be equal to or less than %s",
+
   "commands.helpful_commands.fireball": "Launched a fireball",
   "commands.helpful_commands.fireball.powerConfigValueExceeded": "The power argument should be equal to or less than %s",
 
@@ -252,6 +257,8 @@
   "commands.helpful_commands.killitems.single": "item",
   "commands.helpful_commands.killitems.multiple": "items",
   "commands.helpful_commands.killitems.rangeConfigValueExceeded": "The range argument should be equal to or less than %s",
+
+  "commands.helpful_commands.lightning": "Summoned lightning at %s",
 
   "commands.helpful_commands.time.1000": "Day",
   "commands.helpful_commands.time.13000": "Night",
