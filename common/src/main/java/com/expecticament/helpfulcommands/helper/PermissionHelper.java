@@ -69,4 +69,13 @@ public class PermissionHelper {
             return hasPermission(source, "helpful_commands.config." + configPermission, configOpLevel);
         }
     }
+
+    public static boolean isLuckPermsAvailable() {
+        try {
+            net.luckperms.api.LuckPerms lp = net.luckperms.api.LuckPermsProvider.get();
+            return true;
+        } catch (IllegalStateException | NoClassDefFoundError e) {
+            return false;
+        }
+    }
 }

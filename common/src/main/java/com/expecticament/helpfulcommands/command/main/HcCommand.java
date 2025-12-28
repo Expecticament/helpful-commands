@@ -23,6 +23,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
 import com.mojang.brigadier.tree.CommandNode;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -56,6 +57,7 @@ public class HcCommand extends HelpfulCommandsCommand {
 
         LiteralArgumentBuilder<CommandSourceStack> configFieldArgumentBuilder = Commands.literal("field");
         configFieldArgumentBuilder.requires(src -> PermissionHelper.canConfigure(src, "field"));
+        configFieldArgumentBuilder.executes(this::configField);
         for (ConfigManager.CONFIG_FIELD configField : ConfigManager.CONFIG_FIELD.values()) {
             String name = configField.name().toLowerCase();
             ConfigManager.ConfigFieldProperties properties = configField.properties();
@@ -273,7 +275,7 @@ public class HcCommand extends HelpfulCommandsCommand {
                 continue;
             }
 
-            textBuilder.appendNewline().appendComponent(Component.literal(textDecorators.getCategoryStartingChar()).setStyle(categoryStyle)).appendComponent(Component.literal(TranslationManager.translate(src, "command.category.helpful_commands." + entry.getKey().toString().toLowerCase())).setStyle(categoryStyle));
+            textBuilder.appendNewline().appendComponent(Component.literal(textDecorators.getCategoryStartingChar()).setStyle(categoryStyle)).appendComponent(Component.literal(TranslationManager.translate(src, "helpful_commands.commandCategory.%s".formatted(entry.getKey().toString().toLowerCase()))).setStyle(categoryStyle));
             HelpfulCommandsCommand lastCommand = entry.getValue().getLast();
 
             for (HelpfulCommandsCommand command : entry.getValue()) {
@@ -355,7 +357,7 @@ public class HcCommand extends HelpfulCommandsCommand {
                 continue;
             }
 
-            textBuilder.appendNewline().appendComponent(Component.literal(textDecorators.getCategoryStartingChar()).setStyle(categoryStyle)).appendComponent(Component.literal(TranslationManager.translate(src, "command.category.helpful_commands." + entry.getKey().toString().toLowerCase())).setStyle(categoryStyle));
+            textBuilder.appendNewline().appendComponent(Component.literal(textDecorators.getCategoryStartingChar()).setStyle(categoryStyle)).appendComponent(Component.literal(TranslationManager.translate(src, "helpful_commands.commandCategory.%s".formatted(entry.getKey().toString().toLowerCase()))).setStyle(categoryStyle));
             HelpfulCommandsCommand lastCommand = entry.getValue().getLast();
 
             for (HelpfulCommandsCommand command : entry.getValue()) {
@@ -463,11 +465,25 @@ public class HcCommand extends HelpfulCommandsCommand {
             textBuilder
                     .appendNewline()
                     .appendNewline()
-                    .appendComponent(bulletPoint)
-                    .appendComponent(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.config.field.title")).setStyle(textStyles.getTertiary()))
-                    .appendNewline()
-                    .appendWhitespace()
-                    .appendTranslatable("commands.helpful_commands.hc.config.field.description", Component.literal("/hc config field").setStyle(textStyles.getSecondary().withClickEvent(new ClickEvent.SuggestCommand("/hc config field ")).withHoverEvent(new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "hover.helpful_commands.clickToPasteCommand"))))));
+                    .appendComponent(bulletPoint);
+            if (isPlayer) {
+                Style btnStyle = textStyles.getPrimary().withClickEvent(new ClickEvent.RunCommand("/hc config field"));
+                Component btn = StylingHelper.getButton(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.config.field.title")), btnStyle);
+                textBuilder
+                        .appendComponent(btn)
+                        .appendNewline()
+                        .appendWhitespace()
+                        .appendTranslatable("commands.helpful_commands.hc.config.field.description");
+            } else {
+                textBuilder
+                        .appendComponent(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.config.field.title")).setStyle(textStyles.getTertiary()))
+                        .appendNewline()
+                        .appendWhitespace()
+                        .appendTranslatable("commands.helpful_commands.hc.config.field.description.use", Component.literal("/hc config field").setStyle(textStyles.getSecondary().withClickEvent(new ClickEvent.SuggestCommand("/hc config field ")).withHoverEvent(new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "hover.helpful_commands.clickToPasteCommand"))))))
+                        .appendNewline()
+                        .appendWhitespace()
+                        .appendTranslatable("commands.helpful_commands.hc.config.field.description");
+            }
         }
 
         if (PermissionHelper.canConfigure(src, "styling")) {
@@ -479,6 +495,94 @@ public class HcCommand extends HelpfulCommandsCommand {
                     .appendNewline()
                     .appendWhitespace()
                     .appendTranslatable("commands.helpful_commands.hc.config.styling.description", Component.literal("/hc config styling").setStyle(textStyles.getSecondary().withClickEvent(new ClickEvent.SuggestCommand("/hc config styling ")).withHoverEvent(new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "hover.helpful_commands.clickToPasteCommand"))))));
+        }
+
+        src.sendSystemMessage(textBuilder.getComponent());
+
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int configField(CommandContext<CommandSourceStack> ctx) {
+        CommandSourceStack src = ctx.getSource();
+
+        validateAnySource(src);
+
+        boolean isPlayer = src.isPlayer();
+
+        HelpfulCommandsStyle currentStyle = StylingManager.getCurrentStyle();
+        HelpfulCommandsStyle.TextStyles textStyles = currentStyle.getTextStyles();
+        HelpfulCommandsStyle.TextDecorators textDecorators = currentStyle.getTextDecorators();
+
+        Component bulletPoint = Component.literal(textDecorators.getBulletPoint()).setStyle(textStyles.getTertiary());
+
+        ConfigManager.HelpfulCommandsConfig config = ConfigManager.readConfig();
+
+        TextBuilder textBuilder = new TextBuilder(src);
+        textBuilder.appendComponent(StylingHelper.getTitle(Component.literal("Helpful Commands"), Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.config.field.title"))));
+
+        boolean luckPermsAvailable = PermissionHelper.isLuckPermsAvailable();
+
+        for (ConfigManager.CONFIG_FIELD configField : ConfigManager.CONFIG_FIELD.values()) {
+            String name = configField.name().toLowerCase();
+            ConfigManager.ConfigFieldProperties properties = configField.properties();
+            Object value = config.readField(configField);
+
+            TextBuilder fieldNameTextBuilder = new TextBuilder(src);
+            fieldNameTextBuilder
+                    .appendComponent(Component.literal(name).setStyle(textStyles.getTertiary()))
+                    .appendNewline()
+                    .appendLiteral(TranslationManager.translate(src, "%s.configField.%s".formatted(HelpfulCommands.MOD_ID, name)))
+                    .appendNewline()
+                    .appendNewline()
+                    .appendComponent(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.config.field.defaultValue")).setStyle(textStyles.getSubtle()))
+                    .appendWhitespace()
+                    .appendComponent(Component.literal(String.valueOf(properties.getDefaultValue())).setStyle(textStyles.getPrimary()));
+            Component fieldNameComponent = Component.literal(name).setStyle(textStyles.getTertiary().withHoverEvent(new HoverEvent.ShowText(fieldNameTextBuilder.getComponent())));
+
+            textBuilder
+                    .appendNewline()
+                    .appendComponent(bulletPoint)
+                    .appendComponent(fieldNameComponent)
+                    .appendLiteral(": ")
+                    .appendComponent(Component.literal(String.valueOf(value)).setStyle(textStyles.getPrimary()));
+
+            if (isPlayer) {
+                HoverEvent editBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "hover.helpful_commands.clickToEdit")));
+                ClickEvent editBtnClickEvent = new ClickEvent.SuggestCommand("/hc config field %s set ".formatted(name));
+                Style editBtnStyle = textStyles.getTertiary().withHoverEvent(editBtnHoverEvent).withClickEvent(editBtnClickEvent);
+
+                HoverEvent resetBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.config.field.hover.clickToReset")));
+                ClickEvent resetBtnClickEvent = new ClickEvent.RunCommand("/hc config field %s reset".formatted(name));
+                Style resetBtnStyle = textStyles.getDangerousAction().withHoverEvent(resetBtnHoverEvent).withClickEvent(resetBtnClickEvent);
+
+                textBuilder
+                        .appendWhitespace()
+                        .appendComponent(StylingHelper.getButton(Component.literal(textDecorators.getEdit()), editBtnStyle))
+                        .appendWhitespace()
+                        .appendComponent(StylingHelper.getButton(Component.literal(textDecorators.getRemove()), resetBtnStyle));
+            }
+
+            if (luckPermsAvailable && configField.lpMetaSupport()) {
+                String metaPermId = "meta.%s_%s.(value)".formatted(HelpfulCommands.SHORT_MOD_ID, name);
+                Style lpStyle = Style.EMPTY.applyFormat(ChatFormatting.GREEN);
+
+                TextBuilder metaTextBuilder = new TextBuilder(src);
+                metaTextBuilder
+                        .appendComponent(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.config.field.lpMeta")).setStyle(lpStyle))
+                        .appendNewline()
+                        .appendTranslatable("commands.helpful_commands.hc.config.field.lpMeta.permissionID", Component.literal(metaPermId).setStyle(textStyles.getPrimary()))
+                        .appendNewline()
+                        .appendNewline()
+                        .appendComponent(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.config.field.lpMeta.fallback")).setStyle(textStyles.getSubtle()));
+                HoverEvent metaBtnHoverEvent = new HoverEvent.ShowText(metaTextBuilder.getComponent());
+
+                ClickEvent metaBtnClickEvent = new ClickEvent.CopyToClipboard(metaPermId);
+                Style metaBtnStyle = lpStyle.withHoverEvent(metaBtnHoverEvent).withClickEvent(metaBtnClickEvent);
+
+                textBuilder
+                        .appendWhitespace()
+                        .appendComponent(StylingHelper.getButton(Component.literal("🍀"), metaBtnStyle));
+            }
         }
 
         src.sendSystemMessage(textBuilder.getComponent());
