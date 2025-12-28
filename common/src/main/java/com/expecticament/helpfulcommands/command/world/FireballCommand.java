@@ -1,6 +1,7 @@
 package com.expecticament.helpfulcommands.command.world;
 
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
+import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.manager.ConfigManager;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
@@ -59,7 +60,7 @@ public class FireballCommand extends HelpfulCommandsCommand {
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
-        int maxPower = ConfigManager.readConfig().readField(ConfigManager.CONFIG_FIELD.FIREBALL_POWER_LIMIT);
+        int maxPower = PermissionHelper.getMetaOrElseConfigValue(src, ConfigManager.CONFIG_FIELD.FIREBALL_POWER_LIMIT);
         if (power < 1) {
             power = Math.min(5, maxPower);
         } else if (power > maxPower) {

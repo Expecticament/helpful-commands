@@ -1,6 +1,7 @@
 package com.expecticament.helpfulcommands.manager;
 
 import com.expecticament.helpfulcommands.HelpfulCommands;
+import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.ServerLevelHelper;
 import com.expecticament.helpfulcommands.io.JsonIO;
 import net.minecraft.core.Position;
@@ -54,8 +55,8 @@ public class HomeManager {
         }
     }
 
-    public static class SameHomeNameProvided extends RuntimeException {
-        public SameHomeNameProvided(String newName) {
+    public static class SameHomeNameProvidedException extends RuntimeException {
+        public SameHomeNameProvidedException(String newName) {
             super("The new home name is the same as the old one: %s".formatted(newName));
         }
     }
@@ -68,8 +69,7 @@ public class HomeManager {
         Homes homes = Objects.requireNonNullElse(io.read(), new Homes());
         Map<String, Home> playerHomes = getHomesForPlayer(player, homes);
 
-        ConfigManager.HelpfulCommandsConfig config = ConfigManager.readConfig();
-        int maxHomes = config.readField(ConfigManager.CONFIG_FIELD.MAX_HOMES);
+        int maxHomes = PermissionHelper.getMetaOrElseConfigValue(player, ConfigManager.CONFIG_FIELD.MAX_HOMES);
 
         if (playerHomes.size() >= maxHomes) {
             throw new HomeLimitExceededException(player);
@@ -97,9 +97,9 @@ public class HomeManager {
         throw new HomeDoesntExistException(player, homeName);
     }
 
-    public static void editHomeName(ServerPlayer player, String homeName, String newName) throws SameHomeNameProvided, HomeDoesntExistException, HomeAlreadyExistsException {
+    public static void editHomeName(ServerPlayer player, String homeName, String newName) throws SameHomeNameProvidedException, HomeDoesntExistException, HomeAlreadyExistsException {
         if (homeName.equals(newName)) {
-            throw new SameHomeNameProvided(newName);
+            throw new SameHomeNameProvidedException(newName);
         }
 
         Homes homes = Objects.requireNonNullElse(io.read(), new Homes());

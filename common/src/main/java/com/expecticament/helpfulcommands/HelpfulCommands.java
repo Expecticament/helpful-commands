@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 public final class HelpfulCommands {
     public static final String MOD_ID = "helpful_commands";
+    public static final String SHORT_MOD_ID = "hc";
     public static final String FOLDER_NAME = MOD_ID + "4";
 
     private static String modVersion;

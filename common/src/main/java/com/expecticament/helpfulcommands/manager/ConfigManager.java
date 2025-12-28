@@ -41,48 +41,64 @@ public class ConfigManager {
             return readField(CONFIG_FIELD.valueOf(configField.toUpperCase()));
         }
 
-        @SuppressWarnings("unchecked")
         public <T> T readField(CONFIG_FIELD configField) {
-            Object value = fields.get(configField);
+            return validateFieldValue(configField, fields.get(configField));
+        }
+
+        @SuppressWarnings("unchecked")
+        public <T> T validateFieldValue(CONFIG_FIELD configField, Object value) {
             ConfigFieldProperties properties = configField.properties();
 
             if (value == null) {
                 value = properties.defaultValue;
-                fields.put(configField, value);
             }
 
-            switch (properties.valueType) {
+            return switch (properties.valueType) {
+
                 case Integer -> {
-                    if (!(value instanceof Number num)) {
-                        throw invalidType(configField, "Integer", value);
+                    int intValue;
+
+                    if (value instanceof Integer i) {
+                        intValue = i;
+                    } else if (value instanceof Number n) {
+                        intValue = n.intValue();
+                    } else {
+                        intValue = Integer.parseInt(value.toString());
                     }
-                    int result = (int) Math.clamp(num.intValue(), properties.min.intValue(), properties.max.intValue());
-                    return (T) Integer.valueOf(result);
+
+                    intValue = Math.clamp(intValue, properties.min.intValue(), properties.max.intValue());
+
+                    yield (T) Integer.valueOf(intValue);
                 }
 
                 case Double -> {
-                    if (!(value instanceof Number num)) {
-                        throw invalidType(configField, "Double", value);
+                    double doubleValue;
+
+                    if (value instanceof Double d) {
+                        doubleValue = d;
+                    } else if (value instanceof Number n) {
+                        doubleValue = n.doubleValue();
+                    } else {
+                        doubleValue = Double.parseDouble(value.toString());
                     }
-                    double result = Math.clamp(num.doubleValue(), properties.min, properties.max);
-                    return (T) Double.valueOf(result);
+
+                    doubleValue = Math.clamp(doubleValue, properties.min, properties.max);
+
+                    yield (T) Double.valueOf(doubleValue);
                 }
 
                 case Boolean -> {
-                    if (!(value instanceof Boolean bool)) {
-                        throw invalidType(configField, "Boolean", value);
+                    boolean boolValue;
+
+                    if (value instanceof Boolean b) {
+                        boolValue = b;
+                    } else {
+                        boolValue = Boolean.parseBoolean(value.toString());
                     }
-                    return (T) bool;
+
+                    yield (T) Boolean.valueOf(boolValue);
                 }
-            }
-
-            throw new IllegalStateException("Unknown valueType for field '" + configField.name().toLowerCase() + "'");
-        }
-
-        private IllegalStateException invalidType(CONFIG_FIELD configField, String expected, Object actual) {
-            return new IllegalStateException(
-                    "Config field '" + configField.name().toLowerCase() + "' expected type " + expected + " but found " + actual.getClass().getSimpleName()
-            );
+            };
         }
 
         public boolean setCommandState(String commandName, boolean newState) {
@@ -209,29 +225,35 @@ public class ConfigManager {
     }
 
     public enum CONFIG_FIELD {
-        MAX_HOMES(ConfigFieldProperties.integer(5, 1)),
-        HOME_TP_COOLDOWN(ConfigFieldProperties.integer(0, 0)),
+        MAX_HOMES(ConfigFieldProperties.integer(5, 1), true),
+        HOME_TP_COOLDOWN(ConfigFieldProperties.integer(0, 0), true),
 
-        TPR_REQUEST_TIMEOUT(ConfigFieldProperties.integer(60, 1)),
-        TPR_REQUEST_COOLDOWN_ON_ACCEPTED(ConfigFieldProperties.integer(0, 0)),
-        TPR_REQUEST_COOLDOWN_ON_CANCEL(ConfigFieldProperties.integer(0, 0)),
+        TPR_REQUEST_TIMEOUT(ConfigFieldProperties.integer(60, 1), false),
+        TPR_REQUEST_COOLDOWN_ON_ACCEPTED(ConfigFieldProperties.integer(0, 0), true),
+        TPR_REQUEST_COOLDOWN_ON_CANCEL(ConfigFieldProperties.integer(0, 0), true),
 
-        EXPLOSION_POWER_LIMIT(ConfigFieldProperties.integer(5, 1)),
+        EXPLOSION_POWER_LIMIT(ConfigFieldProperties.integer(5, 1), true),
 
-        FIREBALL_POWER_LIMIT(ConfigFieldProperties.integer(5, 1)),
+        FIREBALL_POWER_LIMIT(ConfigFieldProperties.integer(5, 1), true),
 
-        JUMP_DISTANCE_LIMIT(ConfigFieldProperties.dbl(128, 0.1)),
+        JUMP_DISTANCE_LIMIT(ConfigFieldProperties.dbl(128, 0.1), true),
 
-        KILLITEMS_MAX_RANGE(ConfigFieldProperties.integer(128, 1));
+        KILLITEMS_MAX_RANGE(ConfigFieldProperties.integer(128, 1), true);
 
         private final ConfigFieldProperties properties;
+        private final boolean lpMetaSupport;
 
-        CONFIG_FIELD(ConfigFieldProperties properties) {
+        CONFIG_FIELD(ConfigFieldProperties properties, boolean lpMetaSupport) {
             this.properties = properties;
+            this.lpMetaSupport = lpMetaSupport;
         }
 
         public ConfigFieldProperties properties() {
             return properties;
+        }
+
+        public boolean lpMetaSupport() {
+            return lpMetaSupport;
         }
     }
 

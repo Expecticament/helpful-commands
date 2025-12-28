@@ -1,6 +1,7 @@
 package com.expecticament.helpfulcommands.command.movementAndTeleportation;
 
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
+import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ConfigManager;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
@@ -61,7 +62,7 @@ public class JumpCommand extends HelpfulCommandsCommand {
         Vec3 eyePos = sourcePlayer.getEyePosition();
         Vec3 look = sourcePlayer.getLookAngle();
 
-        double distanceLimit = ConfigManager.readConfig().readField(ConfigManager.CONFIG_FIELD.JUMP_DISTANCE_LIMIT);
+        double distanceLimit = PermissionHelper.getMetaOrElseConfigValue(src, ConfigManager.CONFIG_FIELD.JUMP_DISTANCE_LIMIT);
         if (distance == null) {
             distance = distanceLimit;
         } else if (distance > distanceLimit) {

@@ -1,6 +1,7 @@
 package com.expecticament.helpfulcommands.command.world;
 
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
+import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.ServerLevelHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ConfigManager;
@@ -91,7 +92,7 @@ public class ExplosionCommand extends HelpfulCommandsCommand {
     }
 
     private int validatePowerArgument(CommandSourceStack source, Integer power) throws CommandSyntaxException {
-        int powerLimit = ConfigManager.readConfig().readField(ConfigManager.CONFIG_FIELD.EXPLOSION_POWER_LIMIT);
+        int powerLimit = PermissionHelper.getMetaOrElseConfigValue(source, ConfigManager.CONFIG_FIELD.EXPLOSION_POWER_LIMIT);
         if (power == null) {
             power = powerLimit;
         } else if (power > powerLimit) {

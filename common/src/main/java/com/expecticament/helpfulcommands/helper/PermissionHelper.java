@@ -1,6 +1,8 @@
 package com.expecticament.helpfulcommands.helper;
 
 import com.expecticament.helpfulcommands.HelpfulCommands;
+import com.expecticament.helpfulcommands.manager.ConfigManager;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permission;
@@ -18,6 +20,33 @@ public class PermissionHelper {
             return net.luckperms.api.LuckPermsProvider.get().getPlayerAdapter(ServerPlayer.class).getPermissionData(player).checkPermission(permission).asBoolean();
         } catch (IllegalStateException | NoClassDefFoundError e) {
             return source.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.byId(defaultOpLevel)));
+        }
+    }
+
+    public static <T> T getMetaOrElseConfigValue(CommandSourceStack source, ConfigManager.CONFIG_FIELD field) {
+        try {
+            ServerPlayer player = source.getPlayerOrException();
+            return getMetaOrElseConfigValue(player, field);
+        } catch (CommandSyntaxException e) {
+            return ConfigManager.readConfig().readField(field);
+        }
+    }
+
+    public static <T> T getMetaOrElseConfigValue(ServerPlayer player, ConfigManager.CONFIG_FIELD field) {
+        ConfigManager.HelpfulCommandsConfig config = ConfigManager.readConfig();
+        try {
+            if (!field.lpMetaSupport()) {
+                return config.readField(field);
+            }
+
+            String meta = net.luckperms.api.LuckPermsProvider.get().getPlayerAdapter(ServerPlayer.class).getMetaData(player).getMetaValue(HelpfulCommands.SHORT_MOD_ID + "_" + field.toString().toLowerCase());
+            if (meta == null) {
+                return config.readField(field);
+            }
+
+            return config.validateFieldValue(field, meta);
+        } catch (Exception | NoClassDefFoundError e) {
+            return config.readField(field);
         }
     }
 

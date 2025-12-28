@@ -1,6 +1,7 @@
 package com.expecticament.helpfulcommands.command.world;
 
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
+import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ConfigManager;
 import com.expecticament.helpfulcommands.manager.ModCommandManager.CommandData;
@@ -73,8 +74,7 @@ public class KillitemsCommand extends HelpfulCommandsCommand {
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
-        ConfigManager.HelpfulCommandsConfig config = ConfigManager.readConfig();
-        int maxRange = config.readField(ConfigManager.CONFIG_FIELD.KILLITEMS_MAX_RANGE);
+        int maxRange = PermissionHelper.getMetaOrElseConfigValue(src, ConfigManager.CONFIG_FIELD.KILLITEMS_MAX_RANGE);
 
         if (range < 1) {
             range = Math.clamp(64, 1, maxRange);

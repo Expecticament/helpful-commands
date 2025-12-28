@@ -1,6 +1,7 @@
 package com.expecticament.helpfulcommands.command.movementAndTeleportation;
 
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
+import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.ServerLevelHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.*;
@@ -114,7 +115,7 @@ public class HomeCommand extends HelpfulCommandsCommand {
                 ServerLevel level = ServerLevelHelper.getLevel(home.dimension);
                 sourcePlayer.teleportTo(level, home.x, home.y, home.z, Relative.DELTA, sourcePlayer.getYRot(), sourcePlayer.getXRot(), false);
 
-                CooldownManager.applyCooldown(sourcePlayer, CooldownManager.CooldownType.HOME_TP, ConfigManager.readConfig().readField(ConfigManager.CONFIG_FIELD.HOME_TP_COOLDOWN));
+                CooldownManager.applyCooldown(sourcePlayer, CooldownManager.CooldownType.HOME_TP, PermissionHelper.getMetaOrElseConfigValue(sourcePlayer, ConfigManager.CONFIG_FIELD.HOME_TP_COOLDOWN));
 
                 TextBuilder textBuilder = new TextBuilder(sourcePlayer);
                 textBuilder.appendTranslatable("commands.helpful_commands.home.teleport", Component.literal(homeName).setStyle(textStyles.getPrimary()));
@@ -194,7 +195,7 @@ public class HomeCommand extends HelpfulCommandsCommand {
             src.sendSuccess(textBuilder::getComponent, true);
         } catch (HomeManager.HomeDoesntExistException e) {
             throw HOME_DOESNT_EXIST.create(src, homeName);
-        } catch (HomeManager.SameHomeNameProvided e) {
+        } catch (HomeManager.SameHomeNameProvidedException e) {
             throw SAME_HOME_NAME_PROVIDED.create(src, newName);
         } catch (HomeManager.HomeAlreadyExistsException e) {
             throw HOME_ALREADY_EXISTS.create(src, newName);

@@ -1,6 +1,7 @@
 package com.expecticament.helpfulcommands.command.movementAndTeleportation;
 
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
+import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.*;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
@@ -170,7 +171,7 @@ public class TprCommand extends HelpfulCommandsCommand {
         }
 
         TpRequestsManager.removeRequest(sourcePlayer);
-        CooldownManager.applyCooldown(sourcePlayer, CooldownManager.CooldownType.TPR_REQUEST, ConfigManager.readConfig().readField(ConfigManager.CONFIG_FIELD.TPR_REQUEST_COOLDOWN_ON_CANCEL));
+        CooldownManager.applyCooldown(sourcePlayer, CooldownManager.CooldownType.TPR_REQUEST, PermissionHelper.getMetaOrElseConfigValue(sourcePlayer, ConfigManager.CONFIG_FIELD.TPR_REQUEST_COOLDOWN_ON_CANCEL));
 
         ServerPlayer otherPlayer = src.getServer().getPlayerList().getPlayer(request.getTo());
         if (otherPlayer == null) {
@@ -221,7 +222,7 @@ public class TprCommand extends HelpfulCommandsCommand {
         Vec3 pos = sourcePlayer.position();
         if (otherPlayer.teleportTo(src.getLevel(), pos.x(), pos.y(), pos.z(), new HashSet<>(), otherPlayer.getYRot(), otherPlayer.getXRot(), false)) {
             TpRequestsManager.removeRequest(otherPlayer);
-            CooldownManager.applyCooldown(otherPlayer, CooldownManager.CooldownType.TPR_REQUEST, ConfigManager.readConfig().readField(ConfigManager.CONFIG_FIELD.TPR_REQUEST_COOLDOWN_ON_ACCEPTED));
+            CooldownManager.applyCooldown(otherPlayer, CooldownManager.CooldownType.TPR_REQUEST, PermissionHelper.getMetaOrElseConfigValue(otherPlayer, ConfigManager.CONFIG_FIELD.TPR_REQUEST_COOLDOWN_ON_ACCEPTED));
 
             TextBuilder otherPlayerTextBuilder = new TextBuilder(src);
             otherPlayerTextBuilder.setStyle(textStyles.getAffectedPositive());
