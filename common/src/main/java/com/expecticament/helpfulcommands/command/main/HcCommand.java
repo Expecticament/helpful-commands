@@ -559,7 +559,7 @@ public class HcCommand extends HelpfulCommandsCommand {
                         .appendWhitespace()
                         .appendComponent(StylingHelper.getButton(Component.literal(textDecorators.getEdit()), editBtnStyle))
                         .appendWhitespace()
-                        .appendComponent(StylingHelper.getButton(Component.literal(textDecorators.getRemove()), resetBtnStyle));
+                        .appendComponent(StylingHelper.getButton(Component.literal(textDecorators.getReset()), resetBtnStyle));
             }
 
             if (luckPermsAvailable && configField.lpMetaSupport()) {

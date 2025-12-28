@@ -7,12 +7,11 @@ public abstract class HelpfulCommandsStyle {
 
     public abstract String getDisplayName();
     public String getDescriptionTranslationKey() {
-        return "styling.style." + getDisplayName() + ".description";
+        return "helpful_commands.styling.style.%s.description".formatted(getDisplayName());
     }
 
     public abstract TextStyles getTextStyles();
     public abstract TextDecorators getTextDecorators();
-
 
     public static abstract class TextStyles {
         public Style getSuccess() {
@@ -143,6 +142,10 @@ public abstract class HelpfulCommandsStyle {
 
         public String getEdit() {
             return "\uD83D\uDD8D";
+        }
+
+        public String getReset() {
+            return "⬅";
         }
 
         public String getTeleport() {

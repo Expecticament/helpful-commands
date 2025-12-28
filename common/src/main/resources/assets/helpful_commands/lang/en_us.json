@@ -54,6 +54,10 @@
   "helpful_commands.configField.killitems_max_range": "The maximum range within which the /killitems command can remove items",
 
 
+  "helpful_commands.styling.style.default.description": "The standard appearance of Helpful Commands, using Minecraft's built-in chat colors",
+  "helpful_commands.styling.style.minimal.description": "A simplified color style that removes some decorative colors while keeping important highlights",
+
+
   "commands.helpful_commands.hc.about.title": "About",
   "commands.helpful_commands.hc.about.version": "Version:",
   "commands.helpful_commands.hc.about.author": "Author:",

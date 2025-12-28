@@ -37,12 +37,17 @@ public class HealCommand extends HelpfulCommandsCommand {
         dispatcher.register(Commands.literal(commandData.getName())
                 .requires(this::canExecuteBaseCommand)
                 .executes(this::executeSelf)
-                .then(Commands.argument("hearts", FloatArgumentType.floatArg(0))
-                        .executes(ctx -> executeSelf(ctx, FloatArgumentType.getFloat(ctx, "hearts")))
-                        .then(Commands.argument("entities", EntityArgument.entities())
-                                .requires(src -> canExecute(src, "other"))
-                                .executes(ctx -> executeOther(ctx, FloatArgumentType.getFloat(ctx, "hearts"), EntityArgument.getEntities(ctx, "entities")))
+                .then(Commands.argument("entities", EntityArgument.entities())
+                        .requires(src -> canExecute(src, "other"))
+                        .executes(ctx -> executeOther(ctx, EntityArgument.getEntities(ctx, "entities"), 0))
+                        .then(Commands.argument("hearts", FloatArgumentType.floatArg(0))
+                                .executes(ctx -> executeOther(ctx, EntityArgument.getEntities(ctx, "entities"), FloatArgumentType.getFloat(ctx, "hearts")))
+
                         )
+                )
+                .then(Commands.argument("hearts", FloatArgumentType.floatArg(0))
+                        .requires(src -> !canExecute(src, "other"))
+                        .executes(ctx -> executeSelf(ctx, FloatArgumentType.getFloat(ctx, "hearts")))
                 )
         );
     }
@@ -77,7 +82,7 @@ public class HealCommand extends HelpfulCommandsCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    private int executeOther(CommandContext<CommandSourceStack> ctx, float hearts, Collection<? extends Entity> entities) throws CommandSyntaxException {
+    private int executeOther(CommandContext<CommandSourceStack> ctx, Collection<? extends Entity> entities, float hearts) throws CommandSyntaxException {
         CommandSourceStack src = ctx.getSource();
 
         ServerPlayer sourcePlayer = validateAnySource(src);
