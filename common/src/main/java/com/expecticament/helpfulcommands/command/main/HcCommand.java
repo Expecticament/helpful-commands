@@ -11,7 +11,6 @@ import com.expecticament.helpfulcommands.manager.StylingManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.expecticament.helpfulcommands.suggestionProvider.HelpfulCommandsCommandSuggestionProvider;
-import com.expecticament.helpfulcommands.suggestionProvider.StyleSuggestionProvider;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
@@ -121,20 +120,6 @@ public class HcCommand extends HelpfulCommandsCommand {
                                                 .then(Commands.argument("new_state", BoolArgumentType.bool())
                                                         .executes(ctx -> setCommandState(ctx, StringArgumentType.getString(ctx, "command"), BoolArgumentType.getBool(ctx, "new_state")))
                                                 )
-                                        )
-                                )
-                        )
-                        .then(Commands.literal("styling")
-                                .requires(src -> PermissionHelper.canConfigure(src, "styling"))
-                                .then(Commands.literal("style")
-                                        .then(Commands.literal("set")
-                                                .then(Commands.argument("style_name", StringArgumentType.word())
-                                                        .suggests(new StyleSuggestionProvider())
-                                                        .executes(ctx -> setStyle(ctx, StringArgumentType.getString(ctx, "style_name")))
-                                                )
-                                        )
-                                        .then(Commands.literal("query")
-                                                .executes(this::queryStyle)
                                         )
                                 )
                         )
@@ -486,17 +471,6 @@ public class HcCommand extends HelpfulCommandsCommand {
             }
         }
 
-        if (PermissionHelper.canConfigure(src, "styling")) {
-            textBuilder
-                    .appendNewline()
-                    .appendNewline()
-                    .appendComponent(bulletPoint)
-                    .appendComponent(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.config.styling.title")).setStyle(textStyles.getTertiary()))
-                    .appendNewline()
-                    .appendWhitespace()
-                    .appendTranslatable("commands.helpful_commands.hc.config.styling.description", Component.literal("/hc config styling").setStyle(textStyles.getSecondary().withClickEvent(new ClickEvent.SuggestCommand("/hc config styling ")).withHoverEvent(new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "hover.helpful_commands.clickToPasteCommand"))))));
-        }
-
         src.sendSystemMessage(textBuilder.getComponent());
 
         return Command.SINGLE_SUCCESS;
@@ -586,52 +560,6 @@ public class HcCommand extends HelpfulCommandsCommand {
         }
 
         src.sendSystemMessage(textBuilder.getComponent());
-
-        return Command.SINGLE_SUCCESS;
-    }
-
-    private int setStyle(CommandContext<CommandSourceStack> ctx, String styleName) throws CommandSyntaxException {
-        CommandSourceStack src = ctx.getSource();
-
-        validateAnySource(src);
-
-        HelpfulCommandsStyle currentStyle = StylingManager.getCurrentStyle();
-        HelpfulCommandsStyle.TextStyles textStyles = currentStyle.getTextStyles();
-        Component styleNameText = Component.literal(styleName).setStyle(textStyles.getPrimary());
-
-        if (currentStyle.getDisplayName().equals(styleName)) {
-            throw STYLE_ALREADY_IN_USE.create(src, styleName);
-        }
-
-        try {
-            StylingManager.setCurrentStyle(styleName);
-
-            currentStyle = StylingManager.getCurrentStyle();
-            textStyles = currentStyle.getTextStyles();
-
-            TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.hc.config.styling.style.set", styleNameText).setStyle(textStyles.getSuccess());
-
-            src.sendSuccess(textBuilder::getComponent, true);
-
-            return Command.SINGLE_SUCCESS;
-        } catch (StylingManager.StyleDoesntExistException e) {
-            throw STYLE_DOESNT_EXIST.create(src, styleName);
-        }
-    }
-
-    private int queryStyle(CommandContext<CommandSourceStack> ctx) {
-        CommandSourceStack src = ctx.getSource();
-
-        validateAnySource(src);
-
-        HelpfulCommandsStyle currentStyle = StylingManager.getCurrentStyle();
-        HelpfulCommandsStyle.TextStyles textStyles = currentStyle.getTextStyles();
-
-        TextBuilder textBuilder = new TextBuilder(src);
-        textBuilder.appendTranslatable("commands.helpful_commands.hc.config.styling.style.query", Component.literal(currentStyle.getDisplayName()).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
-
-        src.sendSuccess(textBuilder::getComponent, true);
 
         return Command.SINGLE_SUCCESS;
     }

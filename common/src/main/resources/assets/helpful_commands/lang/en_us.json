@@ -54,10 +54,6 @@
   "helpful_commands.configField.killitems_max_range": "The maximum range within which the /killitems command can remove items",
 
 
-  "helpful_commands.styling.style.default.description": "The standard appearance of Helpful Commands, using Minecraft's built-in chat colors",
-  "helpful_commands.styling.style.minimal.description": "A simplified color style that removes some decorative colors while keeping important highlights",
-
-
   "commands.helpful_commands.hc.about.title": "About",
   "commands.helpful_commands.hc.about.version": "Version:",
   "commands.helpful_commands.hc.about.author": "Author:",
@@ -95,12 +91,6 @@
   "commands.helpful_commands.hc.config.field.set": "Set %s config field value to %s",
   "commands.helpful_commands.hc.config.field.query": "Current %s config field value: %s",
   "commands.helpful_commands.hc.config.field.hover.clickToReset": "Click to reset to the default value",
-  "commands.helpful_commands.hc.config.styling.title": "Styling Configuration",
-  "commands.helpful_commands.hc.config.styling.description": "Use %s.\n Change the way the mod looks. Applies to everything: menus, command outputs, etc.",
-  "commands.helpful_commands.hc.config.styling.style.set": "Set Helpful Commands style to %s",
-  "commands.helpful_commands.hc.config.styling.style.set.error.styleDoesntExist": "%s: style doesn't exist",
-  "commands.helpful_commands.hc.config.styling.style.set.error.styleAlreadyInUse": "%s: style is already in use",
-  "commands.helpful_commands.hc.config.styling.style.query": "Current Helpful Commands style: %s",
 
   "commands.helpful_commands.fly.self": "Flying %s",
   "commands.helpful_commands.fly.affected": "Flying has been %s",

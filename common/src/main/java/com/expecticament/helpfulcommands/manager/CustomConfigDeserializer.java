@@ -19,11 +19,6 @@ public class CustomConfigDeserializer implements JsonDeserializer<ConfigManager.
             config.command = context.deserialize(commandElem, ConfigManager.CommandConfig.class);
         }
 
-        JsonElement stylingElem = obj.get("styling");
-        if (stylingElem != null) {
-            config.styling = context.deserialize(stylingElem, ConfigManager.StylingConfig.class);
-        }
-
         JsonElement fieldsElem = obj.get("fields");
         if (fieldsElem != null && fieldsElem.isJsonObject()) {
             JsonObject fieldsObj = fieldsElem.getAsJsonObject();

@@ -6,22 +6,11 @@ import net.minecraft.network.chat.Style;
 public abstract class HelpfulCommandsStyle {
 
     public abstract String getDisplayName();
-    public String getDescriptionTranslationKey() {
-        return "helpful_commands.styling.style.%s.description".formatted(getDisplayName());
-    }
 
     public abstract TextStyles getTextStyles();
     public abstract TextDecorators getTextDecorators();
 
     public static abstract class TextStyles {
-        public Style getSuccess() {
-            return Style.EMPTY.withColor(ChatFormatting.GREEN);
-        }
-
-        public Style getWarning() {
-            return Style.EMPTY.withColor(ChatFormatting.YELLOW);
-        }
-
         public Style getPrimary() {
             return Style.EMPTY.withColor(ChatFormatting.GOLD);
         }
@@ -34,24 +23,12 @@ public abstract class HelpfulCommandsStyle {
             return Style.EMPTY.withColor(ChatFormatting.YELLOW);
         }
 
-        public Style getSubtle() {
-            return Style.EMPTY.withColor(ChatFormatting.GRAY);
+        public Style getSuccess() {
+            return Style.EMPTY.withColor(ChatFormatting.GREEN);
         }
 
-        public Style getDangerousAction() {
-            return Style.EMPTY.withColor(ChatFormatting.RED);
-        }
-
-        public Style getButton() {
-            return getPrimary();
-        }
-
-        public Style getTitlePrimary() {
-            return getPrimary().withBold(true);
-        }
-
-        public Style getTitleSecondary() {
-            return getSecondary();
+        public Style getWarning() {
+            return Style.EMPTY.withColor(ChatFormatting.YELLOW);
         }
 
         public Style getAffectedNeutral() {
@@ -79,6 +56,26 @@ public abstract class HelpfulCommandsStyle {
         }
 
         public Style getDisabled() {
+            return Style.EMPTY.withColor(ChatFormatting.RED);
+        }
+
+        public Style getSubtle() {
+            return Style.EMPTY.withColor(ChatFormatting.GRAY);
+        }
+
+        public Style getTitlePrimary() {
+            return getPrimary().withBold(true);
+        }
+
+        public Style getTitleSecondary() {
+            return getSecondary();
+        }
+
+        public Style getButton() {
+            return getPrimary();
+        }
+
+        public Style getDangerousAction() {
             return Style.EMPTY.withColor(ChatFormatting.RED);
         }
 

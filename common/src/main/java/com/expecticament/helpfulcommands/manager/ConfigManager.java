@@ -18,7 +18,6 @@ public class ConfigManager {
 
     public static class HelpfulCommandsConfig {
         public CommandConfig command = new CommandConfig();
-        public StylingConfig styling = new StylingConfig();
         protected final EnumMap<CONFIG_FIELD, Object> fields = new EnumMap<>(CONFIG_FIELD.class);
 
         public HelpfulCommandsConfig() {
@@ -54,7 +53,6 @@ public class ConfigManager {
             }
 
             return switch (properties.valueType) {
-
                 case Integer -> {
                     int intValue;
 
@@ -70,7 +68,6 @@ public class ConfigManager {
 
                     yield (T) Integer.valueOf(intValue);
                 }
-
                 case Double -> {
                     double doubleValue;
 
@@ -86,7 +83,6 @@ public class ConfigManager {
 
                     yield (T) Double.valueOf(doubleValue);
                 }
-
                 case Boolean -> {
                     boolean boolValue;
 
@@ -118,15 +114,6 @@ public class ConfigManager {
             CommandConfigEntry entry = command.commands.getOrDefault(commandName, new CommandConfigEntry());
             return entry.state;
         }
-
-        public void setStyle(String styleName) {
-            styling.style = styleName;
-            io.save(this);
-        }
-
-        public String getStyleName() {
-            return styling.style;
-        }
     }
 
     public static class CommandConfig {
@@ -135,10 +122,6 @@ public class ConfigManager {
 
     private static class CommandConfigEntry {
         private boolean state;
-    }
-
-    public static class StylingConfig {
-        private String style;
     }
 
     public static class ConfigFieldProperties {

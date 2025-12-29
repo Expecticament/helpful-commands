@@ -2,9 +2,7 @@ package com.expecticament.helpfulcommands.manager;
 
 import java.util.*;
 
-import com.expecticament.helpfulcommands.style.DefaultStyle;
-import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
-import com.expecticament.helpfulcommands.style.MinimalStyle;
+import com.expecticament.helpfulcommands.style.*;
 
 public class StylingManager {
     private static final List<HelpfulCommandsStyle> styleList = new ArrayList<>();
@@ -19,11 +17,9 @@ public class StylingManager {
     public static void initialize() {
         DefaultStyle defaultStyle = new DefaultStyle();
         styleList.add(defaultStyle);
-        styleList.add(new MinimalStyle());
 
         try {
-            HelpfulCommandsStyle configStyle = getStyleByName(ConfigManager.readConfig().getStyleName());
-            setCurrentStyle(configStyle == null ? defaultStyle.getDisplayName() : configStyle.getDisplayName());
+            setCurrentStyle(defaultStyle.getDisplayName());
         } catch (StyleDoesntExistException ignored) {}
     }
 
@@ -57,6 +53,5 @@ public class StylingManager {
 
     public static void setCurrentStyle(String styleName) throws StyleDoesntExistException {
         currentStyle = getStyle(styleName);
-        ConfigManager.readConfig().setStyle(styleName);
     }
 }
