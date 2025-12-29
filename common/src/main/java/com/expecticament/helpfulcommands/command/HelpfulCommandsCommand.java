@@ -61,10 +61,6 @@ public abstract class HelpfulCommandsCommand {
     }
 
     public boolean canExecute(CommandSourceStack source, String permCheckAppend, int permLevelOverride) {
-        if (data.getCategory() == ModCommandManager.CommandCategory.MAIN) {
-            return true;
-        }
-
         ConfigManager.HelpfulCommandsConfig config = ConfigManager.readConfig();
         if (!config.getCommandState(data.getName())) {
             return false;

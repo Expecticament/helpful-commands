@@ -4,11 +4,8 @@ import com.expecticament.helpfulcommands.HelpfulCommands;
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
 import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
-import com.expecticament.helpfulcommands.manager.ConfigManager;
-import com.expecticament.helpfulcommands.manager.ModCommandManager;
+import com.expecticament.helpfulcommands.manager.*;
 import com.expecticament.helpfulcommands.manager.ModCommandManager.CommandData;
-import com.expecticament.helpfulcommands.manager.StylingManager;
-import com.expecticament.helpfulcommands.manager.TranslationManager;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.expecticament.helpfulcommands.suggestionProvider.HelpfulCommandsCommandSuggestionProvider;
 import com.mojang.brigadier.Command;
@@ -21,13 +18,16 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.tree.CommandNode;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.*;
+import net.minecraft.server.level.ServerPlayer;
 
 import java.net.URI;
 import java.util.*;
@@ -39,11 +39,8 @@ public class HcCommand extends HelpfulCommandsCommand {
     private static final Dynamic2CommandExceptionType COMMAND_NOT_CONFIGURABLE = new Dynamic2CommandExceptionType((src, commandName) ->
             new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.hc.config.command.error.commandNotConfigurable", Component.literal(commandName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
-    private static final Dynamic2CommandExceptionType STYLE_DOESNT_EXIST = new Dynamic2CommandExceptionType((src, styleName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.hc.config.styling.style.set.error.styleDoesntExist", Component.literal(styleName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
-    );
-    private static final Dynamic2CommandExceptionType STYLE_ALREADY_IN_USE = new Dynamic2CommandExceptionType((src, styleName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.hc.config.styling.style.set.error.styleAlreadyInUse", Component.literal(styleName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+    private static final DynamicCommandExceptionType NO_ACTIVE_COOLDOWNS_FOUND = new DynamicCommandExceptionType((src) ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.hc.cooldowns.error.noActiveCooldownsFound").getComponent()
     );
 
     public HcCommand(CommandData commandData) {
@@ -94,6 +91,18 @@ public class HcCommand extends HelpfulCommandsCommand {
             configFieldArgumentBuilder.then(field);
         }
 
+        LiteralArgumentBuilder<CommandSourceStack> cooldownsClearArgumentBuilder = Commands.literal("clear");
+        for (CooldownManager.CooldownType cooldownType : CooldownManager.CooldownType.values()) {
+            String name = cooldownType.name().toLowerCase();
+
+            cooldownsClearArgumentBuilder.then(Commands.literal(name)
+                    .executes(ctx -> clearCooldown(ctx, cooldownType))
+                    .then(Commands.argument("players", EntityArgument.players())
+                            .executes(ctx -> clearCooldown(ctx, cooldownType, EntityArgument.getPlayers(ctx, "players")))
+                    )
+            );
+        }
+
         dispatcher.register(Commands.literal(commandData.getName())
                 .executes(this::about)
                 .then(Commands.literal("about")
@@ -122,6 +131,13 @@ public class HcCommand extends HelpfulCommandsCommand {
                                                 )
                                         )
                                 )
+                        )
+                )
+                .then(Commands.literal("cooldowns")
+                        .requires(PermissionHelper::canManageActiveCooldowns)
+                        .then(cooldownsClearArgumentBuilder)
+                        .then(Commands.literal("clear_all")
+                                .executes(this::clearAllCooldowns)
                         )
                 )
         );
@@ -677,5 +693,64 @@ public class HcCommand extends HelpfulCommandsCommand {
         src.sendSuccess(textBuilder::getComponent, true);
 
         return Command.SINGLE_SUCCESS;
+    }
+
+    private int clearCooldown(CommandContext<CommandSourceStack> ctx, CooldownManager.CooldownType cooldownType) throws CommandSyntaxException {
+        CommandSourceStack src = ctx.getSource();
+
+        ServerPlayer sourcePlayer = validatePlayerOnly(src);
+
+        ArrayList<ServerPlayer> players = new ArrayList<>();
+        players.add(sourcePlayer);
+
+        return clearCooldown(ctx, cooldownType, players);
+    }
+
+    private int clearCooldown(CommandContext<CommandSourceStack> ctx, CooldownManager.CooldownType cooldownType, Collection<ServerPlayer> players) throws CommandSyntaxException {
+        CommandSourceStack src = ctx.getSource();
+
+        validateAnySource(src);
+
+        HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
+
+        int removed = 0;
+
+        for (ServerPlayer player : players) {
+            removed += CooldownManager.removeCooldown(player, cooldownType) ? 1 : 0;
+        }
+
+        if (removed == 0) {
+            throw NO_ACTIVE_COOLDOWNS_FOUND.create(src);
+        }
+
+        TextBuilder textBuilder = new TextBuilder(src);
+        textBuilder.appendTranslatable("commands.helpful_commands.hc.cooldowns.clear", Component.literal(String.valueOf(removed)).setStyle(textStyles.getPrimary()), Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.cooldowns.clear." + (removed == 1 ? "single" : "multiple"))));
+        textBuilder.setStyle(textStyles.getSuccess());
+
+        src.sendSuccess(textBuilder::getComponent, true);
+
+        return removed;
+    }
+
+    private int clearAllCooldowns(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        CommandSourceStack src = ctx.getSource();
+
+        validateAnySource(src);
+
+        HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
+
+        int removed = CooldownManager.removeAllCooldowns();
+
+        if (removed == 0) {
+            throw NO_ACTIVE_COOLDOWNS_FOUND.create(src);
+        }
+
+        TextBuilder textBuilder = new TextBuilder(src);
+        textBuilder.appendTranslatable("commands.helpful_commands.hc.cooldowns.clear", Component.literal(String.valueOf(removed)).setStyle(textStyles.getPrimary()), Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.cooldowns.clear." + (removed == 1 ? "single" : "multiple"))));
+        textBuilder.setStyle(textStyles.getSuccess());
+
+        src.sendSuccess(textBuilder::getComponent, true);
+
+        return removed;
     }
 }

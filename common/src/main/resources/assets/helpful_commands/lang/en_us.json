@@ -91,6 +91,10 @@
   "commands.helpful_commands.hc.config.field.set": "Set %s config field value to %s",
   "commands.helpful_commands.hc.config.field.query": "Current %s config field value: %s",
   "commands.helpful_commands.hc.config.field.hover.clickToReset": "Click to reset to the default value",
+  "commands.helpful_commands.hc.cooldowns.clear": "Cleared %s %s",
+  "commands.helpful_commands.hc.cooldowns.clear.single": "cooldown",
+  "commands.helpful_commands.hc.cooldowns.clear.multiple": "cooldowns",
+  "commands.helpful_commands.hc.cooldowns.error.noActiveCooldownsFound": "No active cooldowns were found",
 
   "commands.helpful_commands.fly.self": "Flying %s",
   "commands.helpful_commands.fly.affected": "Flying has been %s",

@@ -70,6 +70,18 @@ public class PermissionHelper {
         }
     }
 
+    public static boolean canManageActiveCooldowns(CommandSourceStack source) {
+        int defaultOpLevel = 3;
+
+        ServerPlayer player = source.getPlayer();
+
+        if (!HelpfulCommands.isDedicatedServer() && player != null) {
+            return source.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.byId(defaultOpLevel))) && source.getServer().isSingleplayerOwner(new NameAndId(player.getGameProfile()));
+        }
+
+        return hasPermission(source, "%s.manage_active_cooldowns".formatted(HelpfulCommands.MOD_ID), defaultOpLevel);
+    }
+
     public static boolean isLuckPermsAvailable() {
         try {
             net.luckperms.api.LuckPerms lp = net.luckperms.api.LuckPermsProvider.get();

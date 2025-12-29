@@ -68,10 +68,9 @@ public class CooldownManager {
     }
 
     public static long getRemainingCooldown(UUID uuid, CooldownType cooldownType) {
-        Cooldowns data = Objects.requireNonNullElse(io.read(), new Cooldowns());
+        Cooldowns cooldowns = Objects.requireNonNullElse(io.read(), new Cooldowns());
 
-        EnumMap<CooldownType, Cooldown> playerCooldowns = data.entries.get(uuid);
-
+        EnumMap<CooldownType, Cooldown> playerCooldowns = cooldowns.entries.get(uuid);
         if (playerCooldowns == null) {
             return 0;
         }
@@ -85,28 +84,94 @@ public class CooldownManager {
             playerCooldowns.remove(cooldownType);
 
             if (playerCooldowns.isEmpty()) {
-                data.entries.remove(uuid);
+                cooldowns.entries.remove(uuid);
             }
 
-            io.save(data);
+            io.save(cooldowns);
             return 0;
         }
 
         return cooldown.expiresIn();
     }
 
+    public static boolean removeCooldown(ServerPlayer player, CooldownType cooldownType) {
+        return removeCooldown(player.getUUID(), cooldownType);
+    }
+
+    public static boolean removeCooldown(UUID uuid, CooldownType cooldownType) {
+        Cooldowns cooldowns = Objects.requireNonNullElse(io.read(), new Cooldowns());
+
+        EnumMap<CooldownType, Cooldown> playerCooldowns = cooldowns.entries.get(uuid);
+        if (playerCooldowns == null) {
+            return false;
+        }
+
+        Cooldown cooldown = playerCooldowns.get(cooldownType);
+        if (cooldown == null) {
+            return false;
+        }
+
+        if (cooldown.isExpired()) {
+            playerCooldowns.remove(cooldownType);
+
+            if (playerCooldowns.isEmpty()) {
+                cooldowns.entries.remove(uuid);
+            }
+
+            io.save(cooldowns);
+            return false;
+        }
+
+        playerCooldowns.remove(cooldownType);
+
+        io.save(cooldowns);
+
+        return true;
+    }
+
+    public static int removeAllCooldowns(ServerPlayer player) {
+        return removeAllCooldowns(player.getUUID());
+    }
+
+    public static int removeAllCooldowns(UUID uuid) {
+        Cooldowns cooldowns = Objects.requireNonNullElse(io.read(), new Cooldowns());
+
+        EnumMap<CooldownType, Cooldown> playerCooldowns = cooldowns.entries.remove(uuid);
+        if (playerCooldowns == null || playerCooldowns.isEmpty()) {
+            return 0;
+        }
+
+        io.save(cooldowns);
+
+        return playerCooldowns.size();
+    }
+
+    public static int removeAllCooldowns() {
+        Cooldowns cooldowns = Objects.requireNonNullElse(io.read(), new Cooldowns());
+
+        int removed = cooldowns.entries.values()
+                .stream()
+                .mapToInt(Map::size)
+                .sum();
+
+        cooldowns.entries.clear();
+        io.save(cooldowns);
+
+        return removed;
+    }
+
     public static void removeExpired() {
-        Cooldowns data = Objects.requireNonNullElse(io.read(), new Cooldowns());
+        Cooldowns cooldowns = Objects.requireNonNullElse(io.read(), new Cooldowns());
         boolean changed = false;
 
-        Iterator<Map.Entry<UUID, EnumMap<CooldownType, Cooldown>>> playerIterator = data.entries.entrySet().iterator();
+        Iterator<Map.Entry<UUID, EnumMap<CooldownType, Cooldown>>> playerIterator = cooldowns.entries.entrySet().iterator();
         while (playerIterator.hasNext()) {
             Map.Entry<UUID, EnumMap<CooldownType, Cooldown>> playerEntry = playerIterator.next();
-            EnumMap<CooldownType, Cooldown> cooldowns = playerEntry.getValue();
+            EnumMap<CooldownType, Cooldown> playerCooldowns = playerEntry.getValue();
 
-            cooldowns.entrySet().removeIf(e -> e.getValue().isExpired());
+            playerCooldowns.entrySet().removeIf(e -> e.getValue().isExpired());
 
-            if (cooldowns.isEmpty()) {
+            if (playerCooldowns.isEmpty()) {
                 playerIterator.remove();
             }
 
@@ -114,7 +179,7 @@ public class CooldownManager {
         }
 
         if (changed) {
-            io.save(data);
+            io.save(cooldowns);
         }
     }
 
