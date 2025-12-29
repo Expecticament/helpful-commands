@@ -109,6 +109,8 @@
   "commands.helpful_commands.invsee": "Viewing %s's inventory...",
   "commands.helpful_commands.invsee.screenTitle": "%s's Inventory",
   "commands.helpful_commands.invsee.emptySlot": "Empty Slot",
+  "commands.helpful_commands.invsee.infoSlot.name": "What are these slots for?",
+  "commands.helpful_commands.invsee.infoSlot.lore": "Left to right: boots, leggings, chestplate, helmet, off-hand",
 
   "commands.helpful_commands.rename.self": "Renamed your %s to %s",
   "commands.helpful_commands.rename.affected": "Your %s has been renamed to %s",

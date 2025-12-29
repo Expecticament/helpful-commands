@@ -1,6 +1,5 @@
 package com.expecticament.helpfulcommands.helper;
 
-import com.expecticament.helpfulcommands.HelpfulCommands;
 import com.expecticament.helpfulcommands.manager.StylingManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;

@@ -21,6 +21,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.entity.EntityEquipment;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -28,6 +29,10 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.ItemLore;
+import org.jspecify.annotations.NonNull;
+
+import java.util.List;
 
 public class InvseeCommand extends HelpfulCommandsCommand {
     public InvseeCommand(ModCommandManager.CommandData commandData) {
@@ -74,35 +79,42 @@ public class InvseeCommand extends HelpfulCommandsCommand {
     }
 
     private static class InvseeAbstractContainerMenu extends AbstractContainerMenu {
-
         public InvseeAbstractContainerMenu(int syncId, Inventory sourceInventory, Player target) {
             super(MenuType.GENERIC_9x5, syncId);
 
             Inventory targetInventory = target.getInventory();
-            Inventory emptySlotInventory = new Inventory(target, null);
+            Inventory dummyInventory = new Inventory(target, new EntityEquipment());
+
             this.addStandardInventorySlots(targetInventory, 0, 0);
-            for(int i = 0; i < 2; i++) {
-                this.addSlot(new EmptySlot(emptySlotInventory, 0, 0, 0));
-            }
+
+            this.addSlot(new EmptySlot(dummyInventory, 0, 0, 0));
+            this.addSlot(new InfoSlot(dummyInventory, 1, 0, 0));
+
             for(int i = 0; i < 5; i++) {
                 this.addSlot(new Slot(targetInventory, 36 + i, 0, 0));
             }
-            for(int i = 0; i < 2; i++) {
-                this.addSlot(new EmptySlot(emptySlotInventory, 0, 0, 0));
+
+            for(int i = 2; i < 4; i++) {
+                this.addSlot(new EmptySlot(dummyInventory, i, 0, 0));
             }
+
             this.addStandardInventorySlots(sourceInventory, 0, 0);
         }
 
         @Override
-        public ItemStack quickMoveStack(Player player, int slotIndex) {
+        public @NonNull ItemStack quickMoveStack(@NonNull Player player, int slotIndex) {
             ItemStack newStack = ItemStack.EMPTY;
             Slot slot = this.slots.get(slotIndex);
+
+            if (slot instanceof EmptySlot || slot instanceof InfoSlot) {
+                return ItemStack.EMPTY;
+            }
 
             if (slot.hasItem()) {
                 ItemStack originalStack = slot.getItem();
                 newStack = originalStack.copy();
 
-                int targetSlotCount = 45; // 36 for main inventory + 4 for armor + offhand + 4 empties
+                int targetSlotCount = 45; // 36 for main inventory + 4 for armor + offhand + info slot + 3 empty slots
                 int totalSlots = this.slots.size();
 
                 if (slotIndex < targetSlotCount) {
@@ -128,7 +140,7 @@ public class InvseeCommand extends HelpfulCommandsCommand {
         }
 
         @Override
-        public boolean stillValid(Player player) {
+        public boolean stillValid(@NonNull Player player) {
             return true;
         }
     }
@@ -144,18 +156,35 @@ public class InvseeCommand extends HelpfulCommandsCommand {
         }
 
         @Override
-        public boolean mayPlace(ItemStack stack) {
+        public boolean mayPlace(@NonNull ItemStack stack) {
             return false;
         }
 
         @Override
-        public boolean mayPickup(Player playerEntity) {
+        public boolean mayPickup(@NonNull Player playerEntity) {
+            return false;
+        }
+    }
+
+    public static class InfoSlot extends Slot {
+        public InfoSlot(Inventory inventory, int index, int x, int y) {
+            super(inventory, index, x, y);
+
+            ItemStack itemStack = new ItemStack(Items.ENCHANTED_BOOK);
+            itemStack.set(DataComponents.CUSTOM_NAME, Component.literal(TranslationManager.translate((ServerPlayer) inventory.player, "commands.helpful_commands.invsee.infoSlot.name")));
+            itemStack.set(DataComponents.LORE, new ItemLore(List.of(Component.literal(TranslationManager.translate((ServerPlayer) inventory.player, "commands.helpful_commands.invsee.infoSlot.lore")))));
+
+            set(itemStack);
+        }
+
+        @Override
+        public boolean mayPlace(@NonNull ItemStack stack) {
             return false;
         }
 
-//        @Override
-//        public Identifier getBackgroundSprite() {
-//            return ;
-//        }
+        @Override
+        public boolean mayPickup(@NonNull Player playerEntity) {
+            return false;
+        }
     }
 }
