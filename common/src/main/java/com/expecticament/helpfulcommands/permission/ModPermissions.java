@@ -40,7 +40,7 @@ public class ModPermissions {
 
         Permission(PermissionLevel defaultRequiredPermissionLevel) {
             String permName = this.name().toLowerCase().replaceAll("_", ".");
-            if (HelpfulCommands.getPlatform().equals(HelpfulCommands.Platform.NeoForge)) {
+            if (HelpfulCommands.getPlatform().equals(HelpfulCommands.Platform.NEO_FORGE)) {
                 this.id = permName;
             } else {
                 this.id = "%s.%s".formatted(HelpfulCommands.MOD_ID, permName);

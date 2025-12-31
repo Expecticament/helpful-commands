@@ -61,8 +61,16 @@ public class HomeManager {
         }
     }
 
-    public static void initialize(MinecraftServer server) {
+    public static int initialize(MinecraftServer server) {
         io = new JsonIO<>(server.getWorldPath(LevelResource.ROOT).resolve(HelpfulCommands.FOLDER_NAME), FILE_NAME, Homes.class);
+        Homes homes = io.read();
+        if (homes == null) {
+            return 0;
+        }
+        return homes.entries.values()
+                .stream()
+                .mapToInt(Map::size)
+                .sum();
     }
 
     public static void addHome(ServerPlayer player, String homeName) throws HomeAlreadyExistsException, HomeLimitExceededException {

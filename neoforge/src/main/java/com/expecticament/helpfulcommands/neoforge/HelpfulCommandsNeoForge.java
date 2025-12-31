@@ -23,8 +23,8 @@ public final class HelpfulCommandsNeoForge {
 
         IEventBus eventBus = NeoForge.EVENT_BUS;
 
-        // Run our common setup.
-        HelpfulCommands.init(HelpfulCommands.Platform.NeoForge, version);
+        // Common init
+        HelpfulCommands.init(HelpfulCommands.Platform.NEO_FORGE, version);
 
         // Permissions
         eventBus.addListener(PermissionHandlerNeoForgeImpl::registerPermissionNodes);

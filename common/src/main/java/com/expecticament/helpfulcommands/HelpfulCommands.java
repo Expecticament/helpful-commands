@@ -11,10 +11,24 @@ public final class HelpfulCommands {
     public static final String SHORT_MOD_ID = "hc";
     public static final String FOLDER_NAME = MOD_ID + "4";
 
-    public enum Platform { Fabric, NeoForge }
+    public enum Platform {
+        FABRIC("Fabric"),
+        NEO_FORGE("NeoForge");
+
+        private final String displayName;
+
+        Platform(String displayName) {
+            this.displayName = displayName;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
+    }
+
     private static Platform platform;
     private static String modVersion;
-
     private static boolean isDedicatedServer;
 
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -27,21 +41,23 @@ public final class HelpfulCommands {
     public static void onServerStarting(MinecraftServer server) {
         isDedicatedServer = server.isDedicatedServer();
 
-        ConfigManager.initialize(server);
-        StylingManager.initialize();
-        HomeManager.initialize(server);
-        WarpManager.initialize(server);
-        TranslationManager.initialize();
-        ServerLevelHelper.initialize(server);
-        CooldownManager.initialize(server);
-
-        LOGGER.info("");
         LOGGER.info("H   H  CCCCC  | ");
         LOGGER.info("H   H  C      |  Thank you for using");
         LOGGER.info("HHHHH  C      |  Helpful Commands");
-        LOGGER.info("H   H  C      |  " + HelpfulCommands.modVersion);
+        LOGGER.info("H   H  C      |  v{} on {}", modVersion, platform.toString());
         LOGGER.info("H   H  CCCCC  | ");
-        LOGGER.info("");
+
+        ConfigManager.initialize(server);
+        StylingManager.initialize();
+
+        int homes = HomeManager.initialize(server);
+        LOGGER.info("Loaded {} home{}", homes, homes == 1 ? "" : "s");
+        int warps = WarpManager.initialize(server);
+        LOGGER.info("Loaded {} warp{}", warps, warps == 1 ? "" : "s");
+        int cooldowns = CooldownManager.initialize(server);
+        LOGGER.info("Loaded {} active cooldown{}", cooldowns, cooldowns == 1 ? "" : "s");
+        TranslationManager.initialize();
+        ServerLevelHelper.initialize(server);
     }
 
     public static void save(MinecraftServer minecraftServer) {

@@ -145,8 +145,13 @@ public class WarpManager {
         return Objects.requireNonNullElse(io.read(), new Warps()).entries;
     }
 
-    public static void initialize(MinecraftServer server) {
+    public static int initialize(MinecraftServer server) {
         io = new JsonIO<>(server.getWorldPath(LevelResource.ROOT).resolve(HelpfulCommands.FOLDER_NAME), FILE_NAME, Warps.class);
+        Warps warps = io.read();
+        if (warps == null) {
+            return 0;
+        }
+        return warps.entries.size();
     }
 
     public static void writeToDisk() {

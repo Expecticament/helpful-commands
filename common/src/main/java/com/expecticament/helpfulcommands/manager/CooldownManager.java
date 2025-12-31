@@ -183,8 +183,16 @@ public class CooldownManager {
         }
     }
 
-    public static void initialize(MinecraftServer server) {
+    public static int initialize(MinecraftServer server) {
         io = new JsonIO<>(server.getWorldPath(LevelResource.ROOT).resolve(HelpfulCommands.FOLDER_NAME), FILE_NAME, Cooldowns.class);
+        Cooldowns cooldowns = io.read();
+        if (cooldowns == null) {
+            return 0;
+        }
+        return cooldowns.entries.values()
+                .stream()
+                .mapToInt(Map::size)
+                .sum();
     }
 
     public static void writeToDisk() {

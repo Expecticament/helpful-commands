@@ -23,9 +23,10 @@ public final class HelpfulCommandsFabric implements ModInitializer {
             version = "unknown";
         }
 
-        // Run our common setup.
-        HelpfulCommands.init(HelpfulCommands.Platform.Fabric, version);
+        // Common init
+        HelpfulCommands.init(HelpfulCommands.Platform.FABRIC, version);
 
+        // Permissions
         PermissionHandlerProvider.instance = new PermissionHandlerFabricImpl();
 
         // Register commands
