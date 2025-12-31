@@ -8,6 +8,7 @@ import com.expecticament.helpfulcommands.command.movementAndTeleportation.*;
 import com.expecticament.helpfulcommands.command.playersAndEntities.*;
 import com.expecticament.helpfulcommands.command.social.*;
 import com.expecticament.helpfulcommands.command.world.*;
+import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -27,25 +28,15 @@ public class ModCommandManager {
         private final String name;
         private final CommandCategory category;
         private final boolean defaultState;
-        private final int defaultOpLevel;
 
         public CommandData(String name, CommandCategory category) {
-            this(name, category, true, 2);
+            this(name, category, true);
         }
 
         public CommandData(String name, CommandCategory category, boolean defaultState) {
-            this(name, category, defaultState, 2);
-        }
-
-        public CommandData(String name, CommandCategory category, int defaultOpLevel) {
-            this(name, category, true, defaultOpLevel);
-        }
-
-        public CommandData(String name, CommandCategory category, boolean defaultState, int defaultOpLevel) {
             this.name = name;
             this.category = category;
             this.defaultState = defaultState;
-            this.defaultOpLevel = defaultOpLevel;
         }
 
         public String getName() {
@@ -59,8 +50,6 @@ public class ModCommandManager {
         public boolean isEnabledByDefault() {
             return defaultState;
         }
-
-        public int getDefaultOpLevel() { return defaultOpLevel; }
     }
 
     public static void registerCommands(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection selection) {
@@ -83,21 +72,21 @@ public class ModCommandManager {
         commands.add(new JumpCommand(new CommandData("jump", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
         commands.add(new SpawnCommand(new CommandData("spawn", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
         commands.add(new TprCommand(new CommandData("tpr", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
-        commands.add(new WarpCommand(new CommandData("warp", CommandCategory.MOVEMENT_AND_TELEPORTATION, 0)));
+        commands.add(new WarpCommand(new CommandData("warp", CommandCategory.MOVEMENT_AND_TELEPORTATION)));
 
-        commands.add(new CoordsCommand(new CommandData("coords", CommandCategory.PLAYERS_AND_ENTITIES, 0)));
+        commands.add(new CoordsCommand(new CommandData("coords", CommandCategory.PLAYERS_AND_ENTITIES)));
         commands.add(new DmgCommand(new CommandData("dmg", CommandCategory.PLAYERS_AND_ENTITIES)));
         commands.add(new ExtinguishCommand(new CommandData("extinguish", CommandCategory.PLAYERS_AND_ENTITIES)));
         commands.add(new FeedCommand(new CommandData("feed", CommandCategory.PLAYERS_AND_ENTITIES)));
         commands.add(new GmCommand(new CommandData("gm", CommandCategory.PLAYERS_AND_ENTITIES)));
-        commands.add(new HatCommand(new CommandData("hat", CommandCategory.PLAYERS_AND_ENTITIES, 0)));
+        commands.add(new HatCommand(new CommandData("hat", CommandCategory.PLAYERS_AND_ENTITIES)));
         commands.add(new HealCommand(new CommandData("heal", CommandCategory.PLAYERS_AND_ENTITIES)));
         commands.add(new IgniteCommand(new CommandData("ignite", CommandCategory.PLAYERS_AND_ENTITIES)));
 
-        commands.add(new CoinflipCommand(new CommandData("coinflip", CommandCategory.SOCIAL, 0)));
+        commands.add(new CoinflipCommand(new CommandData("coinflip", CommandCategory.SOCIAL)));
 
-        commands.add(new TimeCommand(new CommandData("day", CommandCategory.WORLD), 1000));
-        commands.add(new TimeCommand(new CommandData("night", CommandCategory.WORLD), 13000));
+        commands.add(new TimeCommand(new CommandData("day", CommandCategory.WORLD), 1000, ModPermissions.Permission.COMMAND_DAY));
+        commands.add(new TimeCommand(new CommandData("night", CommandCategory.WORLD), 13000, ModPermissions.Permission.COMMAND_NIGHT));
         commands.add(new ExplosionCommand(new CommandData("explosion", CommandCategory.WORLD, false)));
         commands.add(new FireballCommand(new CommandData("fireball", CommandCategory.WORLD, false)));
         commands.add(new KillitemsCommand(new CommandData("killitems", CommandCategory.WORLD)));

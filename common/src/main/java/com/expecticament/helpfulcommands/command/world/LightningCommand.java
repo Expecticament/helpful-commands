@@ -1,11 +1,13 @@
 package com.expecticament.helpfulcommands.command.world;
 
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
+import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.ServerLevelHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
@@ -31,7 +33,7 @@ public class LightningCommand extends HelpfulCommandsCommand {
         ModCommandManager.CommandData commandData = getCommandData();
 
         dispatcher.register(Commands.literal(commandData.getName())
-                .requires(this::canExecuteBaseCommand)
+                .requires(this::canExecute)
                 .then(Commands.argument("position", Vec3Argument.vec3())
                         .executes(ctx -> executePosition(ctx, Vec3Argument.getVec3(ctx, "position")))
                 )
@@ -42,8 +44,8 @@ public class LightningCommand extends HelpfulCommandsCommand {
     }
 
     @Override
-    public boolean canExecuteBaseCommand(CommandSourceStack source) {
-        return canExecute(source);
+    protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
+        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_LIGHTNING);
     }
 
     private int executePosition(CommandContext<CommandSourceStack> ctx, Vec3 position) {

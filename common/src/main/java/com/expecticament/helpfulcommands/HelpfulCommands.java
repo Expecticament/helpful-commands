@@ -11,14 +11,17 @@ public final class HelpfulCommands {
     public static final String SHORT_MOD_ID = "hc";
     public static final String FOLDER_NAME = MOD_ID + "4";
 
+    public enum Platform { Fabric, NeoForge }
+    private static Platform platform;
     private static String modVersion;
 
     private static boolean isDedicatedServer;
 
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    public static void init(String version) {
-        modVersion = version;
+    public static void init(Platform platform, String modVersion) {
+        HelpfulCommands.platform = platform;
+        HelpfulCommands.modVersion = modVersion;
     }
 
     public static void onServerStarting(MinecraftServer server) {
@@ -48,6 +51,8 @@ public final class HelpfulCommands {
         CooldownManager.removeExpired();
         CooldownManager.writeToDisk();
     }
+
+    public static Platform getPlatform() { return platform; }
 
     public static String getModVersion() { return modVersion; }
 

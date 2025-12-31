@@ -4,6 +4,7 @@ import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
 import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.*;
+import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.expecticament.helpfulcommands.suggestionProvider.TprReceivedRequestsPlayerNameSuggestionProvider;
 import com.mojang.brigadier.Command;
@@ -55,7 +56,7 @@ public class TprCommand extends HelpfulCommandsCommand {
         ModCommandManager.CommandData commandData = getCommandData();
 
         dispatcher.register(Commands.literal(commandData.getName())
-                .requires(this::canExecuteBaseCommand)
+                .requires(this::canExecute)
                 .then(Commands.literal("accept")
                         .then(Commands.argument("player", StringArgumentType.word())
                                 .suggests(new TprReceivedRequestsPlayerNameSuggestionProvider())
@@ -69,7 +70,7 @@ public class TprCommand extends HelpfulCommandsCommand {
                         )
                 )
                 .then(Commands.literal("request")
-                        .requires(src -> canExecute(src, "request"))
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_TPR_REQUEST))
                         .then(Commands.argument("player", EntityArgument.player())
                                 .executes(ctx -> executeRequest(ctx, EntityArgument.getPlayer(ctx, "player"), ""))
                                 .then(Commands.argument("comment", StringArgumentType.string())
@@ -84,8 +85,8 @@ public class TprCommand extends HelpfulCommandsCommand {
     }
 
     @Override
-    public boolean canExecuteBaseCommand(CommandSourceStack source) {
-        return canExecute(source) || canExecute(source, "request");
+    protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
+        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_TPR);
     }
 
     private int executeRequest(CommandContext<CommandSourceStack> ctx, ServerPlayer otherPlayer, String comment) throws CommandSyntaxException {
@@ -97,7 +98,7 @@ public class TprCommand extends HelpfulCommandsCommand {
             throw TARGET_MUST_BE_OTHER_PLAYER.create(src);
         }
 
-        if (!canExecuteBaseCommand(otherPlayer.createCommandSourceStack())) {
+        if (!this.checkBaseCommandRequirements(otherPlayer.createCommandSourceStack())) {
             throw TARGET_CANT_ACCEPT_REQUESTS.create(src, otherPlayer);
         }
 

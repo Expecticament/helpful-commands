@@ -2,10 +2,12 @@ package com.expecticament.helpfulcommands.command.playersAndEntities;
 
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
 import com.expecticament.helpfulcommands.helper.GameRulesHelper;
+import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
@@ -42,13 +44,13 @@ public class HatCommand extends HelpfulCommandsCommand {
         ModCommandManager.CommandData commandData = getCommandData();
 
         dispatcher.register(Commands.literal(commandData.getName())
-                .requires(this::canExecuteBaseCommand)
+                .requires(this::canExecute)
                 .executes(this::executeSelf)
                 .then(Commands.argument("players", EntityArgument.players())
-                        .requires(src -> canExecute(src, "other", 2))
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HAT_OTHERS))
                         .executes(ctx -> executeOther(ctx, EntityArgument.getPlayers(ctx, "players"), null))
                         .then(Commands.argument("item", ItemArgument.item(buildContext))
-                                .requires(src -> canExecute(src, "item", 2))
+                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HAT_ITEM))
                                 .executes(ctx -> executeOther(ctx, EntityArgument.getPlayers(ctx, "players"), ItemArgument.getItem(ctx, "item").createItemStack(1, false)))
                         )
                 )
@@ -56,8 +58,8 @@ public class HatCommand extends HelpfulCommandsCommand {
     }
 
     @Override
-    public boolean canExecuteBaseCommand(CommandSourceStack source) {
-        return canExecute(source) || canExecute(source, "other", 2) || canExecute(source, "item", 2);
+    protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
+        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_HAT);
     }
 
     private int executeSelf(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {

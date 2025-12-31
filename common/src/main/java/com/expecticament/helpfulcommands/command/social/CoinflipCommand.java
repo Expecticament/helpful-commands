@@ -1,11 +1,13 @@
 package com.expecticament.helpfulcommands.command.social;
 
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
+import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
@@ -46,7 +48,7 @@ public class CoinflipCommand extends HelpfulCommandsCommand {
         ModCommandManager.CommandData commandData = getCommandData();
 
         dispatcher.register(Commands.literal(commandData.getName())
-                .requires(this::canExecuteBaseCommand)
+                .requires(this::canExecute)
                 .then(Commands.literal("heads")
                         .executes(ctx -> execute(ctx, CoinSide.HEADS))
                 )
@@ -57,8 +59,8 @@ public class CoinflipCommand extends HelpfulCommandsCommand {
     }
 
     @Override
-    public boolean canExecuteBaseCommand(CommandSourceStack source) {
-        return canExecute(source);
+    protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
+        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_COINFLIP);
     }
 
     private int execute(CommandContext<CommandSourceStack> ctx, CoinSide guessedCoinSide) throws CommandSyntaxException {

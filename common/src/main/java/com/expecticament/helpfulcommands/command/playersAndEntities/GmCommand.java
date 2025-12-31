@@ -2,10 +2,12 @@ package com.expecticament.helpfulcommands.command.playersAndEntities;
 
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
 import com.expecticament.helpfulcommands.helper.GameRulesHelper;
+import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager;
+import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
@@ -33,32 +35,36 @@ public class GmCommand extends HelpfulCommandsCommand {
         ModCommandManager.CommandData commandData = getCommandData();
 
         dispatcher.register(Commands.literal(commandData.getName())
-                .requires(this::canExecuteBaseCommand)
+                .requires(this::canExecute)
                 .then(Commands.literal("a")
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_GM_A))
                         .executes(ctx -> executeSelf(ctx, GameType.ADVENTURE))
                         .then(Commands.argument("players", EntityArgument.players())
-                                .requires(src -> canExecute(src, "other"))
+                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_GM_OTHERS))
                                 .executes(ctx -> executeOther(ctx, GameType.ADVENTURE, EntityArgument.getPlayers(ctx, "players")))
                         )
                 )
                 .then(Commands.literal("c")
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_GM_C))
                         .executes(ctx -> executeSelf(ctx, GameType.CREATIVE))
                         .then(Commands.argument("players", EntityArgument.players())
-                                .requires(src -> canExecute(src, "other"))
+                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_GM_OTHERS))
                                 .executes(ctx -> executeOther(ctx, GameType.CREATIVE, EntityArgument.getPlayers(ctx, "players")))
                         )
                 )
+                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_GM_S))
                 .then(Commands.literal("s")
                         .executes(ctx -> executeSelf(ctx, GameType.SURVIVAL))
                         .then(Commands.argument("players", EntityArgument.players())
-                                .requires(src -> canExecute(src, "other"))
+                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_GM_OTHERS))
                                 .executes(ctx -> executeOther(ctx, GameType.SURVIVAL, EntityArgument.getPlayers(ctx, "players")))
                         )
                 )
                 .then(Commands.literal("sp")
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_GM_SP))
                         .executes(ctx -> executeSelf(ctx, GameType.SPECTATOR))
                         .then(Commands.argument("players", EntityArgument.players())
-                                .requires(src -> canExecute(src, "other"))
+                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_GM_OTHERS))
                                 .executes(ctx -> executeOther(ctx, GameType.SPECTATOR, EntityArgument.getPlayers(ctx, "players")))
                         )
                 )
@@ -66,8 +72,8 @@ public class GmCommand extends HelpfulCommandsCommand {
     }
 
     @Override
-    public boolean canExecuteBaseCommand(CommandSourceStack source) {
-        return canExecute(source) || canExecute(source, "other");
+    protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
+        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_GM);
     }
 
     private int executeSelf(CommandContext<CommandSourceStack> ctx, GameType gameType) throws CommandSyntaxException {

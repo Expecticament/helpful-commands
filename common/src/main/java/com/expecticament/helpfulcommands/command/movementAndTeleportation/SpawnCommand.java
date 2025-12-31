@@ -1,12 +1,14 @@
 package com.expecticament.helpfulcommands.command.movementAndTeleportation;
 
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
+import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.ServerLevelHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
@@ -46,27 +48,28 @@ public class SpawnCommand extends HelpfulCommandsCommand {
         ModCommandManager.CommandData commandData = getCommandData();
 
         dispatcher.register(Commands.literal(commandData.getName())
-                .requires(this::canExecuteBaseCommand)
+                .requires(this::canExecute)
                 .then(Commands.literal("player")
                         .then(Commands.literal("tp")
-                                .requires(src -> canExecute(src, "player.tp"))
+                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_SPAWN_PLAYER_TP))
                                 .then(Commands.argument("player", EntityArgument.player())
-                                        .requires(src -> canExecute(src, "player.tp.other"))
+                                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_SPAWN_PLAYER_TP_OTHER))
                                         .executes(ctx -> executePlayerTp(ctx, EntityArgument.getPlayer(ctx, "player")))
                                 )
                                 .executes(ctx -> executePlayerTp(ctx, null))
                         )
                         .then(Commands.literal("query")
                                 .then(Commands.argument("player", EntityArgument.player())
-                                        .requires(src -> canExecute(src, "player.query.other"))
+                                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_SPAWN_PLAYER_QUERY_OTHER))
                                         .executes(ctx -> executePlayerQuery(ctx, EntityArgument.getPlayer(ctx, "player")))
                                 )
                                 .executes(ctx -> executePlayerQuery(ctx, null))
                         )
                 )
                 .then(Commands.literal("world")
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_SPAWN_WORLD))
                         .then(Commands.literal("tp")
-                                .requires(src -> canExecute(src, "world.tp"))
+                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_SPAWN_WORLD_TP))
                                 .executes(this::executeWorldTp)
                         )
                         .then(Commands.literal("query")
@@ -77,8 +80,8 @@ public class SpawnCommand extends HelpfulCommandsCommand {
     }
 
     @Override
-    public boolean canExecuteBaseCommand(CommandSourceStack source) {
-        return canExecute(source) || canExecute(source, "player.tp") || canExecute(source, "player.tp.other") || canExecute(source, "player.query.other") || canExecute(source, "world.tp");
+    protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
+        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_SPAWN) || PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_SPAWN_WORLD);
     }
 
     private int executePlayerTp(CommandContext<CommandSourceStack> ctx, ServerPlayer otherPlayer) throws CommandSyntaxException {
@@ -211,7 +214,7 @@ public class SpawnCommand extends HelpfulCommandsCommand {
                 .appendLiteral(": ")
                 .appendComponent(Component.literal(dimensionLocation).setStyle(textStyles.getSecondary()));
 
-        if (src.isPlayer() && canExecute(src, isPlayer ? (isOwnSpawn ? "player.tp" : "player.tp.other") : "world.tp")) {
+        if (src.isPlayer() && PermissionHelper.hasPermission(src, isPlayer ? (isOwnSpawn ? ModPermissions.Permission.COMMAND_SPAWN_PLAYER_TP : ModPermissions.Permission.COMMAND_SPAWN_PLAYER_TP_OTHER) : ModPermissions.Permission.COMMAND_SPAWN_WORLD_TP)) {
             textBuilder
                     .appendNewline()
                     .appendNewline()

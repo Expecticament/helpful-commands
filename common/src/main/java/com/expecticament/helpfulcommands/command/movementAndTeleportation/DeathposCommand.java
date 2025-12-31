@@ -1,10 +1,12 @@
 package com.expecticament.helpfulcommands.command.movementAndTeleportation;
 
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
+import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.ServerLevelHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
+import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
@@ -43,19 +45,18 @@ public class DeathposCommand extends HelpfulCommandsCommand {
         ModCommandManager.CommandData commandData = getCommandData();
 
         dispatcher.register(Commands.literal(commandData.getName())
-                .requires(this::canExecuteBaseCommand)
+                .requires(this::canExecute)
                 .then(Commands.literal("tp")
-                        .requires(ctx -> canExecute(ctx, "tp") || canExecute(ctx, "tp.other"))
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_DEATHPOS_TP))
                         .then(Commands.argument("player", EntityArgument.player())
-                                .requires(src -> canExecute(src, "tp.other"))
+                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_DEATHPOS_TP_OTHER))
                                 .executes(ctx -> teleport(ctx, EntityArgument.getPlayer(ctx, "player")))
                         )
                         .executes(this::teleport)
                 )
                 .then(Commands.literal("query")
-                        .requires(src -> canExecute(src, "query") || canExecute(src, "query.other"))
                         .then(Commands.argument("player", EntityArgument.player())
-                                .requires(src -> canExecute(src, "query.other"))
+                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_DEATHPOS_QUERY_OTHER))
                                 .executes(ctx -> query(ctx, EntityArgument.getPlayer(ctx, "player")))
                         )
                         .executes(this::query)
@@ -64,8 +65,8 @@ public class DeathposCommand extends HelpfulCommandsCommand {
     }
 
     @Override
-    public boolean canExecuteBaseCommand(CommandSourceStack source) {
-        return canExecute(source) || canExecute(source, "tp") || canExecute(source, "tp.other") || canExecute(source, "query") || canExecute(source, "query.other");
+    protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
+        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_DEATHPOS);
     }
 
     private int query(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {

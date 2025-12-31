@@ -2,11 +2,13 @@ package com.expecticament.helpfulcommands.command.movementAndTeleportation;
 
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
 import com.expecticament.helpfulcommands.helper.GameRulesHelper;
+import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.ServerLevelHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager;
+import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.expecticament.helpfulcommands.suggestionProvider.WarpDescriptionSuggestionProvider;
 import com.expecticament.helpfulcommands.suggestionProvider.WarpNameSuggestionProvider;
@@ -65,12 +67,12 @@ public class WarpCommand extends HelpfulCommandsCommand {
         WarpNameSuggestionProvider warpNameSuggestionProvider = new WarpNameSuggestionProvider();
 
         dispatcher.register(Commands.literal(commandData.getName())
-                .requires(this::canExecuteBaseCommand)
+                .requires(this::canExecute)
                 .then(Commands.literal("tp")
-                        .requires(src -> canExecute(src, "tp"))
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_TP))
                         .then(Commands.argument("warp_name", StringArgumentType.word())
                                 .then(Commands.argument("entities", EntityArgument.entities())
-                                        .requires(src -> canExecute(src, "tp.other", 2))
+                                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_TP_OTHERS))
                                         .executes(ctx -> teleport(ctx, StringArgumentType.getString(ctx, "warp_name"), EntityArgument.getEntities(ctx, "entities")))
                                 )
                                 .executes(ctx -> teleport(ctx, StringArgumentType.getString(ctx, "warp_name")))
@@ -78,7 +80,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
                         )
                 )
                 .then(Commands.literal("add")
-                        .requires(src -> canExecute(src, "manage", 3))
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_MANAGE))
                         .then(Commands.argument("warp_name", StringArgumentType.word())
                                 .then(Commands.argument("description", StringArgumentType.string())
                                         .executes(ctx -> addWarp(ctx, StringArgumentType.getString(ctx, "warp_name"), StringArgumentType.getString(ctx, "description")))
@@ -93,14 +95,14 @@ public class WarpCommand extends HelpfulCommandsCommand {
                         )
                 )
                 .then(Commands.literal("remove")
-                        .requires(src -> canExecute(src, "manage", 3))
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_MANAGE))
                         .then(Commands.argument("warp_name", StringArgumentType.word())
                                 .executes(ctx -> removeWarp(ctx, StringArgumentType.getString(ctx, "warp_name")))
                                 .suggests(warpNameSuggestionProvider)
                         )
                 )
                 .then(Commands.literal("edit")
-                        .requires(src -> canExecute(src, "manage", 3))
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_MANAGE))
                         .then(Commands.argument("warp_name", StringArgumentType.word())
                                 .then(Commands.literal("name")
                                         .then(Commands.argument("new_name", StringArgumentType.word())
@@ -135,8 +137,8 @@ public class WarpCommand extends HelpfulCommandsCommand {
     }
 
     @Override
-    public boolean canExecuteBaseCommand(CommandSourceStack source) {
-        return canExecute(source) || canExecute(source, "tp") || canExecute(source, "tp.other") || canExecute(source, "manage");
+    protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
+        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_WARP);
     }
 
     private int teleport(CommandContext<CommandSourceStack> ctx, String warpName) throws CommandSyntaxException {
@@ -422,8 +424,8 @@ public class WarpCommand extends HelpfulCommandsCommand {
                         .appendNewline()
                         .appendLiteral(TranslationManager.translate(src, "helpful_commands.common.remove") + ": /warp remove %s".formatted(warpName));
             } else {
-                boolean canTp = canExecute(src, "tp");
-                boolean canManage = canExecute(src, "manage", 3);
+                boolean canTp = PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_TP);
+                boolean canManage = PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_MANAGE);
                 if (canTp || canManage) {
                     textBuilder
                             .appendNewline()

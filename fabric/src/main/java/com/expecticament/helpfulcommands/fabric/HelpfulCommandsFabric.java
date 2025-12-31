@@ -1,5 +1,7 @@
 package com.expecticament.helpfulcommands.fabric;
 
+import com.expecticament.helpfulcommands.fabric.permission.PermissionHandlerFabricImpl;
+import com.expecticament.helpfulcommands.permission.PermissionHandlerProvider;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import net.fabricmc.api.ModInitializer;
 
@@ -14,15 +16,17 @@ public final class HelpfulCommandsFabric implements ModInitializer {
         // This code runs as soon as Minecraft is in a mod-load-ready state.
         // However, some things (like resources) may still be uninitialized.
         // Proceed with mild caution.
-
         String version;
         try {
             version = FabricLoader.getInstance().getModContainer(HelpfulCommands.MOD_ID).orElseThrow().getMetadata().getVersion().toString();
         } catch (Exception e) {
             version = "unknown";
         }
+
         // Run our common setup.
-        HelpfulCommands.init(version);
+        HelpfulCommands.init(HelpfulCommands.Platform.Fabric, version);
+
+        PermissionHandlerProvider.instance = new PermissionHandlerFabricImpl();
 
         // Register commands
         CommandRegistrationCallback.EVENT.register(ModCommandManager::registerCommands);

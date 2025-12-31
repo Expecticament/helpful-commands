@@ -1,7 +1,9 @@
 package com.expecticament.helpfulcommands.command.world;
 
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
+import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.manager.StylingManager;
+import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
@@ -18,10 +20,12 @@ import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 
 public class TimeCommand extends HelpfulCommandsCommand {
     private final int time;
+    private final ModPermissions.Permission permission;
 
-    public TimeCommand(CommandData commandData, int time) {
+    public TimeCommand(CommandData commandData, int time, ModPermissions.Permission permission) {
         super(commandData);
         this.time = time;
+        this.permission = permission;
     }
 
     @Override
@@ -29,14 +33,14 @@ public class TimeCommand extends HelpfulCommandsCommand {
         CommandData commandData = getCommandData();
 
         dispatcher.register(Commands.literal(commandData.getName())
-                .requires(this::canExecuteBaseCommand)
+                .requires(this::canExecute)
                 .executes(this::execute)
         );
     }
 
     @Override
-    public boolean canExecuteBaseCommand(CommandSourceStack source) {
-        return canExecute(source);
+    protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
+        return PermissionHelper.hasPermission(source, permission);
     }
 
     private int execute(CommandContext<CommandSourceStack> ctx) {

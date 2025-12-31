@@ -1,10 +1,12 @@
 package com.expecticament.helpfulcommands.command.playersAndEntities;
 
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
+import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager;
+import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
@@ -39,7 +41,7 @@ public class DmgCommand extends HelpfulCommandsCommand {
         ModCommandManager.CommandData commandData = getCommandData();
 
         dispatcher.register(Commands.literal(commandData.getName())
-                .requires(this::canExecuteBaseCommand)
+                .requires(this::canExecute)
                 .then(Commands.argument("entities", EntityArgument.entities())
                         .then(Commands.argument("amount", FloatArgumentType.floatArg(0f))
                                 .executes(context -> execute(context, EntityArgument.getEntities(context, "entities"), FloatArgumentType.getFloat(context, "amount"), context.getSource().getLevel().damageSources().generic()))
@@ -66,8 +68,8 @@ public class DmgCommand extends HelpfulCommandsCommand {
     }
 
     @Override
-    public boolean canExecuteBaseCommand(CommandSourceStack source) {
-        return canExecute(source);
+    protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
+        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_DMG);
     }
 
     private int execute(CommandContext<CommandSourceStack> ctx, Collection<? extends Entity> entities, float amount, DamageSource damageSource) throws CommandSyntaxException {

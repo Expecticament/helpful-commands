@@ -1,7 +1,5 @@
 package com.expecticament.helpfulcommands.command;
 
-import com.expecticament.helpfulcommands.HelpfulCommands;
-import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ConfigManager;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
@@ -50,28 +48,15 @@ public abstract class HelpfulCommandsCommand {
 
     public abstract void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection);
 
-    public abstract boolean canExecuteBaseCommand(CommandSourceStack source);
-
     public boolean canExecute(CommandSourceStack source) {
-        return canExecute(source, "", data.getDefaultOpLevel());
-    }
-
-    public boolean canExecute(CommandSourceStack source, String permCheckAppend) {
-        return canExecute(source, permCheckAppend, data.getDefaultOpLevel());
-    }
-
-    public boolean canExecute(CommandSourceStack source, String permCheckAppend, int permLevelOverride) {
+        if (data.getCategory().equals(ModCommandManager.CommandCategory.MAIN)) {
+            return true;
+        }
         ConfigManager.HelpfulCommandsConfig config = ConfigManager.readConfig();
-        if (!config.getCommandState(data.getName())) {
-            return false;
-        }
-
-        if (!permCheckAppend.isEmpty()) {
-            permCheckAppend = "." + permCheckAppend;
-        }
-
-        return PermissionHelper.hasPermission(source, HelpfulCommands.MOD_ID + ".command." + data.getCategory().toString().toLowerCase() + "." + data.getName() + permCheckAppend, permLevelOverride);
+        return config.getCommandState(data.getName()) && checkBaseCommandRequirements(source);
     }
+
+    protected abstract boolean checkBaseCommandRequirements(CommandSourceStack source);
 
     protected ServerPlayer validatePlayerOnly(CommandSourceStack source) throws CommandSyntaxException {
         return source.getPlayerOrException();

@@ -7,6 +7,7 @@ import com.expecticament.helpfulcommands.manager.ConfigManager;
 import com.expecticament.helpfulcommands.manager.ModCommandManager.CommandData;
 import com.expecticament.helpfulcommands.manager.StylingManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager;
+import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -43,7 +44,7 @@ public class KillitemsCommand extends HelpfulCommandsCommand {
         CommandData commandData = getCommandData();
 
         dispatcher.register(Commands.literal(commandData.getName())
-                .requires(this::canExecuteBaseCommand)
+                .requires(this::canExecute)
                 .then(Commands.argument("range_cubic", IntegerArgumentType.integer(1))
                         .then(Commands.argument("filter", ItemPredicateArgument.itemPredicate(buildContext))
                                 .executes(ctx -> execute(ctx, IntegerArgumentType.getInteger(ctx, "range_cubic"), ItemPredicateArgument.getItemPredicate(ctx, "filter")))
@@ -55,8 +56,8 @@ public class KillitemsCommand extends HelpfulCommandsCommand {
     }
 
     @Override
-    public boolean canExecuteBaseCommand(CommandSourceStack source) {
-        return canExecute(source);
+    protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
+        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_KILLITEMS);
     }
 
     private int execute(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {

@@ -5,6 +5,7 @@ import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.ServerLevelHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.*;
+import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.expecticament.helpfulcommands.suggestionProvider.HomeNameSuggestionProvider;
 import com.mojang.brigadier.Command;
@@ -51,9 +52,9 @@ public class HomeCommand extends HelpfulCommandsCommand {
         HomeNameSuggestionProvider homeNameSuggestionProvider = new HomeNameSuggestionProvider();
 
         dispatcher.register(Commands.literal(commandData.getName())
-                .requires(this::canExecuteBaseCommand)
+                .requires(this::canExecute)
                 .then(Commands.literal("tp")
-                        .requires(ctx -> canExecute(ctx, "tp"))
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_TP))
                         .then(Commands.argument("home_name", StringArgumentType.word())
                                 .suggests(homeNameSuggestionProvider)
                                 .executes(ctx -> teleport(ctx, StringArgumentType.getString(ctx, "home_name")))
@@ -93,8 +94,8 @@ public class HomeCommand extends HelpfulCommandsCommand {
     }
 
     @Override
-    public boolean canExecuteBaseCommand(CommandSourceStack source) {
-        return canExecute(source) || canExecute(source, "tp");
+    protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
+        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_HOME);
     }
 
     private int teleport(CommandContext<CommandSourceStack> ctx, String homeName) throws CommandSyntaxException {
@@ -263,7 +264,7 @@ public class HomeCommand extends HelpfulCommandsCommand {
                     .appendNewline()
                     .appendNewline();
 
-            if (src.isPlayer() && canExecute(src, "tp")) {
+            if (src.isPlayer() && PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_TP)) {
                 textBuilder
                         .appendComponent(StylingHelper.getButton(textDecorators.getTeleport(), Component.literal(TranslationManager.translate(sourcePlayer, "helpful_commands.common.teleport")), tpBtnStyle))
                         .appendWhitespace();

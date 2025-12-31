@@ -2,11 +2,13 @@ package com.expecticament.helpfulcommands.command.itemsAndInventory;
 
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
 import com.expecticament.helpfulcommands.helper.GameRulesHelper;
+import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
@@ -46,7 +48,7 @@ public class RenameCommand extends HelpfulCommandsCommand {
         ModCommandManager.CommandData commandData = getCommandData();
 
         dispatcher.register(Commands.literal(commandData.getName())
-                .requires(this::canExecuteBaseCommand)
+                .requires(this::canExecute)
                 .then(Commands.argument("new_name", StringArgumentType.string())
                         .suggests(new SuggestionProvider<CommandSourceStack>() {
                             @Override
@@ -57,7 +59,7 @@ public class RenameCommand extends HelpfulCommandsCommand {
                         })
                         .executes(ctx -> executeSelf(ctx, StringArgumentType.getString(ctx, "new_name")))
                         .then(Commands.argument("players", EntityArgument.players())
-                                .requires(src -> canExecute(src, "other"))
+                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_RENAME_OTHERS))
                                 .executes(ctx -> executeOther(ctx, StringArgumentType.getString(ctx, "new_name"), EntityArgument.getPlayers(ctx, "players")))
                         )
                 )
@@ -65,8 +67,8 @@ public class RenameCommand extends HelpfulCommandsCommand {
     }
 
     @Override
-    public boolean canExecuteBaseCommand(CommandSourceStack source) {
-        return canExecute(source) || canExecute(source, "other");
+    protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
+        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_RENAME);
     }
 
     private int executeSelf(CommandContext<CommandSourceStack> ctx, String newName) throws CommandSyntaxException {

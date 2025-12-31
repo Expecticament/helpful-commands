@@ -6,6 +6,7 @@ import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.*;
 import com.expecticament.helpfulcommands.manager.ModCommandManager.CommandData;
+import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.expecticament.helpfulcommands.suggestionProvider.HelpfulCommandsCommandSuggestionProvider;
 import com.mojang.brigadier.Command;
@@ -28,6 +29,7 @@ import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.*;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.NameAndId;
 
 import java.net.URI;
 import java.util.*;
@@ -52,7 +54,7 @@ public class HcCommand extends HelpfulCommandsCommand {
         CommandData commandData = getCommandData();
 
         LiteralArgumentBuilder<CommandSourceStack> configFieldArgumentBuilder = Commands.literal("field");
-        configFieldArgumentBuilder.requires(src -> PermissionHelper.canConfigure(src, "field"));
+        configFieldArgumentBuilder.requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HC_CONFIG_FIELD));
         configFieldArgumentBuilder.executes(this::configField);
         for (ConfigManager.CONFIG_FIELD configField : ConfigManager.CONFIG_FIELD.values()) {
             String name = configField.name().toLowerCase();
@@ -104,26 +106,27 @@ public class HcCommand extends HelpfulCommandsCommand {
         }
 
         dispatcher.register(Commands.literal(commandData.getName())
+                .requires(this::canExecute)
                 .executes(this::about)
                 .then(Commands.literal("about")
                         .executes(this::about)
                 )
-                .then(Commands.literal("commandList")
+                .then(Commands.literal("commands")
                         .executes(ctx -> commandList(ctx, dispatcher, null))
                         .then(Commands.argument("show_all", BoolArgumentType.bool())
-                                .requires(src -> !PermissionHelper.canConfigure(src, "command.state") && src.isPlayer())
+                                .requires(src -> src.isPlayer() && (!PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HC_CONFIG_COMMAND_STATE) || !singleplayerOwnerCheck(src)))
                                 .executes(ctx -> commandList(ctx, dispatcher, BoolArgumentType.getBool(ctx, "show_all")))
                         )
                 )
                 .then(Commands.literal("config")
-                        .requires(PermissionHelper::canConfigure)
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HC_CONFIG) && singleplayerOwnerCheck(src))
                         .executes(this::config)
                         .then(configFieldArgumentBuilder)
                         .then(Commands.literal("command")
-                                .requires(src -> PermissionHelper.canConfigure(src, "command") || PermissionHelper.canConfigure(src, "command.state"))
+                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HC_CONFIG_COMMAND))
                                 .then(Commands.literal("state")
+                                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HC_CONFIG_COMMAND_STATE))
                                         .then(Commands.argument("command", StringArgumentType.word())
-                                                .requires(src -> PermissionHelper.canConfigure(src, "command.state"))
                                                 .executes(ctx -> queryCommandState(ctx, StringArgumentType.getString(ctx, "command")))
                                                 .suggests(new HelpfulCommandsCommandSuggestionProvider())
                                                 .then(Commands.argument("new_state", BoolArgumentType.bool())
@@ -134,7 +137,7 @@ public class HcCommand extends HelpfulCommandsCommand {
                         )
                 )
                 .then(Commands.literal("cooldowns")
-                        .requires(PermissionHelper::canManageActiveCooldowns)
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HC_COOLDOWNS) && singleplayerOwnerCheck(src))
                         .then(cooldownsClearArgumentBuilder)
                         .then(Commands.literal("clear_all")
                                 .executes(this::clearAllCooldowns)
@@ -144,8 +147,18 @@ public class HcCommand extends HelpfulCommandsCommand {
     }
 
     @Override
-    public boolean canExecuteBaseCommand(CommandSourceStack source) {
+    protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
         return true;
+    }
+
+    private boolean singleplayerOwnerCheck(CommandSourceStack source) {
+        if (HelpfulCommands.isDedicatedServer()) {
+            return true;
+        }
+
+        ServerPlayer sourcePlayer = source.getPlayer();
+
+        return sourcePlayer != null && source.getServer().isSingleplayerOwner(new NameAndId(sourcePlayer.getGameProfile()));
     }
 
     private int about(CommandContext<CommandSourceStack> ctx) {
@@ -159,7 +172,7 @@ public class HcCommand extends HelpfulCommandsCommand {
 
         HoverEvent linkHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "hover.helpful_commands.clickToOpenTheLink")));
 
-        Component quickActionCommandListBtn = StylingHelper.getButton("\uD83D\uDCC3", Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.actions.commandList")), new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.hover.commandList"))), new ClickEvent.RunCommand("/hc commandList"));
+        Component quickActionCommandListBtn = StylingHelper.getButton("\uD83D\uDCC3", Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.actions.commandList")), new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.hover.commandList"))), new ClickEvent.RunCommand("/hc commands"));
         Component quickActionConfigureBtn = StylingHelper.getButton("\uD83D\uDD27", Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.actions.config")), new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.hover.config"))), new ClickEvent.RunCommand("/hc config"));
 
         String linkSeparator = isPlayer ? " " + textDecorators.getBulletPoint() : "\n";
@@ -226,7 +239,7 @@ public class HcCommand extends HelpfulCommandsCommand {
                     .appendWhitespace()
                     .appendComponent(quickActionCommandListBtn);
 
-            if (PermissionHelper.canConfigure(src)) {
+            if (PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HC_CONFIG) && singleplayerOwnerCheck(src)) {
                 textBuilder
                         .appendWhitespace()
                         .appendComponent(quickActionConfigureBtn);
@@ -235,7 +248,7 @@ public class HcCommand extends HelpfulCommandsCommand {
             textBuilder
                     .appendNewline()
                     .appendTranslatable("commands.helpful_commands.hc.about.actions.commandList")
-                    .appendLiteral(": /hc commandList")
+                    .appendLiteral(": /hc commands")
                     .appendNewline()
                     .appendTranslatable("commands.helpful_commands.hc.about.actions.config")
                     .appendLiteral(": /hc config");
@@ -250,7 +263,7 @@ public class HcCommand extends HelpfulCommandsCommand {
         CommandSourceStack src = ctx.getSource();
 
         if (showAll == null) {
-            showAll = !src.isPlayer() || PermissionHelper.canConfigure(src, "command.state");
+            showAll = !src.isPlayer() || (PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HC_CONFIG_COMMAND_STATE) && singleplayerOwnerCheck(src));
         }
 
         TextBuilder textBuilder = new TextBuilder(src);
@@ -267,7 +280,7 @@ public class HcCommand extends HelpfulCommandsCommand {
         HelpfulCommandsStyle.TextDecorators textDecorators = hcStyle.getTextDecorators();
         Style categoryStyle = textStyles.getTertiary();
 
-        boolean toggleStateCommandPermission = PermissionHelper.canConfigure(src, "command.state");
+        boolean toggleStateCommandPermission = PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HC_CONFIG_COMMAND_STATE) && singleplayerOwnerCheck(src);
 
         ConfigManager.HelpfulCommandsConfig config = ConfigManager.readConfig();
 
@@ -283,7 +296,7 @@ public class HcCommand extends HelpfulCommandsCommand {
                 CommandData cmdData = command.getCommandData();
 
                 boolean enabled = config.getCommandState(cmdData.getName());
-                boolean hasPerms = command.canExecuteBaseCommand(src);
+                boolean hasPerms = command.canExecute(src);
                 boolean canUse = enabled && hasPerms;
 
                 textBuilder.appendNewline().appendComponent(Component.literal(command.equals(lastCommand) ? textDecorators.getCategoryEndingChar() : textDecorators.getCategoryTrailingChar()).setStyle(categoryStyle));
@@ -329,7 +342,7 @@ public class HcCommand extends HelpfulCommandsCommand {
 
             totalCommands += entry.getValue().size();
 
-            List<HelpfulCommandsCommand> filtered = entry.getValue().stream().filter(cmd -> config.getCommandState(cmd.getCommandData().getName())).filter(cmd -> cmd.canExecuteBaseCommand(src)).toList();
+            List<HelpfulCommandsCommand> filtered = entry.getValue().stream().filter(cmd -> config.getCommandState(cmd.getCommandData().getName())).filter(cmd -> cmd.canExecute(src)).toList();
             if (!filtered.isEmpty()) {
                 available.put(entry.getKey(), filtered);
                 availableCommands += filtered.size();
@@ -350,7 +363,7 @@ public class HcCommand extends HelpfulCommandsCommand {
                 .appendComponent(Component.literal("[!] ").setStyle(textStyles.getWarning()))
                 .appendComponent(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.commandList.availableOnly")).setStyle(textStyles.getWarning()))
                 .appendWhitespace()
-                .appendComponent(StylingHelper.getButton(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.commandList.availableOnly.showAll")), textStyles.getButton().withClickEvent(new ClickEvent.RunCommand("/hc commandList true"))))
+                .appendComponent(StylingHelper.getButton(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.commandList.availableOnly.showAll")), textStyles.getButton().withClickEvent(new ClickEvent.RunCommand("/hc commands true"))))
                 .appendNewline();
 
         for (Map.Entry<ModCommandManager.CommandCategory, List<HelpfulCommandsCommand>> entry : available.entrySet()) {
@@ -444,7 +457,7 @@ public class HcCommand extends HelpfulCommandsCommand {
 
         textBuilder.appendComponent(StylingHelper.getTitle(Component.literal("Helpful Commands"), Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.config.title"))));
 
-        if (PermissionHelper.canConfigure(src, "command") || PermissionHelper.canConfigure(src, "command.state")) {
+        if (PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HC_CONFIG_COMMAND) && singleplayerOwnerCheck(src)) {
             textBuilder
                     .appendNewline()
                     .appendNewline()
@@ -454,7 +467,7 @@ public class HcCommand extends HelpfulCommandsCommand {
                     .appendWhitespace()
                     .appendTranslatable("commands.helpful_commands.hc.config.command.description", Component.literal("/hc config command").setStyle(textStyles.getSecondary().withClickEvent(new ClickEvent.SuggestCommand("/hc config command ")).withHoverEvent(new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "hover.helpful_commands.clickToPasteCommand"))))));
             if (isPlayer) {
-                Component commandListBtn = StylingHelper.getButton("\uD83D\uDCC3", Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.actions.commandList")), new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.hover.commandList"))), new ClickEvent.RunCommand("/hc commandList"));
+                Component commandListBtn = StylingHelper.getButton("\uD83D\uDCC3", Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.actions.commandList")), new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.hover.commandList"))), new ClickEvent.RunCommand("/hc commands"));
                 textBuilder
                         .appendNewline()
                         .appendWhitespace()
@@ -462,7 +475,7 @@ public class HcCommand extends HelpfulCommandsCommand {
             }
         }
 
-        if (PermissionHelper.canConfigure(src, "field")) {
+        if (PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HC_CONFIG_FIELD) && singleplayerOwnerCheck(src)) {
             textBuilder
                     .appendNewline()
                     .appendNewline()

@@ -2,11 +2,13 @@ package com.expecticament.helpfulcommands.command.movementAndTeleportation;
 
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
 import com.expecticament.helpfulcommands.helper.GameRulesHelper;
+import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.ServerLevelHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager;
+import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
@@ -44,10 +46,10 @@ public class DimensionCommand extends HelpfulCommandsCommand {
         ModCommandManager.CommandData commandData = getCommandData();
 
         dispatcher.register(Commands.literal(commandData.getName())
-                .requires(this::canExecuteBaseCommand)
+                .requires(this::canExecute)
                 .then(Commands.argument("dimension", DimensionArgument.dimension())
                         .then(Commands.argument("entities", EntityArgument.entities())
-                                .requires(src -> canExecute(src, "other"))
+                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_DIMENSION_OTHERS))
                                 .executes(ctx -> executeOther(ctx, DimensionArgument.getDimension(ctx, "dimension"), EntityArgument.getEntities(ctx, "entities")))
                         )
                         .executes(ctx -> executeSelf(ctx, DimensionArgument.getDimension(ctx, "dimension")))
@@ -56,8 +58,8 @@ public class DimensionCommand extends HelpfulCommandsCommand {
     }
 
     @Override
-    public boolean canExecuteBaseCommand(CommandSourceStack source) {
-        return canExecute(source) || canExecute(source, "other");
+    protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
+        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_DIMENSION);
     }
 
     private int executeSelf(CommandContext<CommandSourceStack> ctx, ServerLevel serverLevel) throws CommandSyntaxException {

@@ -1,11 +1,13 @@
 package com.expecticament.helpfulcommands.command.playersAndEntities;
 
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
+import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.ServerLevelHelper;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.StylingManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager;
+import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
@@ -34,25 +36,24 @@ public class CoordsCommand extends HelpfulCommandsCommand {
         ModCommandManager.CommandData commandData = getCommandData();
 
         dispatcher.register(Commands.literal(commandData.getName())
-                .requires(this::canExecuteBaseCommand)
+                .requires(this::canExecute)
                 .then(Commands.literal("broadcast")
-                        .requires(src -> canExecute(src, "broadcast", 2) || canExecute(src, "broadcast.other", 2))
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_COORDS_BROADCAST))
                         .then(Commands.argument("player", EntityArgument.player())
-                                .requires(src -> canExecute(src, "broadcast.other", 2))
+                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_COORDS_BROADCAST_OTHER))
                                 .executes(ctx -> broadcast(ctx, EntityArgument.getPlayer(ctx, "player")))
                         )
                         .executes(this::broadcast)
                 )
                 .then(Commands.literal("share")
-                        .requires(src -> canExecute(src, "share"))
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_COORDS_SHARE))
                         .then(Commands.argument("players", EntityArgument.players())
                                 .executes(ctx -> share(ctx, EntityArgument.getPlayers(ctx, "players")))
                         )
                 )
                 .then(Commands.literal("query")
-                        .requires(src -> canExecute(src, "query", 2) || canExecute(src, "query.other", 2))
                         .then(Commands.argument("player", EntityArgument.player())
-                                .requires(src -> canExecute(src, "query.other", 2))
+                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_COORDS_QUERY_OTHER))
                                 .executes(ctx -> query(ctx, EntityArgument.getPlayer(ctx, "player")))
                         )
                         .executes(this::execute)
@@ -62,8 +63,8 @@ public class CoordsCommand extends HelpfulCommandsCommand {
     }
 
     @Override
-    public boolean canExecuteBaseCommand(CommandSourceStack source) {
-        return canExecute(source) || canExecute(source, "broadcast", 2) || canExecute(source, "broadcast.other", 2) || canExecute(source, "share") || canExecute(source,"query", 2) || canExecute(source,"query.other", 2);
+    protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
+        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_COORDS);
     }
 
     private int execute(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
