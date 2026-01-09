@@ -32,21 +32,21 @@ import java.util.Collection;
 public class DmgCommand extends HelpfulCommandsCommand {
     private static final SimpleCommandExceptionType ERROR_INVULNERABLE = new SimpleCommandExceptionType(Component.translatable("commands.damage.invulnerable"));
 
-    public DmgCommand(ModCommandManager.CommandData commandData) {
-        super(commandData);
+    public DmgCommand(ModCommandManager.ModCommand modCommand) {
+        super(modCommand);
     }
 
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
-        ModCommandManager.CommandData commandData = getCommandData();
+        ModCommandManager.ModCommand modCommand = getModCommand();
 
-        dispatcher.register(Commands.literal(commandData.getName())
+        dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .then(Commands.argument("entities", EntityArgument.entities())
                         .then(Commands.argument("amount", FloatArgumentType.floatArg(0f))
                                 .executes(context -> execute(context, EntityArgument.getEntities(context, "entities"), FloatArgumentType.getFloat(context, "amount"), context.getSource().getLevel().damageSources().generic()))
                                 .then(Commands.argument("damage_type", ResourceArgument.resource(buildContext, Registries.DAMAGE_TYPE))
-                                        .executes(context -> execute(context, EntityArgument.getEntities(context, "target(s)"), FloatArgumentType.getFloat(context, "amount"), new DamageSource(ResourceArgument.getResource(context, "damage_type", Registries.DAMAGE_TYPE))))
+                                        .executes(context -> execute(context, EntityArgument.getEntities(context, "entities"), FloatArgumentType.getFloat(context, "amount"), new DamageSource(ResourceArgument.getResource(context, "damage_type", Registries.DAMAGE_TYPE))))
                                         .then(Commands.literal("at")
                                                 .then(Commands.argument("location", Vec3Argument.vec3())
                                                         .executes(context -> execute(context, EntityArgument.getEntities(context, "entities"), FloatArgumentType.getFloat(context, "amount"), new DamageSource(ResourceArgument.getResource(context, "damage_type", Registries.DAMAGE_TYPE), Vec3Argument.getVec3(context, "location")))))

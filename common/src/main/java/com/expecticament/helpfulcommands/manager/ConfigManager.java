@@ -246,13 +246,13 @@ public class ConfigManager {
         HelpfulCommandsConfig config = readConfig();
 
         for (HelpfulCommandsCommand command : ModCommandManager.getCommandList()) {
-            ModCommandManager.CommandData data = command.getCommandData();
-            if (data.getCategory() == ModCommandManager.CommandCategory.MAIN) {
+            ModCommandManager.ModCommand modCommand = command.getModCommand();
+            if (modCommand.getCategory() == ModCommandManager.CommandCategory.MAIN) {
                 continue;
             }
             CommandConfigEntry entry = new CommandConfigEntry();
-            entry.state = data.isEnabledByDefault();
-            config.command.commands.putIfAbsent(data.getName(), entry);
+            entry.state = modCommand.isEnabledByDefault();
+            config.command.commands.putIfAbsent(modCommand.getName(), entry);
         }
 
         io.save(config);

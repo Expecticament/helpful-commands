@@ -33,15 +33,15 @@ public class RepairCommand extends HelpfulCommandsCommand {
             new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.repair.error.itemNotDamaged").getComponent()
     );
 
-    public RepairCommand(ModCommandManager.CommandData commandData) {
-        super(commandData);
+    public RepairCommand(ModCommandManager.ModCommand modCommand) {
+        super(modCommand);
     }
 
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
-        ModCommandManager.CommandData commandData = getCommandData();
+        ModCommandManager.ModCommand modCommand = getModCommand();
 
-        dispatcher.register(Commands.literal(commandData.getName())
+        dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .executes(this::executeSelf)
                 .then(Commands.argument("players", EntityArgument.players())

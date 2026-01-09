@@ -39,15 +39,15 @@ public class SpawnCommand extends HelpfulCommandsCommand {
             new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.spawn.error.playerSpawnNotSet.other", StylingHelper.getAffectedEntityNameText((ServerPlayer) otherPlayer)).getComponent()
     );
 
-    public SpawnCommand(ModCommandManager.CommandData commandData) {
-        super(commandData);
+    public SpawnCommand(ModCommandManager.ModCommand modCommand) {
+        super(modCommand);
     }
 
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
-        ModCommandManager.CommandData commandData = getCommandData();
+        ModCommandManager.ModCommand modCommand = getModCommand();
 
-        dispatcher.register(Commands.literal(commandData.getName())
+        dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .then(Commands.literal("player")
                         .then(Commands.literal("tp")

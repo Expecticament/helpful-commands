@@ -5,7 +5,6 @@ import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
 import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.*;
-import com.expecticament.helpfulcommands.manager.ModCommandManager.CommandData;
 import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.expecticament.helpfulcommands.suggestionProvider.HelpfulCommandsCommandSuggestionProvider;
@@ -45,13 +44,13 @@ public class HcCommand extends HelpfulCommandsCommand {
             new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.hc.cooldowns.error.noActiveCooldownsFound").getComponent()
     );
 
-    public HcCommand(CommandData commandData) {
-        super(commandData);
+    public HcCommand(ModCommandManager.ModCommand modCommand) {
+        super(modCommand);
     }
 
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
-        CommandData commandData = getCommandData();
+        ModCommandManager.ModCommand modCommand = getModCommand();
 
         LiteralArgumentBuilder<CommandSourceStack> configFieldArgumentBuilder = Commands.literal("field");
         configFieldArgumentBuilder.requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HC_CONFIG_FIELD));
@@ -105,7 +104,7 @@ public class HcCommand extends HelpfulCommandsCommand {
             );
         }
 
-        dispatcher.register(Commands.literal(commandData.getName())
+        dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .executes(this::about)
                 .then(Commands.literal("about")
@@ -293,27 +292,27 @@ public class HcCommand extends HelpfulCommandsCommand {
             HelpfulCommandsCommand lastCommand = entry.getValue().getLast();
 
             for (HelpfulCommandsCommand command : entry.getValue()) {
-                CommandData cmdData = command.getCommandData();
+                ModCommandManager.ModCommand modCommand = command.getModCommand();
 
-                boolean enabled = config.getCommandState(cmdData.getName());
+                boolean enabled = config.getCommandState(modCommand.getName());
                 boolean hasPerms = command.canExecute(src);
                 boolean canUse = enabled && hasPerms;
 
                 textBuilder.appendNewline().appendComponent(Component.literal(command.equals(lastCommand) ? textDecorators.getCategoryEndingChar() : textDecorators.getCategoryTrailingChar()).setStyle(categoryStyle));
 
                 if (toggleStateCommandPermission) {
-                    HoverEvent cmdStateHoverEvent = getCommandStateHoverEvent(src, textStyles, cmdData.getName(), enabled);
-                    ClickEvent cmdStateClickEvent = new ClickEvent.RunCommand("/hc config command state " + cmdData.getName() + " " + String.valueOf(!enabled).toLowerCase());
+                    HoverEvent cmdStateHoverEvent = getCommandStateHoverEvent(src, textStyles, modCommand.getName(), enabled);
+                    ClickEvent cmdStateClickEvent = new ClickEvent.RunCommand("/hc config command state " + modCommand.getName() + " " + String.valueOf(!enabled).toLowerCase());
                     Style cmdStateStyle = (enabled ? textStyles.getEnabled() : textStyles.getDisabled()).withHoverEvent(cmdStateHoverEvent).withClickEvent(cmdStateClickEvent);
 
                     textBuilder.appendComponent(StylingHelper.getButton(Component.literal(enabled ? textDecorators.getCheckmark() : textDecorators.getCross()), cmdStateStyle)).appendWhitespace();
                 }
 
                 HoverEvent cmdNameHoverEvent = getCommandHoverEvent(src, dispatcher, textStyles, command, hasPerms, enabled);
-                ClickEvent cmdNameClickEvent = canUse ? new ClickEvent.SuggestCommand("/" + cmdData.getName() + " ") : null;
+                ClickEvent cmdNameClickEvent = canUse ? new ClickEvent.SuggestCommand("/" + modCommand.getName() + " ") : null;
                 Style cmdNameStyle = (canUse ? textStyles.getAvailable() : textStyles.getUnavailable()).withHoverEvent(cmdNameHoverEvent).withClickEvent(cmdNameClickEvent);
 
-                textBuilder.appendComponent(Component.literal("/" + cmdData.getName()).setStyle(cmdNameStyle));
+                textBuilder.appendComponent(Component.literal("/" + modCommand.getName()).setStyle(cmdNameStyle));
             }
         }
 
@@ -342,7 +341,7 @@ public class HcCommand extends HelpfulCommandsCommand {
 
             totalCommands += entry.getValue().size();
 
-            List<HelpfulCommandsCommand> filtered = entry.getValue().stream().filter(cmd -> config.getCommandState(cmd.getCommandData().getName())).filter(cmd -> cmd.canExecute(src)).toList();
+            List<HelpfulCommandsCommand> filtered = entry.getValue().stream().filter(cmd -> config.getCommandState(cmd.getModCommand().getName())).filter(cmd -> cmd.canExecute(src)).toList();
             if (!filtered.isEmpty()) {
                 available.put(entry.getKey(), filtered);
                 availableCommands += filtered.size();
@@ -375,14 +374,14 @@ public class HcCommand extends HelpfulCommandsCommand {
             HelpfulCommandsCommand lastCommand = entry.getValue().getLast();
 
             for (HelpfulCommandsCommand command : entry.getValue()) {
-                CommandData cmdData = command.getCommandData();
+                ModCommandManager.ModCommand modCommand = command.getModCommand();
 
                 textBuilder.appendNewline().appendComponent(Component.literal(command.equals(lastCommand) ? textDecorators.getCategoryEndingChar() : textDecorators.getCategoryTrailingChar()).setStyle(categoryStyle));
                 HoverEvent cmdNameHoverEvent = getCommandHoverEvent(src, dispatcher, textStyles, command, true, true);
-                ClickEvent cmdNameClickEvent = new ClickEvent.SuggestCommand("/" + cmdData.getName() + " ");
+                ClickEvent cmdNameClickEvent = new ClickEvent.SuggestCommand("/" + modCommand.getName() + " ");
                 Style cmdNameStyle = (textStyles.getAvailable()).withHoverEvent(cmdNameHoverEvent).withClickEvent(cmdNameClickEvent);
 
-                textBuilder.appendComponent(Component.literal("/" + cmdData.getName()).setStyle(cmdNameStyle));
+                textBuilder.appendComponent(Component.literal("/" + modCommand.getName()).setStyle(cmdNameStyle));
             }
         }
 
@@ -392,7 +391,7 @@ public class HcCommand extends HelpfulCommandsCommand {
     }
 
     private HoverEvent getCommandHoverEvent(CommandSourceStack src, CommandDispatcher<CommandSourceStack> dispatcher, HelpfulCommandsStyle.TextStyles textStyles, HelpfulCommandsCommand command, boolean hasPerms, boolean enabled) {
-        String commandName = command.getCommandData().getName();
+        String commandName = command.getModCommand().getName();
 
         boolean canUse = enabled && hasPerms;
 
@@ -602,9 +601,9 @@ public class HcCommand extends HelpfulCommandsCommand {
 
         boolean valid = false;
         for (HelpfulCommandsCommand hcCmd : ModCommandManager.getCommandList()) {
-            CommandData data = hcCmd.getCommandData();
-            if (data.getName().equals(command)) {
-                if (data.getCategory() == ModCommandManager.CommandCategory.MAIN) {
+            ModCommandManager.ModCommand modCommand = hcCmd.getModCommand();
+            if (modCommand.getName().equals(command)) {
+                if (modCommand.getCategory() == ModCommandManager.CommandCategory.MAIN) {
                     throw COMMAND_NOT_CONFIGURABLE.create(src, command);
                 }
                 valid = true;
@@ -642,9 +641,9 @@ public class HcCommand extends HelpfulCommandsCommand {
 
         boolean valid = false;
         for (HelpfulCommandsCommand hcCmd : ModCommandManager.getCommandList()) {
-            CommandData data = hcCmd.getCommandData();
-            if (data.getName().equals(command)) {
-                if (data.getCategory() == ModCommandManager.CommandCategory.MAIN) {
+            ModCommandManager.ModCommand modCommand = hcCmd.getModCommand();
+            if (modCommand.getName().equals(command)) {
+                if (modCommand.getCategory() == ModCommandManager.CommandCategory.MAIN) {
                     throw COMMAND_NOT_CONFIGURABLE.create(src, command);
                 }
                 valid = true;

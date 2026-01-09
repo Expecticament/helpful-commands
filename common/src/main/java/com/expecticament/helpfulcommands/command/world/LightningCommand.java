@@ -24,15 +24,15 @@ import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.phys.Vec3;
 
 public class LightningCommand extends HelpfulCommandsCommand {
-    public LightningCommand(ModCommandManager.CommandData commandData) {
-        super(commandData);
+    public LightningCommand(ModCommandManager.ModCommand modCommand) {
+        super(modCommand);
     }
 
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
-        ModCommandManager.CommandData commandData = getCommandData();
+        ModCommandManager.ModCommand modCommand = getModCommand();
 
-        dispatcher.register(Commands.literal(commandData.getName())
+        dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .then(Commands.argument("position", Vec3Argument.vec3())
                         .executes(ctx -> executePosition(ctx, Vec3Argument.getVec3(ctx, "position")))

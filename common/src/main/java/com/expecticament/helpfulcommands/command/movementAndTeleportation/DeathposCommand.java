@@ -36,15 +36,15 @@ public class DeathposCommand extends HelpfulCommandsCommand {
             new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.deathpos.error.noDeathPos.other", StylingHelper.getAffectedEntityNameText((ServerPlayer) otherPlayer)).getComponent()
     );
 
-    public DeathposCommand(ModCommandManager.CommandData commandData) {
-        super(commandData);
+    public DeathposCommand(ModCommandManager.ModCommand modCommand) {
+        super(modCommand);
     }
 
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
-        ModCommandManager.CommandData commandData = getCommandData();
+        ModCommandManager.ModCommand modCommand = getModCommand();
 
-        dispatcher.register(Commands.literal(commandData.getName())
+        dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .then(Commands.literal("tp")
                         .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_DEATHPOS_TP))

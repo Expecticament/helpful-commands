@@ -2,13 +2,13 @@ package com.expecticament.helpfulcommands.command.world;
 
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
 import com.expecticament.helpfulcommands.helper.PermissionHelper;
+import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
 import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
-import com.expecticament.helpfulcommands.manager.ModCommandManager.CommandData;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -22,17 +22,17 @@ public class TimeCommand extends HelpfulCommandsCommand {
     private final int time;
     private final ModPermissions.Permission permission;
 
-    public TimeCommand(CommandData commandData, int time, ModPermissions.Permission permission) {
-        super(commandData);
+    public TimeCommand(ModCommandManager.ModCommand modCommand, int time, ModPermissions.Permission permission) {
+        super(modCommand);
         this.time = time;
         this.permission = permission;
     }
 
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
-        CommandData commandData = getCommandData();
+        ModCommandManager.ModCommand modCommand = getModCommand();
 
-        dispatcher.register(Commands.literal(commandData.getName())
+        dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .executes(this::execute)
         );

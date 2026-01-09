@@ -27,15 +27,15 @@ import java.util.Collection;
 import java.util.List;
 
 public class CoordsCommand extends HelpfulCommandsCommand {
-    public CoordsCommand(ModCommandManager.CommandData commandData) {
-        super(commandData);
+    public CoordsCommand(ModCommandManager.ModCommand modCommand) {
+        super(modCommand);
     }
 
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
-        ModCommandManager.CommandData commandData = getCommandData();
+        ModCommandManager.ModCommand modCommand = getModCommand();
 
-        dispatcher.register(Commands.literal(commandData.getName())
+        dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .then(Commands.literal("broadcast")
                         .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_COORDS_BROADCAST))

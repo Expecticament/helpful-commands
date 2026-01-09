@@ -41,17 +41,17 @@ public class HomeCommand extends HelpfulCommandsCommand {
             new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.edit.name.error.sameHomeNameProvided", Component.literal(homeName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
 
-    public HomeCommand(ModCommandManager.CommandData commandData) {
-        super(commandData);
+    public HomeCommand(ModCommandManager.ModCommand modCommand) {
+        super(modCommand);
     }
 
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
-        ModCommandManager.CommandData commandData = getCommandData();
+        ModCommandManager.ModCommand modCommand = getModCommand();
 
         HomeNameSuggestionProvider homeNameSuggestionProvider = new HomeNameSuggestionProvider();
 
-        dispatcher.register(Commands.literal(commandData.getName())
+        dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .then(Commands.literal("tp")
                         .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_TP))

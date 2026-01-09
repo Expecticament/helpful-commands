@@ -30,15 +30,15 @@ public class JumpCommand extends HelpfulCommandsCommand {
             new TranslationManager.TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.jump.error.distanceConfigvalueExceeded", Component.literal(String.valueOf(maxDistance)).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
 
-    public JumpCommand(ModCommandManager.CommandData commandData) {
-        super(commandData);
+    public JumpCommand(ModCommandManager.ModCommand modCommand) {
+        super(modCommand);
     }
 
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
-        ModCommandManager.CommandData commandData = getCommandData();
+        ModCommandManager.ModCommand modCommand = getModCommand();
 
-        dispatcher.register(Commands.literal(commandData.getName())
+        dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                         .then(Commands.argument("distance", DoubleArgumentType.doubleArg(0.1))
                                 .executes(ctx -> execute(ctx, DoubleArgumentType.getDouble(ctx, "distance"), false))

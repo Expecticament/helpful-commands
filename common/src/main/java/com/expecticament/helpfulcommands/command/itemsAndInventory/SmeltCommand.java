@@ -34,15 +34,15 @@ public class SmeltCommand extends HelpfulCommandsCommand {
             new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.smelt.error.itemNotSmeltable").getComponent()
     );
 
-    public SmeltCommand(ModCommandManager.CommandData commandData) {
-        super(commandData);
+    public SmeltCommand(ModCommandManager.ModCommand modCommand) {
+        super(modCommand);
     }
 
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
-        ModCommandManager.CommandData commandData = getCommandData();
+        ModCommandManager.ModCommand modCommand = getModCommand();
 
-        dispatcher.register(Commands.literal(commandData.getName())
+        dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .executes(this::executeSelf)
                 .then(Commands.argument("players", EntityArgument.players())

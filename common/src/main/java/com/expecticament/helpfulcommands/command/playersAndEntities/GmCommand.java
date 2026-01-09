@@ -26,15 +26,15 @@ import java.util.Collection;
 import java.util.List;
 
 public class GmCommand extends HelpfulCommandsCommand {
-    public GmCommand(ModCommandManager.CommandData commandData) {
-        super(commandData);
+    public GmCommand(ModCommandManager.ModCommand modCommand) {
+        super(modCommand);
     }
 
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
-        ModCommandManager.CommandData commandData = getCommandData();
+        ModCommandManager.ModCommand modCommand = getModCommand();
 
-        dispatcher.register(Commands.literal(commandData.getName())
+        dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .then(Commands.literal("a")
                         .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_GM_A))

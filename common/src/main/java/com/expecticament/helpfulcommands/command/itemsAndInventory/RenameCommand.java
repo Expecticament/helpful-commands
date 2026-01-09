@@ -16,9 +16,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
-import com.mojang.brigadier.suggestion.SuggestionProvider;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -29,7 +26,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 public class RenameCommand extends HelpfulCommandsCommand {
     private static final DynamicCommandExceptionType SAME_NAME_PROVIDED = new DynamicCommandExceptionType(src ->
@@ -39,23 +35,20 @@ public class RenameCommand extends HelpfulCommandsCommand {
             new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.rename.error.noCustomName").getComponent()
     );
 
-    public RenameCommand(ModCommandManager.CommandData commandData) {
-        super(commandData);
+    public RenameCommand(ModCommandManager.ModCommand modCommand) {
+        super(modCommand);
     }
 
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
-        ModCommandManager.CommandData commandData = getCommandData();
+        ModCommandManager.ModCommand modCommand = getModCommand();
 
-        dispatcher.register(Commands.literal(commandData.getName())
+        dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .then(Commands.argument("new_name", StringArgumentType.string())
-                        .suggests(new SuggestionProvider<CommandSourceStack>() {
-                            @Override
-                            public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> commandContext, SuggestionsBuilder suggestionsBuilder) {
-                                suggestionsBuilder.suggest("\"\"");
-                                return suggestionsBuilder.buildFuture();
-                            }
+                        .suggests((ctx, suggestionsBuilder) -> {
+                            suggestionsBuilder.suggest("\"\"");
+                            return suggestionsBuilder.buildFuture();
                         })
                         .executes(ctx -> executeSelf(ctx, StringArgumentType.getString(ctx, "new_name")))
                         .then(Commands.argument("players", EntityArgument.players())

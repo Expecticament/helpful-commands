@@ -30,8 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CoinflipCommand extends HelpfulCommandsCommand {
-    public CoinflipCommand(ModCommandManager.CommandData commandData) {
-        super(commandData);
+    public CoinflipCommand(ModCommandManager.ModCommand modCommand) {
+        super(modCommand);
     }
 
     private enum CoinSide {
@@ -45,9 +45,9 @@ public class CoinflipCommand extends HelpfulCommandsCommand {
 
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
-        ModCommandManager.CommandData commandData = getCommandData();
+        ModCommandManager.ModCommand modCommand = getModCommand();
 
-        dispatcher.register(Commands.literal(commandData.getName())
+        dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .then(Commands.literal("heads")
                         .executes(ctx -> execute(ctx, CoinSide.HEADS))

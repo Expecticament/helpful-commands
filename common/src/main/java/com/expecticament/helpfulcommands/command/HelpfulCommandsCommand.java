@@ -3,7 +3,6 @@ package com.expecticament.helpfulcommands.command;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ConfigManager;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
-import com.expecticament.helpfulcommands.manager.ModCommandManager.CommandData;
 import com.expecticament.helpfulcommands.manager.StylingManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 import com.mojang.brigadier.CommandDispatcher;
@@ -36,24 +35,24 @@ public abstract class HelpfulCommandsCommand {
             new TextBuilder((CommandSourceStack) src).appendTranslatable("error.helpful_commands.onCooldown.teleport", StylingHelper.formatDuration((long) remaining, (CommandSourceStack) src)).getComponent()
     );
 
-    private final CommandData data;
+    private final ModCommandManager.ModCommand modCommand;
 
-    public HelpfulCommandsCommand(CommandData commandData) {
-        this.data = commandData;
+    public HelpfulCommandsCommand(ModCommandManager.ModCommand modCommand) {
+        this.modCommand = modCommand;
     }
 
-    public CommandData getCommandData() {
-        return data;
+    public ModCommandManager.ModCommand getModCommand() {
+        return modCommand;
     }
 
     public abstract void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection);
 
     public boolean canExecute(CommandSourceStack source) {
-        if (data.getCategory().equals(ModCommandManager.CommandCategory.MAIN)) {
+        if (modCommand.getCategory().equals(ModCommandManager.CommandCategory.MAIN)) {
             return true;
         }
         ConfigManager.HelpfulCommandsConfig config = ConfigManager.readConfig();
-        return config.getCommandState(data.getName()) && checkBaseCommandRequirements(source);
+        return config.getCommandState(modCommand.getName()) && checkBaseCommandRequirements(source);
     }
 
     protected abstract boolean checkBaseCommandRequirements(CommandSourceStack source);

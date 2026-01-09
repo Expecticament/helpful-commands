@@ -4,7 +4,7 @@ import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
 import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ConfigManager;
-import com.expecticament.helpfulcommands.manager.ModCommandManager.CommandData;
+import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager;
 import com.expecticament.helpfulcommands.permission.ModPermissions;
@@ -35,15 +35,15 @@ public class KillitemsCommand extends HelpfulCommandsCommand {
             new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.killitems.rangeConfigValueExceeded", Component.literal(String.valueOf(maxRange)).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
 
-    public KillitemsCommand(CommandData commandData) {
-        super(commandData);
+    public KillitemsCommand(ModCommandManager.ModCommand modCommand) {
+        super(modCommand);
     }
 
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
-        CommandData commandData = getCommandData();
+        ModCommandManager.ModCommand modCommand = getModCommand();
 
-        dispatcher.register(Commands.literal(commandData.getName())
+        dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .then(Commands.argument("range_cubic", IntegerArgumentType.integer(1))
                         .then(Commands.argument("filter", ItemPredicateArgument.itemPredicate(buildContext))

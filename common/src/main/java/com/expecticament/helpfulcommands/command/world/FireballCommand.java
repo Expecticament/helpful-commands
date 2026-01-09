@@ -28,15 +28,15 @@ public class FireballCommand extends HelpfulCommandsCommand {
             new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.fireball.powerConfigValueExceeded", Component.literal(String.valueOf(maxPower)).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
 
-    public FireballCommand(ModCommandManager.CommandData commandData) {
-        super(commandData);
+    public FireballCommand(ModCommandManager.ModCommand modCommand) {
+        super(modCommand);
     }
 
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
-        ModCommandManager.CommandData commandData = getCommandData();
+        ModCommandManager.ModCommand modCommand = getModCommand();
 
-        dispatcher.register(Commands.literal(commandData.getName())
+        dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .executes(this::execute)
                 .then(Commands.argument("power", IntegerArgumentType.integer(1))

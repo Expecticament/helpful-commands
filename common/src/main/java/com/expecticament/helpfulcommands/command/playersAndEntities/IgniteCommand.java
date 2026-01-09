@@ -27,15 +27,15 @@ import java.util.Collection;
 import java.util.List;
 
 public class IgniteCommand extends HelpfulCommandsCommand {
-    public IgniteCommand(ModCommandManager.CommandData commandData) {
-        super(commandData);
+    public IgniteCommand(ModCommandManager.ModCommand modCommand) {
+        super(modCommand);
     }
 
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
-        ModCommandManager.CommandData commandData = getCommandData();
+        ModCommandManager.ModCommand modCommand = getModCommand();
 
-        dispatcher.register(Commands.literal(commandData.getName())
+        dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .then(Commands.argument("duration_seconds", FloatArgumentType.floatArg(1f))
                         .executes(ctx -> executeSelf(ctx, FloatArgumentType.getFloat(ctx, "duration_seconds")))

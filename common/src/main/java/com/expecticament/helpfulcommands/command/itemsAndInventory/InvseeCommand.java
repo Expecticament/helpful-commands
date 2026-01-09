@@ -37,15 +37,15 @@ import org.jspecify.annotations.NonNull;
 import java.util.List;
 
 public class InvseeCommand extends HelpfulCommandsCommand {
-    public InvseeCommand(ModCommandManager.CommandData commandData) {
-        super(commandData);
+    public InvseeCommand(ModCommandManager.ModCommand modCommand) {
+        super(modCommand);
     }
 
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
-        ModCommandManager.CommandData commandData = getCommandData();
+        ModCommandManager.ModCommand modCommand = getModCommand();
 
-        dispatcher.register(Commands.literal(commandData.getName())
+        dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .then(Commands.argument("player", EntityArgument.player())
                         .executes(ctx -> execute(ctx, EntityArgument.getPlayer(ctx, "player")))

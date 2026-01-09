@@ -56,17 +56,17 @@ public class WarpCommand extends HelpfulCommandsCommand {
             new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.noDimensionProvided").getComponent()
     );
 
-    public WarpCommand(ModCommandManager.CommandData commandData) {
-        super(commandData);
+    public WarpCommand(ModCommandManager.ModCommand modCommand) {
+        super(modCommand);
     }
 
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
-        ModCommandManager.CommandData commandData = getCommandData();
+        ModCommandManager.ModCommand modCommand = getModCommand();
 
         WarpNameSuggestionProvider warpNameSuggestionProvider = new WarpNameSuggestionProvider();
 
-        dispatcher.register(Commands.literal(commandData.getName())
+        dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .then(Commands.literal("tp")
                         .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_TP))

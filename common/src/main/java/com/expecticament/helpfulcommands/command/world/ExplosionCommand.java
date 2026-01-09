@@ -34,15 +34,15 @@ public class ExplosionCommand extends HelpfulCommandsCommand {
             new TranslationManager.TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.explosion.powerConfigValueExceeded", Component.literal(String.valueOf(maxPower)).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
 
-    public ExplosionCommand(ModCommandManager.CommandData commandData) {
-        super(commandData);
+    public ExplosionCommand(ModCommandManager.ModCommand modCommand) {
+        super(modCommand);
     }
 
     @Override
     public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
-        ModCommandManager.CommandData commandData = getCommandData();
+        ModCommandManager.ModCommand modCommand = getModCommand();
 
-        dispatcher.register(Commands.literal(commandData.getName())
+        dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .then(Commands.argument("position", Vec3Argument.vec3())
                         .then(Commands.argument("power", IntegerArgumentType.integer(1))

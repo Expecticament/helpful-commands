@@ -14,11 +14,11 @@ public class HelpfulCommandsCommandSuggestionProvider implements SuggestionProvi
     @Override
     public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
         for (HelpfulCommandsCommand command : ModCommandManager.getCommandList()) {
-            ModCommandManager.CommandData data = command.getCommandData();
-            if (data.getCategory() == ModCommandManager.CommandCategory.MAIN) {
+            ModCommandManager.ModCommand modCommand = command.getModCommand();
+            if (modCommand.getCategory() == ModCommandManager.CommandCategory.MAIN) {
                 continue;
             }
-            builder.suggest(data.getName());
+            builder.suggest(modCommand.getName());
         }
         return builder.buildFuture();
     }
