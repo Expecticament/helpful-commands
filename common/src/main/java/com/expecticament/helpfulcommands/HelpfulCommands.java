@@ -42,9 +42,9 @@ public final class HelpfulCommands {
         isDedicatedServer = server.isDedicatedServer();
 
         LOGGER.info("H   H  CCCCC  | ");
-        LOGGER.info("H   H  C      |  Thank you for using");
-        LOGGER.info("HHHHH  C      |  Helpful Commands");
-        LOGGER.info("H   H  C      |  v{} on {}", modVersion, platform.toString());
+        LOGGER.info("H   H  C      |  Helpful Commands");
+        LOGGER.info("HHHHH  C      |  v{}", modVersion);
+        LOGGER.info("H   H  C      |  Platform: {}", platform.toString());
         LOGGER.info("H   H  CCCCC  | ");
 
         ConfigManager.initialize(server);

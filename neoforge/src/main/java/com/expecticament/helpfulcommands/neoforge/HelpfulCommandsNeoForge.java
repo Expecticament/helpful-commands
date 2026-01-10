@@ -11,6 +11,7 @@ import net.neoforged.fml.common.Mod;
 import com.expecticament.helpfulcommands.HelpfulCommands;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
 @Mod(HelpfulCommands.MOD_ID)
@@ -33,10 +34,8 @@ public final class HelpfulCommandsNeoForge {
         eventBus.addListener(this::onRegisterCommands);
 
         // Server events
-        eventBus.addListener((ServerStartingEvent event) -> {
-            HelpfulCommands.onServerStarting(event.getServer());
-        });
-        eventBus.addListener(net.neoforged.neoforge.event.level.LevelEvent.Save.class, event -> {
+        eventBus.addListener((ServerStartingEvent event) -> HelpfulCommands.onServerStarting(event.getServer()));
+        eventBus.addListener(LevelEvent.Save.class, event -> {
             if (event.getLevel() instanceof ServerLevel serverLevel) {
                 if (serverLevel.dimension() == Level.OVERWORLD) {
                     HelpfulCommands.save(serverLevel.getServer());
