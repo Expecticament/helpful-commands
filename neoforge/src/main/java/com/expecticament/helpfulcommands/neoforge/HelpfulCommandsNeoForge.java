@@ -27,7 +27,6 @@ public final class HelpfulCommandsNeoForge {
         HelpfulCommands.init(HelpfulCommands.Platform.NEO_FORGE, version);
 
         // Permissions
-        eventBus.addListener(PermissionHandlerNeoForgeImpl::registerPermissionNodes);
         PermissionHandlerProvider.instance = new PermissionHandlerNeoForgeImpl();
 
         // Register commands

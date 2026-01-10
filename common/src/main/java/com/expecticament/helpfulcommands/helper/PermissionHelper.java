@@ -5,12 +5,27 @@ import com.expecticament.helpfulcommands.manager.ConfigManager;
 import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.permission.PermissionHandlerProvider;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.luckperms.api.util.Tristate;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permission;
 
 public class PermissionHelper {
     public static boolean hasPermission(CommandSourceStack source, ModPermissions.Permission permission) {
         return PermissionHandlerProvider.get().hasPermission(source, permission);
+    }
+
+    public static boolean hasPermissionLuckPerms(ServerPlayer player, ModPermissions.Permission permission) {
+        boolean hasPermission = player.permissions().hasPermission(new Permission.HasCommandLevel(permission.getDefaultRequiredPermission()));
+        try {
+            net.luckperms.api.util.Tristate result = net.luckperms.api.LuckPermsProvider.get().getPlayerAdapter(ServerPlayer.class).getPermissionData(player).checkPermission(permission.getId());
+            if (result == Tristate.UNDEFINED) {
+                return hasPermission;
+            }
+            return result == Tristate.TRUE;
+        } catch (Exception | NoClassDefFoundError e) {
+            return hasPermission;
+        }
     }
 
     public static <T> T getMetaOrElseConfigValue(CommandSourceStack source, ConfigManager.CONFIG_FIELD field) {
