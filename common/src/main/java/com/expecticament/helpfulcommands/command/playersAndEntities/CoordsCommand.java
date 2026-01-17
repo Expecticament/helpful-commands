@@ -52,6 +52,7 @@ public class CoordsCommand extends HelpfulCommandsCommand {
                         )
                 )
                 .then(Commands.literal("query")
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_COORDS_QUERY))
                         .then(Commands.argument("player", EntityArgument.player())
                                 .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_COORDS_QUERY_OTHER))
                                 .executes(ctx -> query(ctx, EntityArgument.getPlayer(ctx, "player")))
@@ -131,7 +132,7 @@ public class CoordsCommand extends HelpfulCommandsCommand {
         playerList.remove(sourcePlayer);
 
         if (playerList.isEmpty()) {
-            throw EntityArgument.NO_PLAYERS_FOUND.create();
+            throw TARGET_MUST_BE_OTHER_PLAYER.create(src);
         }
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();

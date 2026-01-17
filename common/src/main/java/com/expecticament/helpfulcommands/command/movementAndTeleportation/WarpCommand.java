@@ -80,7 +80,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
                         )
                 )
                 .then(Commands.literal("add")
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_MANAGE))
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_ADD))
                         .then(Commands.argument("warp_name", StringArgumentType.word())
                                 .then(Commands.argument("description", StringArgumentType.string())
                                         .executes(ctx -> addWarp(ctx, StringArgumentType.getString(ctx, "warp_name"), StringArgumentType.getString(ctx, "description")))
@@ -95,14 +95,14 @@ public class WarpCommand extends HelpfulCommandsCommand {
                         )
                 )
                 .then(Commands.literal("remove")
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_MANAGE))
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_REMOVE))
                         .then(Commands.argument("warp_name", StringArgumentType.word())
                                 .executes(ctx -> removeWarp(ctx, StringArgumentType.getString(ctx, "warp_name")))
                                 .suggests(warpNameSuggestionProvider)
                         )
                 )
                 .then(Commands.literal("edit")
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_MANAGE))
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_EDIT))
                         .then(Commands.argument("warp_name", StringArgumentType.word())
                                 .then(Commands.literal("name")
                                         .then(Commands.argument("new_name", StringArgumentType.word())
@@ -128,6 +128,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
                         )
                 )
                 .then(Commands.literal("info")
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_INFO))
                         .then(Commands.argument("warp_name", StringArgumentType.word())
                                 .suggests(warpNameSuggestionProvider)
                                 .executes(ctx -> warpInfo(ctx, StringArgumentType.getString(ctx, "warp_name")))
@@ -380,16 +381,6 @@ public class WarpCommand extends HelpfulCommandsCommand {
             WarpManager.Warp warp = WarpManager.getWarp(warpName);
             TextBuilder textBuilder = new TextBuilder(src);
 
-            HoverEvent tpBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "hover.helpful_commands.clickToTeleport")));
-            ClickEvent tpBtnClickEvent = new ClickEvent.RunCommand("/warp tp " + warpName);
-            Style tpBtnStyle = textStyles.getSecondary().withHoverEvent(tpBtnHoverEvent).withClickEvent(tpBtnClickEvent);
-            HoverEvent editBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "hover.helpful_commands.clickToEdit")));
-            ClickEvent editBtnClickEvent = new ClickEvent.SuggestCommand("/warp edit " + warpName + " ");
-            Style editBtnStyle = textStyles.getTertiary().withHoverEvent(editBtnHoverEvent).withClickEvent(editBtnClickEvent);
-            HoverEvent removeBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "hover.helpful_commands.clickToRemove")));
-            ClickEvent removeBtnClickEvent = new ClickEvent.RunCommand("/warp remove " + warpName);
-            Style removeBtnStyle = textStyles.getDangerousAction().withHoverEvent(removeBtnHoverEvent).withClickEvent(removeBtnClickEvent);
-
             Component bulletPointComponent = Component.literal(textDecorators.getBulletPoint()).setStyle(textStyles.getTertiary());
             Component colonComponent = Component.literal(": ").setStyle(textStyles.getTertiary());
 
@@ -425,20 +416,36 @@ public class WarpCommand extends HelpfulCommandsCommand {
                         .appendLiteral(TranslationManager.translate(src, "helpful_commands.common.remove") + ": /warp remove %s".formatted(warpName));
             } else {
                 boolean canTp = PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_TP);
-                boolean canManage = PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_MANAGE);
-                if (canTp || canManage) {
+                boolean canEdit = PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_EDIT);
+                boolean canRemove = PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_REMOVE);
+                if (canTp || canEdit || canRemove) {
                     textBuilder
                             .appendNewline()
                             .appendNewline();
 
                     if (canTp) {
-                        textBuilder.appendComponent(StylingHelper.getButton(textDecorators.getTeleport(), Component.literal(TranslationManager.translate(src, "helpful_commands.common.teleport")), tpBtnStyle)).appendWhitespace();
+                        HoverEvent tpBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "hover.helpful_commands.clickToTeleport")));
+                        ClickEvent tpBtnClickEvent = new ClickEvent.RunCommand("/warp tp " + warpName);
+                        Style tpBtnStyle = textStyles.getSecondary().withHoverEvent(tpBtnHoverEvent).withClickEvent(tpBtnClickEvent);
+                        textBuilder.appendComponent(StylingHelper.getButton(textDecorators.getTeleport(), Component.literal(TranslationManager.translate(src, "helpful_commands.common.teleport")), tpBtnStyle));
                     }
-                    if (canManage) {
-                        textBuilder
-                                .appendComponent(StylingHelper.getButton(Component.literal(textDecorators.getEdit()), editBtnStyle))
-                                .appendWhitespace()
-                                .appendComponent(StylingHelper.getButton(Component.literal(textDecorators.getRemove()), removeBtnStyle));
+                    if (canEdit) {
+                        HoverEvent editBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "hover.helpful_commands.clickToEdit")));
+                        ClickEvent editBtnClickEvent = new ClickEvent.SuggestCommand("/warp edit " + warpName + " ");
+                        Style editBtnStyle = textStyles.getTertiary().withHoverEvent(editBtnHoverEvent).withClickEvent(editBtnClickEvent);
+                        if (canTp) {
+                            textBuilder.appendWhitespace();
+                        }
+                        textBuilder.appendComponent(StylingHelper.getButton(Component.literal(textDecorators.getEdit()), editBtnStyle));
+                    }
+                    if (canRemove) {
+                        HoverEvent removeBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "hover.helpful_commands.clickToRemove")));
+                        ClickEvent removeBtnClickEvent = new ClickEvent.RunCommand("/warp remove " + warpName);
+                        Style removeBtnStyle = textStyles.getDangerousAction().withHoverEvent(removeBtnHoverEvent).withClickEvent(removeBtnClickEvent);
+                        if (canTp || canEdit) {
+                            textBuilder.appendWhitespace();
+                        }
+                        textBuilder.appendComponent(StylingHelper.getButton(Component.literal(textDecorators.getRemove()), removeBtnStyle));
                     }
                 }
             }

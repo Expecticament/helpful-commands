@@ -35,12 +35,12 @@
   "commands.helpful_commands.heal.description": "Restore health for entities",
   "commands.helpful_commands.ignite.description": "Set entities on fire for a specified time",
   "commands.helpful_commands.coinflip.description": "Flip a coin",
+  "commands.helpful_commands.day.description": "Set the time to day",
+  "commands.helpful_commands.night.description": "Set the time to night",
   "commands.helpful_commands.explosion.description": "Create an explosion",
   "commands.helpful_commands.fireball.description": "Launch a fireball",
   "commands.helpful_commands.killitems.description": "Delete items lying on the ground",
   "commands.helpful_commands.lightning.description": "Summon lightning",
-  "commands.helpful_commands.day.description": "Set the time to day",
-  "commands.helpful_commands.night.description": "Set the time to night",
 
 
   "helpful_commands.configField.max_homes": "The maximum number of homes that each player can have",
@@ -82,7 +82,7 @@
   "commands.helpful_commands.hc.config.command.error.invalidHcCommand": "%s: unknown Helpful Commands command",
   "commands.helpful_commands.hc.config.command.error.commandNotConfigurable": "%s: you can't configure this command",
   "commands.helpful_commands.hc.config.field.title": "Config Fields",
-  "commands.helpful_commands.hc.config.field.description": "Change the mod's behavior or set limits.",
+  "commands.helpful_commands.hc.config.field.description": "Change the mod's behavior, set limits and cooldowns.",
   "commands.helpful_commands.hc.config.field.description.use": "Use %s.",
   "commands.helpful_commands.hc.config.field.defaultValue": "Default value:",
   "commands.helpful_commands.hc.config.field.lpMeta": "Can be overridden by LuckPerms Meta",

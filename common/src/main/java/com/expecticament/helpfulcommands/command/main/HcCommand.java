@@ -65,18 +65,18 @@ public class HcCommand extends HelpfulCommandsCommand {
 
             switch (properties.getValueType()) {
                 case ConfigManager.ConfigFieldProperties.ValueType.Double:
-                    setArgument.then(Commands.argument("value", DoubleArgumentType.doubleArg(properties.getMin(), properties.getMax()))
-                            .executes(ctx -> setConfigField(ctx, name, DoubleArgumentType.getDouble(ctx, "value")))
+                    setArgument.then(Commands.argument("new_value", DoubleArgumentType.doubleArg(properties.getMin(), properties.getMax()))
+                            .executes(ctx -> setConfigField(ctx, name, DoubleArgumentType.getDouble(ctx, "new_value")))
                     );
                     break;
                 case ConfigManager.ConfigFieldProperties.ValueType.Integer:
-                    setArgument.then(Commands.argument("value", IntegerArgumentType.integer(properties.getMin().intValue(), properties.getMax().intValue()))
-                            .executes(ctx -> setConfigField(ctx, name, IntegerArgumentType.getInteger(ctx, "value")))
+                    setArgument.then(Commands.argument("new_value", IntegerArgumentType.integer(properties.getMin().intValue(), properties.getMax().intValue()))
+                            .executes(ctx -> setConfigField(ctx, name, IntegerArgumentType.getInteger(ctx, "new_value")))
                     );
                     break;
                 case ConfigManager.ConfigFieldProperties.ValueType.Boolean:
-                    setArgument.then(Commands.argument("value", BoolArgumentType.bool())
-                            .executes(ctx -> setConfigField(ctx, name, BoolArgumentType.getBool(ctx, "value")))
+                    setArgument.then(Commands.argument("new_value", BoolArgumentType.bool())
+                            .executes(ctx -> setConfigField(ctx, name, BoolArgumentType.getBool(ctx, "new_value")))
                     );
                     break;
             }
@@ -93,6 +93,7 @@ public class HcCommand extends HelpfulCommandsCommand {
         }
 
         LiteralArgumentBuilder<CommandSourceStack> cooldownsClearArgumentBuilder = Commands.literal("clear");
+        cooldownsClearArgumentBuilder.requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HC_COOLDOWNS_CLEAR));
         for (CooldownManager.CooldownType cooldownType : CooldownManager.CooldownType.values()) {
             String name = cooldownType.name().toLowerCase();
 
@@ -125,11 +126,11 @@ public class HcCommand extends HelpfulCommandsCommand {
                                 .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HC_CONFIG_COMMAND))
                                 .then(Commands.literal("state")
                                         .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HC_CONFIG_COMMAND_STATE))
-                                        .then(Commands.argument("command", StringArgumentType.word())
-                                                .executes(ctx -> queryCommandState(ctx, StringArgumentType.getString(ctx, "command")))
+                                        .then(Commands.argument("hc_command", StringArgumentType.word())
+                                                .executes(ctx -> queryCommandState(ctx, StringArgumentType.getString(ctx, "hc_command")))
                                                 .suggests(new HelpfulCommandsCommandSuggestionProvider())
                                                 .then(Commands.argument("new_state", BoolArgumentType.bool())
-                                                        .executes(ctx -> setCommandState(ctx, StringArgumentType.getString(ctx, "command"), BoolArgumentType.getBool(ctx, "new_state")))
+                                                        .executes(ctx -> setCommandState(ctx, StringArgumentType.getString(ctx, "hc_command"), BoolArgumentType.getBool(ctx, "new_state")))
                                                 )
                                         )
                                 )
@@ -139,6 +140,7 @@ public class HcCommand extends HelpfulCommandsCommand {
                         .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HC_COOLDOWNS) && singleplayerOwnerCheck(src))
                         .then(cooldownsClearArgumentBuilder)
                         .then(Commands.literal("clear_all")
+                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HC_COOLDOWNS_CLEARALL))
                                 .executes(this::clearAllCooldowns)
                         )
                 )
@@ -456,9 +458,9 @@ public class HcCommand extends HelpfulCommandsCommand {
 
         textBuilder.appendComponent(StylingHelper.getTitle(Component.literal("Helpful Commands"), Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.config.title"))));
 
-        if (PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HC_CONFIG_COMMAND) && singleplayerOwnerCheck(src)) {
+        boolean commandConfig = PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HC_CONFIG_COMMAND) && singleplayerOwnerCheck(src);
+        if (commandConfig) {
             textBuilder
-                    .appendNewline()
                     .appendNewline()
                     .appendComponent(bulletPoint)
                     .appendComponent(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.config.command.title")).setStyle(textStyles.getTertiary()))
@@ -475,8 +477,10 @@ public class HcCommand extends HelpfulCommandsCommand {
         }
 
         if (PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HC_CONFIG_FIELD) && singleplayerOwnerCheck(src)) {
+            if (commandConfig) {
+                textBuilder.appendNewline();
+            }
             textBuilder
-                    .appendNewline()
                     .appendNewline()
                     .appendComponent(bulletPoint);
             if (isPlayer) {

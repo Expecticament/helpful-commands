@@ -55,6 +55,7 @@ public class DeathposCommand extends HelpfulCommandsCommand {
                         .executes(this::teleport)
                 )
                 .then(Commands.literal("query")
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_DEATHPOS_QUERY))
                         .then(Commands.argument("player", EntityArgument.player())
                                 .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_DEATHPOS_QUERY_OTHER))
                                 .executes(ctx -> query(ctx, EntityArgument.getPlayer(ctx, "player")))

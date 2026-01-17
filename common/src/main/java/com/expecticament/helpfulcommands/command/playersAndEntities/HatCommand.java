@@ -54,6 +54,10 @@ public class HatCommand extends HelpfulCommandsCommand {
                                 .executes(ctx -> executeOther(ctx, EntityArgument.getPlayers(ctx, "players"), ItemArgument.getItem(ctx, "item").createItemStack(1, false)))
                         )
                 )
+                .then(Commands.argument("item", ItemArgument.item(buildContext))
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HAT_ITEM) && !PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HAT_OTHERS))
+                        .executes(ctx -> executeSelf(ctx, ItemArgument.getItem(ctx, "item").createItemStack(1, false), false))
+                )
         );
     }
 

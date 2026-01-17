@@ -35,9 +35,11 @@ public class LightningCommand extends HelpfulCommandsCommand {
         dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .then(Commands.argument("position", Vec3Argument.vec3())
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_LIGHTNING_POSITION))
                         .executes(ctx -> executePosition(ctx, Vec3Argument.getVec3(ctx, "position")))
                 )
                 .then(Commands.argument("entity", EntityArgument.entity())
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_LIGHTNING_ENTITY))
                         .executes(ctx -> executeTarget(ctx, EntityArgument.getEntity(ctx, "entity")))
                 )
         );

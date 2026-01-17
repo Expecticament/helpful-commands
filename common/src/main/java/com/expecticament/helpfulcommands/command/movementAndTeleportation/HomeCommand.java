@@ -61,17 +61,20 @@ public class HomeCommand extends HelpfulCommandsCommand {
                         )
                 )
                 .then(Commands.literal("add")
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_ADD))
                         .then(Commands.argument("home_name", StringArgumentType.word())
                                 .executes(ctx -> addHome(ctx, StringArgumentType.getString(ctx, "home_name")))
                         )
                 )
                 .then(Commands.literal("remove")
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_REMOVE))
                         .then(Commands.argument("home_name", StringArgumentType.word())
                                 .suggests(homeNameSuggestionProvider)
                                 .executes(ctx -> removeHome(ctx, StringArgumentType.getString(ctx, "home_name")))
                         )
                 )
                 .then(Commands.literal("edit")
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_EDIT))
                         .then(Commands.argument("home_name", StringArgumentType.word())
                                 .suggests(homeNameSuggestionProvider)
                                 .then(Commands.literal("name")
@@ -85,6 +88,7 @@ public class HomeCommand extends HelpfulCommandsCommand {
                         )
                 )
                 .then(Commands.literal("info")
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_INFO))
                         .then(Commands.argument("home_name", StringArgumentType.word())
                                 .suggests(homeNameSuggestionProvider)
                                 .executes(ctx -> homeInfo(ctx, StringArgumentType.getString(ctx, "home_name")))
@@ -239,16 +243,6 @@ public class HomeCommand extends HelpfulCommandsCommand {
             HomeManager.Home home = HomeManager.getHome(sourcePlayer, homeName);
             TextBuilder textBuilder = new TextBuilder(sourcePlayer);
 
-            HoverEvent tpBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(sourcePlayer, "hover.helpful_commands.clickToTeleport")));
-            ClickEvent tpBtnClickEvent = new ClickEvent.RunCommand("/home tp " + homeName);
-            Style tpBtnStyle = textStyles.getSecondary().withHoverEvent(tpBtnHoverEvent).withClickEvent(tpBtnClickEvent);
-            HoverEvent editBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(sourcePlayer, "hover.helpful_commands.clickToEdit")));
-            ClickEvent editBtnClickEvent = new ClickEvent.SuggestCommand("/home edit " + homeName + " ");
-            Style editBtnStyle = textStyles.getTertiary().withHoverEvent(editBtnHoverEvent).withClickEvent(editBtnClickEvent);
-            HoverEvent removeBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(sourcePlayer, "hover.helpful_commands.clickToRemove")));
-            ClickEvent removeBtnClickEvent = new ClickEvent.RunCommand("/home remove " + homeName);
-            Style removeBtnStyle = textStyles.getDangerousAction().withHoverEvent(removeBtnHoverEvent).withClickEvent(removeBtnClickEvent);
-
             textBuilder
                     .appendComponent(StylingHelper.getTitle(Component.literal(TranslationManager.translate(sourcePlayer, "commands.helpful_commands.home.info.title")), Component.literal(homeName)))
                     .appendNewline()
@@ -260,20 +254,44 @@ public class HomeCommand extends HelpfulCommandsCommand {
                     .appendComponent(Component.literal(textDecorators.getBulletPoint()).setStyle(textStyles.getTertiary()))
                     .appendComponent(Component.literal(TranslationManager.translate(sourcePlayer, "helpful_commands.common.dimension")).setStyle(textStyles.getTertiary()))
                     .appendComponent(Component.literal(": ").setStyle(textStyles.getTertiary()))
-                    .appendComponent(Component.literal(home.dimension).setStyle(textStyles.getSecondary()))
-                    .appendNewline()
-                    .appendNewline();
+                    .appendComponent(Component.literal(home.dimension).setStyle(textStyles.getSecondary()));
 
-            if (src.isPlayer() && PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_TP)) {
+            boolean canTp = PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_TP);
+            boolean canEdit = PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_EDIT);
+            boolean canRemove = PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_REMOVE);
+
+            if (canTp || canEdit || canRemove) {
                 textBuilder
-                        .appendComponent(StylingHelper.getButton(textDecorators.getTeleport(), Component.literal(TranslationManager.translate(sourcePlayer, "helpful_commands.common.teleport")), tpBtnStyle))
-                        .appendWhitespace();
-            }
+                        .appendNewline()
+                        .appendNewline();
 
-            textBuilder
-                    .appendComponent(StylingHelper.getButton(Component.literal(textDecorators.getEdit()), editBtnStyle))
-                    .appendWhitespace()
-                    .appendComponent(StylingHelper.getButton(Component.literal(textDecorators.getRemove()), removeBtnStyle));
+                if (canTp) {
+                    HoverEvent tpBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(sourcePlayer, "hover.helpful_commands.clickToTeleport")));
+                    ClickEvent tpBtnClickEvent = new ClickEvent.RunCommand("/home tp " + homeName);
+                    Style tpBtnStyle = textStyles.getSecondary().withHoverEvent(tpBtnHoverEvent).withClickEvent(tpBtnClickEvent);
+                    textBuilder.appendComponent(StylingHelper.getButton(textDecorators.getTeleport(), Component.literal(TranslationManager.translate(src, "helpful_commands.common.teleport")), tpBtnStyle));
+                }
+
+                if (canEdit) {
+                    HoverEvent editBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(sourcePlayer, "hover.helpful_commands.clickToEdit")));
+                    ClickEvent editBtnClickEvent = new ClickEvent.SuggestCommand("/home edit " + homeName + " ");
+                    Style editBtnStyle = textStyles.getTertiary().withHoverEvent(editBtnHoverEvent).withClickEvent(editBtnClickEvent);
+                    if (canTp) {
+                        textBuilder.appendWhitespace();
+                    }
+                    textBuilder.appendComponent(StylingHelper.getButton(Component.literal(textDecorators.getEdit()), editBtnStyle));
+                }
+
+                if (canRemove) {
+                    HoverEvent removeBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(sourcePlayer, "hover.helpful_commands.clickToRemove")));
+                    ClickEvent removeBtnClickEvent = new ClickEvent.RunCommand("/home remove " + homeName);
+                    Style removeBtnStyle = textStyles.getDangerousAction().withHoverEvent(removeBtnHoverEvent).withClickEvent(removeBtnClickEvent);
+                    if (canTp || canEdit) {
+                        textBuilder.appendWhitespace();
+                    }
+                    textBuilder.appendComponent(StylingHelper.getButton(Component.literal(textDecorators.getRemove()), removeBtnStyle));
+                }
+            }
 
             src.sendSystemMessage(textBuilder.getComponent());
         } catch (HomeManager.HomeDoesntExistException e) {

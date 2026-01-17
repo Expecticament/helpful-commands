@@ -5,6 +5,8 @@ import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.*;
 import com.expecticament.helpfulcommands.permission.ModPermissions;
+import com.expecticament.helpfulcommands.permission.PermissionHandler;
+import com.expecticament.helpfulcommands.permission.PermissionHandlerProvider;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.expecticament.helpfulcommands.suggestionProvider.TprReceivedRequestsPlayerNameSuggestionProvider;
 import com.mojang.brigadier.Command;
@@ -58,12 +60,14 @@ public class TprCommand extends HelpfulCommandsCommand {
         dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .then(Commands.literal("accept")
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_TPR_ACCEPT))
                         .then(Commands.argument("player", StringArgumentType.word())
                                 .suggests(new TprReceivedRequestsPlayerNameSuggestionProvider())
                                 .executes(ctx -> executeAccept(ctx, StringArgumentType.getString(ctx, "player")))
                         )
                 )
                 .then(Commands.literal("deny")
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_TPR_DENY))
                         .then(Commands.argument("player", StringArgumentType.word())
                                 .suggests(new TprReceivedRequestsPlayerNameSuggestionProvider())
                                 .executes(ctx -> executeDeny(ctx, StringArgumentType.getString(ctx, "player")))
@@ -74,11 +78,13 @@ public class TprCommand extends HelpfulCommandsCommand {
                         .then(Commands.argument("player", EntityArgument.player())
                                 .executes(ctx -> executeRequest(ctx, EntityArgument.getPlayer(ctx, "player"), ""))
                                 .then(Commands.argument("comment", StringArgumentType.string())
+                                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_TPR_REQUEST_COMMENT))
                                         .executes(ctx -> executeRequest(ctx, EntityArgument.getPlayer(ctx, "player"), StringArgumentType.getString(ctx, "comment")))
                                 )
                         )
                 )
                 .then(Commands.literal("cancel")
+                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_TPR_CANCEL))
                         .executes(this::executeCancel)
                 )
         );
@@ -98,7 +104,7 @@ public class TprCommand extends HelpfulCommandsCommand {
             throw TARGET_MUST_BE_OTHER_PLAYER.create(src);
         }
 
-        if (!this.checkBaseCommandRequirements(otherPlayer.createCommandSourceStack())) {
+        if (!canAccept(otherPlayer)) {
             throw TARGET_CANT_ACCEPT_REQUESTS.create(src, otherPlayer);
         }
 
@@ -118,7 +124,6 @@ public class TprCommand extends HelpfulCommandsCommand {
 
             TextBuilder otherTextBuilder = new TextBuilder(otherPlayer);
             Component acceptBtn = StylingHelper.getButton(textDecorators.getCheckmark(), Component.literal(TranslationManager.translate(otherPlayer, "commands.helpful_commands.tpr.request.accept")), textStyles.getAffectedPositive().withClickEvent(new ClickEvent.RunCommand("/tpr accept " + sourcePlayer.getName().getString())));
-            Component denyBtn = StylingHelper.getButton(textDecorators.getCross(), Component.literal(TranslationManager.translate(otherPlayer, "commands.helpful_commands.tpr.request.deny")), textStyles.getAffectedNegative().withClickEvent(new ClickEvent.RunCommand("/tpr deny " + sourcePlayer.getName().getString())));
             otherTextBuilder
                     .appendComponent(StylingHelper.getTitle(Component.literal(TranslationManager.translate(otherPlayer, "commands.helpful_commands.tpr.request.title"))))
                     .appendNewline()
@@ -140,9 +145,14 @@ public class TprCommand extends HelpfulCommandsCommand {
                     .appendComponent(new TextBuilder(otherPlayer).setStyle(textStyles.getTertiary()).appendTranslatable("commands.helpful_commands.tpr.request.timeout", StylingHelper.formatDuration(timeout, otherPlayer)).getComponent())
                     .appendNewline()
                     .appendNewline()
-                    .appendComponent(acceptBtn)
-                    .appendWhitespace()
-                    .appendComponent(denyBtn);
+                    .appendComponent(acceptBtn);
+            if (canDeny(otherPlayer)) {
+                Component denyBtn = StylingHelper.getButton(textDecorators.getCross(), Component.literal(TranslationManager.translate(otherPlayer, "commands.helpful_commands.tpr.request.deny")), textStyles.getAffectedNegative().withClickEvent(new ClickEvent.RunCommand("/tpr deny " + sourcePlayer.getName().getString())));
+                otherTextBuilder
+                        .appendWhitespace()
+                        .appendComponent(denyBtn);
+            }
+
             otherPlayer.sendSystemMessage(otherTextBuilder.getComponent());
 
             TextBuilder textBuilder = new TextBuilder(src);
@@ -284,5 +294,15 @@ public class TprCommand extends HelpfulCommandsCommand {
         src.sendSuccess(textBuilder::getComponent, true);
 
         return Command.SINGLE_SUCCESS;
+    }
+
+    private boolean canAccept(ServerPlayer player) {
+        CommandSourceStack src = player.createCommandSourceStack();
+        return checkBaseCommandRequirements(src) && PermissionHandlerProvider.get().hasPermission(src, ModPermissions.Permission.COMMAND_TPR_ACCEPT);
+    }
+
+    private boolean canDeny(ServerPlayer player) {
+        CommandSourceStack src = player.createCommandSourceStack();
+        return checkBaseCommandRequirements(src) && PermissionHandlerProvider.get().hasPermission(src, ModPermissions.Permission.COMMAND_TPR_DENY);
     }
 }
