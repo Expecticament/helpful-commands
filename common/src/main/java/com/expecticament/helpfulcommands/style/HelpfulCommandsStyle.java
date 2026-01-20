@@ -88,7 +88,7 @@ public abstract class HelpfulCommandsStyle {
         }
 
         public Style getAxisZ() {
-            return Style.EMPTY.withColor(ChatFormatting.BLUE);
+            return Style.EMPTY.withColor(ChatFormatting.AQUA);
         }
     }
 
