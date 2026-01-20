@@ -2,6 +2,7 @@ package com.expecticament.helpfulcommands.command.social;
 
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
 import com.expecticament.helpfulcommands.helper.PermissionHelper;
+import com.expecticament.helpfulcommands.helper.SoundHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
@@ -78,12 +79,12 @@ public class CoinflipCommand extends HelpfulCommandsCommand {
         Component affectedPlayerText = StylingHelper.getAffectedEntityNameText(sourcePlayer);
 
         for (ServerPlayer player : playerList) {
-            Component guessedCoinSideText = Component.literal(TranslationManager.translate(player, "commands.helpful_commands.coinflip." + guessedCoinSide.toString().toLowerCase())).setStyle(textStyles.getPrimary());
-            Component landedCoinSideText = Component.literal(TranslationManager.translate(player, "commands.helpful_commands.coinflip." + landedCoinSide.toString().toLowerCase())).setStyle(textStyles.getPrimary());
-            Component resultText = Component.literal(TranslationManager.translate(player, "commands.helpful_commands.coinflip." + (won ? "won" : "lost"))).setStyle(won ? textStyles.getAffectedPositive() : textStyles.getAffectedNegative());
+            Component pickedCoinSideComponent = Component.literal(TranslationManager.translate(player, "commands.helpful_commands.coinflip." + guessedCoinSide.toString().toLowerCase())).setStyle(textStyles.getPrimary());
+            Component landedCoinSideComponent = Component.literal(TranslationManager.translate(player, "commands.helpful_commands.coinflip." + landedCoinSide.toString().toLowerCase())).setStyle(textStyles.getPrimary());
+            Component resultComponent = Component.literal(TranslationManager.translate(player, "commands.helpful_commands.coinflip." + (won ? "won" : "lost"))).setStyle(won ? textStyles.getAffectedPositive() : textStyles.getAffectedNegative());
 
             TextBuilder textBuilder = new TextBuilder(player);
-            textBuilder.appendTranslatable("commands.helpful_commands.coinflip", affectedPlayerText, guessedCoinSideText, landedCoinSideText, resultText);
+            textBuilder.appendTranslatable("commands.helpful_commands.coinflip", landedCoinSideComponent, affectedPlayerText, pickedCoinSideComponent, resultComponent);
             if (won) {
                 textBuilder.appendLiteral("!");
             }
@@ -91,9 +92,7 @@ public class CoinflipCommand extends HelpfulCommandsCommand {
             player.sendSystemMessage(textBuilder.getComponent());
         }
 
-        Vec3 vec3 = sourcePlayer.position();
-        Holder<SoundEvent> holder = Holder.direct(SoundEvent.createVariableRangeEvent((won ? SoundEvents.PLAYER_LEVELUP : SoundEvents.WANDERING_TRADER_NO).location()));
-        sourcePlayer.connection.send(new ClientboundSoundPacket(holder, SoundSource.PLAYERS, vec3.x(), vec3.y(), vec3.z(), 0.5f, 1, src.getLevel().getRandom().nextLong()));
+        SoundHelper.playSound(sourcePlayer, won ? SoundEvents.PLAYER_LEVELUP : SoundEvents.WANDERING_TRADER_NO, 0.5f, 1);
 
         return Command.SINGLE_SUCCESS;
     }

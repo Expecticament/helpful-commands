@@ -258,7 +258,7 @@
   "commands.helpful_commands.ignite.second": "second",
   "commands.helpful_commands.ignite.seconds": "seconds",
 
-  "commands.helpful_commands.coinflip": "%s guessed %s. The coin landed on %s. They %s",
+  "commands.helpful_commands.coinflip": "The coin flips... %s! %s picked %s and %s",
   "commands.helpful_commands.coinflip.heads": "Heads",
   "commands.helpful_commands.coinflip.tails": "Tails",
   "commands.helpful_commands.coinflip.won": "won",

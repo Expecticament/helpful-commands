@@ -3,6 +3,7 @@ package com.expecticament.helpfulcommands.command.playersAndEntities;
 import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
 import com.expecticament.helpfulcommands.helper.GameRulesHelper;
 import com.expecticament.helpfulcommands.helper.PermissionHelper;
+import com.expecticament.helpfulcommands.helper.SoundHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
@@ -190,9 +191,7 @@ public class HatCommand extends HelpfulCommandsCommand {
 
         inventory.setItem(39, itemStack.copy());
 
-        Vec3 vec3 = player.position();
-        Holder<SoundEvent> holder = Holder.direct(SoundEvent.createVariableRangeEvent(SoundEvents.ARMOR_EQUIP_GENERIC.value().location()));
-        player.connection.send(new ClientboundSoundPacket(holder, SoundSource.PLAYERS, vec3.x(), vec3.y(), vec3.z(), 0.5f, 1, player.level().getRandom().nextLong()));
+        SoundHelper.playSound(player, SoundEvents.ARMOR_EQUIP_GENERIC.value(), 0.5f, 1);
 
         return true;
     }
