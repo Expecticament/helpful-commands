@@ -21,7 +21,16 @@ public class StylingHelper {
 
     public static Component getAffectedEntityNameText(Entity entity) {
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
-        return Component.literal(entity.getName().getString()).setStyle(textStyles.getPrimary());
+
+        String entityName = entity.getName().getString();
+
+        HoverEvent hoverEvent = new HoverEvent.ShowEntity(new HoverEvent.EntityTooltipInfo(entity.getType(), entity.getUUID(), entity.getName()));
+        ClickEvent clickEvent = null;
+        if (entity.isAlwaysTicking()) {
+            clickEvent = new ClickEvent.SuggestCommand("/tell " + entityName + " ");
+        }
+
+        return Component.literal(entityName).setStyle(textStyles.getPrimary().withHoverEvent(hoverEvent).withClickEvent(clickEvent));
     }
 
     public static Component getAffectedEntitiesNumberText(List<? extends Entity> entities) {
