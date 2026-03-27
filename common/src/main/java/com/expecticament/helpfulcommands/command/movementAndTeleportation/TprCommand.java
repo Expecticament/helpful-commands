@@ -4,8 +4,8 @@ import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
 import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.*;
+import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 import com.expecticament.helpfulcommands.permission.ModPermissions;
-import com.expecticament.helpfulcommands.permission.PermissionHandler;
 import com.expecticament.helpfulcommands.permission.PermissionHandlerProvider;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.expecticament.helpfulcommands.suggestionProvider.TprReceivedRequestsPlayerNameSuggestionProvider;
@@ -23,7 +23,6 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.HashSet;

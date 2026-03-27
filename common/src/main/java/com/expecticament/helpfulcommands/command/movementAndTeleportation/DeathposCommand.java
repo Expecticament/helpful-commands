@@ -6,6 +6,7 @@ import com.expecticament.helpfulcommands.helper.ServerLevelHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
+import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
@@ -23,7 +24,6 @@ import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 import net.minecraft.world.entity.Relative;
 
 import java.util.Optional;

@@ -6,7 +6,6 @@ import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
-import com.expecticament.helpfulcommands.manager.TranslationManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
@@ -25,7 +24,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RenameCommand extends HelpfulCommandsCommand {
     private static final DynamicCommandExceptionType SAME_NAME_PROVIDED = new DynamicCommandExceptionType(src ->
@@ -132,7 +133,7 @@ public class RenameCommand extends HelpfulCommandsCommand {
             }
 
             if (commandFeedback && sourcePlayer != player) {
-                TranslationManager.TextBuilder textBuilder = new TranslationManager.TextBuilder(player);
+                TextBuilder textBuilder = new TextBuilder(player);
                 textBuilder.setStyle(textStyles.getAffectedNeutral());
                 Component oldNameComponent = Component.literal(oldName).setStyle(textStyles.getPrimary());
                 switch (result) {

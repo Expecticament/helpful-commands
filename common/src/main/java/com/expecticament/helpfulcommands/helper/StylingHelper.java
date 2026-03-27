@@ -4,12 +4,12 @@ import com.expecticament.helpfulcommands.manager.StylingManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.*;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.GlobalPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 

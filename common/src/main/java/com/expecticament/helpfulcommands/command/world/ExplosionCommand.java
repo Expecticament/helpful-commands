@@ -7,7 +7,7 @@ import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ConfigManager;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
-import com.expecticament.helpfulcommands.manager.TranslationManager;
+import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
@@ -27,11 +27,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 
 public class ExplosionCommand extends HelpfulCommandsCommand {
     private static final Dynamic2CommandExceptionType POWER_CONFIG_VALUE_EXCEEDED = new Dynamic2CommandExceptionType((src, maxPower) ->
-            new TranslationManager.TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.explosion.powerConfigValueExceeded", Component.literal(String.valueOf(maxPower)).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.explosion.powerConfigValueExceeded", Component.literal(String.valueOf(maxPower)).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
 
     public ExplosionCommand(ModCommandManager.ModCommand modCommand) {

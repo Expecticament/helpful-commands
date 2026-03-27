@@ -19,17 +19,12 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.item.ItemArgument;
-import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,12 +47,12 @@ public class HatCommand extends HelpfulCommandsCommand {
                         .executes(ctx -> executeOther(ctx, EntityArgument.getPlayers(ctx, "players"), null))
                         .then(Commands.argument("item", ItemArgument.item(buildContext))
                                 .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HAT_ITEM))
-                                .executes(ctx -> executeOther(ctx, EntityArgument.getPlayers(ctx, "players"), ItemArgument.getItem(ctx, "item").createItemStack(1, false)))
+                                .executes(ctx -> executeOther(ctx, EntityArgument.getPlayers(ctx, "players"), ItemArgument.getItem(ctx, "item").createItemStack(1)))
                         )
                 )
                 .then(Commands.argument("item", ItemArgument.item(buildContext))
                         .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HAT_ITEM) && !PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HAT_OTHERS))
-                        .executes(ctx -> executeSelf(ctx, ItemArgument.getItem(ctx, "item").createItemStack(1, false), false))
+                        .executes(ctx -> executeSelf(ctx, ItemArgument.getItem(ctx, "item").createItemStack(1), false))
                 )
         );
     }

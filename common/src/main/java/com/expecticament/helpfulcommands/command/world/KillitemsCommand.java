@@ -7,6 +7,7 @@ import com.expecticament.helpfulcommands.manager.ConfigManager;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager;
+import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.CommandDispatcher;
@@ -25,7 +26,6 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 
 import java.util.List;
 import java.util.function.Predicate;

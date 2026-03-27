@@ -5,6 +5,7 @@ import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.ServerLevelHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.*;
+import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.expecticament.helpfulcommands.suggestionProvider.HomeNameSuggestionProvider;
@@ -25,7 +26,6 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Relative;
-import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 
 public class HomeCommand extends HelpfulCommandsCommand {
     private static final Dynamic2CommandExceptionType HOME_DOESNT_EXIST = new Dynamic2CommandExceptionType((src, homeName) ->

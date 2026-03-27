@@ -7,6 +7,7 @@ import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager;
+import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
@@ -22,9 +23,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Abilities;
-import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
 public class FlyCommand extends HelpfulCommandsCommand {
     public FlyCommand(ModCommandManager.ModCommand modCommand) {

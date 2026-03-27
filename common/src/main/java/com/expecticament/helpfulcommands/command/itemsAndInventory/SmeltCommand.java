@@ -6,7 +6,6 @@ import com.expecticament.helpfulcommands.helper.PermissionHelper;
 import com.expecticament.helpfulcommands.helper.StylingHelper;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
 import com.expecticament.helpfulcommands.manager.StylingManager;
-import com.expecticament.helpfulcommands.manager.TranslationManager;
 import com.expecticament.helpfulcommands.manager.TranslationManager.TextBuilder;
 import com.expecticament.helpfulcommands.permission.ModPermissions;
 import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
@@ -27,7 +26,10 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 public class SmeltCommand extends HelpfulCommandsCommand {
     private static final DynamicCommandExceptionType ITEM_NOT_SMELTABLE = new DynamicCommandExceptionType(src ->
@@ -108,7 +110,7 @@ public class SmeltCommand extends HelpfulCommandsCommand {
             }
 
             if (commandFeedback && sourcePlayer != player) {
-                TranslationManager.TextBuilder textBuilder = new TranslationManager.TextBuilder(player);
+                TextBuilder textBuilder = new TextBuilder(player);
                 textBuilder.setStyle(textStyles.getAffectedNeutral());
                 textBuilder.appendTranslatable("commands.helpful_commands.smelt.affected", itemNameComponent);
 
@@ -122,7 +124,7 @@ public class SmeltCommand extends HelpfulCommandsCommand {
             throw EntityArgument.NO_PLAYERS_FOUND.create();
         }
 
-        TranslationManager.TextBuilder feedback = new TranslationManager.TextBuilder(src);
+        TextBuilder feedback = new TextBuilder(src);
         feedback.setStyle(textStyles.getSuccess());
         if (affected.size() == 1) {
             feedback.appendTranslatable("commands.helpful_commands.smelt.other", StylingHelper.getAffectedEntityNameText(affected.keySet().iterator().next()), Component.literal(affected.values().iterator().next()).setStyle(textStyles.getPrimary()));
@@ -139,11 +141,10 @@ public class SmeltCommand extends HelpfulCommandsCommand {
         ServerLevel serverLevel = player.level();
         SingleRecipeInput input = new SingleRecipeInput(itemStack.copy());
         RecipeManager recipeManager = serverLevel.recipeAccess();
-        RegistryAccess registryAccess = serverLevel.registryAccess();
         Optional<RecipeHolder<SmeltingRecipe>> optionalRecipe = recipeManager.getRecipeFor(RecipeType.SMELTING, input, serverLevel);
 
         ItemStack output = optionalRecipe
-                .map(holder -> holder.value().assemble(input, registryAccess))
+                .map(holder -> holder.value().assemble(input))
                 .orElse(ItemStack.EMPTY);
 
         if (output.isEmpty()) {

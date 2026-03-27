@@ -1,7 +1,5 @@
-package com.expecticament.helpfulcommands.fabric.permission;
+package com.expecticament.helpfulcommands.permission;
 
-import com.expecticament.helpfulcommands.permission.ModPermissions;
-import com.expecticament.helpfulcommands.permission.PermissionHandler;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.commands.CommandSourceStack;
 

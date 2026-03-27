@@ -279,7 +279,8 @@
 
   "commands.helpful_commands.time.1000": "Day",
   "commands.helpful_commands.time.13000": "Night",
-  "commands.helpful_commands.time": "Set the time to %s",
+  "commands.helpful_commands.time.ticks": "%s tick(s)",
+  "commands.helpful_commands.time": "Set the time in %s to %s",
 
 
   "hover.helpful_commands.clickToOpenTheLink": "Click to open the link",

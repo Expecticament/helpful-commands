@@ -1,8 +1,6 @@
-package com.expecticament.helpfulcommands.neoforge.permission;
+package com.expecticament.helpfulcommands.permission;
 
 import com.expecticament.helpfulcommands.helper.PermissionHelper;
-import com.expecticament.helpfulcommands.permission.ModPermissions;
-import com.expecticament.helpfulcommands.permission.PermissionHandler;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permission;

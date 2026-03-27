@@ -1,47 +1,46 @@
 {
-  "schemaVersion": 1,
-  "id": "${mod_id}",
-  "version": "${version}",
-  "name": "${mod_name}",
-  "description": "${mod_description}",
-  "authors": [
-    "${mod_author}"
-  ],
-  "contact": {
-    "homepage": "https://helpfulcommands.expecticament.com",
-    "sources": "https://github.com/Expecticament/helpful-commands",
-    "issues": "https://github.com/Expecticament/helpful-commands/issues"
-  },
-  "license": "${license}",
-  "icon": "assets/helpful_commands/icon.png",
-  "environment": "*",
-  "entrypoints": {
-    "main": [
-      "com.expecticament.helpfulcommands.fabric.HelpfulCommandsFabric"
+    "schemaVersion": 1,
+    "id": "${mod_id}",
+    "version": "${version}",
+    "name": "${mod_name}",
+    "description": "${description}",
+    "authors": [
+        "${mod_author}"
     ],
-    "client": [
-      "com.expecticament.helpfulcommands.fabric.client.HelpfulCommandsFabricClient"
-    ]
-  },
-  "mixins": [
-    "helpful_commands.mixins.json"
-  ],
-  "depends": {
-    "fabricloader": ">=${fabric_loader_version}",
-    "minecraft": "~${minecraft_version}",
-    "java": ">=21",
-    "fabric-api": "*"
-  },
-  "custom": {
-    "modmenu": {
-      "links": {
-        "modmenu.wiki": "https://helpfulcommands.expecticament.com",
-        "modmenu.kofi": "https://ko-fi.com/expecticament",
-        "modmenu.youtube": "https://www.youtube.com/@expecticament",
-        "modmenu.curseforge": "https://www.curseforge.com/minecraft/mc-mods/helpful-commands",
-        "modmenu.modrinth": "https://modrinth.com/mod/helpful-commands",
-        "modmenu.github_releases": "https://github.com/Expecticament/helpful-commands/releases"
-      }
+    "contact": {
+        "homepage": "https://helpfulcommands.expecticament.com",
+        "sources": "https://github.com/Expecticament/helpful-commands",
+        "issues": "https://github.com/Expecticament/helpful-commands/issues"
+    },
+    "license": "${license}",
+    "icon": "${mod_id}.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+          "com.expecticament.helpfulcommands.HelpfulCommandsFabric"
+        ]
+    },
+    "mixins": [
+        "${mod_id}.mixins.json",
+        "${mod_id}.fabric.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=${fabric_loader_version}",
+        "fabric-api": "*",
+        "minecraft": "~${minecraft_version}",
+        "java": ">=${java_version}"
+    },
+    "custom": {
+        "modmenu": {
+            "links": {
+                "modmenu.wiki": "https://helpfulcommands.expecticament.com",
+                "modmenu.kofi": "https://ko-fi.com/expecticament",
+                "modmenu.youtube": "https://www.youtube.com/@expecticament",
+                "modmenu.curseforge": "https://www.curseforge.com/minecraft/mc-mods/helpful-commands",
+                "modmenu.modrinth": "https://modrinth.com/mod/helpful-commands",
+                "modmenu.github_releases": "https://github.com/Expecticament/helpful-commands/releases"
+            }
+        }
     }
-  }
 }
+  

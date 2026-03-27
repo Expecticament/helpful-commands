@@ -1,11 +1,9 @@
-package com.expecticament.helpfulcommands.fabric;
+package com.expecticament.helpfulcommands;
 
-import com.expecticament.helpfulcommands.fabric.permission.PermissionHandlerFabricImpl;
-import com.expecticament.helpfulcommands.permission.PermissionHandlerProvider;
+import com.expecticament.helpfulcommands.permission.PermissionHandlerFabricImpl;
 import com.expecticament.helpfulcommands.manager.ModCommandManager;
+import com.expecticament.helpfulcommands.permission.PermissionHandlerProvider;
 import net.fabricmc.api.ModInitializer;
-
-import com.expecticament.helpfulcommands.HelpfulCommands;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
