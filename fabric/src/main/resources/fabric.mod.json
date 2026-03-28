@@ -5,7 +5,13 @@
     "name": "${mod_name}",
     "description": "${description}",
     "authors": [
-        "${mod_author}"
+        {
+            "name": "${mod_author}",
+            "contact": {
+                "email": "contact@expecticament.com",
+                "homepage": "https://expecticament.com"
+            }
+        }
     ],
     "contact": {
         "homepage": "https://helpfulcommands.expecticament.com",
@@ -13,17 +19,13 @@
         "issues": "https://github.com/Expecticament/helpful-commands/issues"
     },
     "license": "${license}",
-    "icon": "${mod_id}.png",
+    "icon": "assets/helpful_commands/icon.png",
     "environment": "*",
     "entrypoints": {
         "main": [
-          "com.expecticament.helpfulcommands.HelpfulCommandsFabric"
+            "com.expecticament.helpful_commands.HelpfulCommandsFabric"
         ]
     },
-    "mixins": [
-        "${mod_id}.mixins.json",
-        "${mod_id}.fabric.mixins.json"
-    ],
     "depends": {
         "fabricloader": ">=${fabric_loader_version}",
         "fabric-api": "*",

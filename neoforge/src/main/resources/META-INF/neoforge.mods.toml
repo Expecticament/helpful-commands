@@ -7,14 +7,9 @@ modId = "${mod_id}"
 version = "${version}"
 displayName = "${mod_name}"
 displayURL="https://helpfulcommands.expecticament.com"
-logoFile="${mod_id}.png"
-credits="${credits}"
+logoFile="assets/helpful_commands/icon.png"
 authors = "${mod_author}"
 description = '''${description}'''
-[[mixins]]
-config = "${mod_id}.mixins.json"
-[[mixins]]
-config = "${mod_id}.neoforge.mixins.json"
 [[dependencies.${mod_id}]]
 modId = "neoforge"
 type="required"
