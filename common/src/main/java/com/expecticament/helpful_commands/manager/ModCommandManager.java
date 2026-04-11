@@ -3,10 +3,7 @@ package com.expecticament.helpful_commands.manager;
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
 import com.expecticament.helpful_commands.command.abilities.FlyCommand;
 import com.expecticament.helpful_commands.command.abilities.GodCommand;
-import com.expecticament.helpful_commands.command.itemsAndInventory.InvseeCommand;
-import com.expecticament.helpful_commands.command.itemsAndInventory.RenameCommand;
-import com.expecticament.helpful_commands.command.itemsAndInventory.RepairCommand;
-import com.expecticament.helpful_commands.command.itemsAndInventory.SmeltCommand;
+import com.expecticament.helpful_commands.command.itemsAndInventory.*;
 import com.expecticament.helpful_commands.command.main.HcCommand;
 import com.expecticament.helpful_commands.command.movementAndTeleportation.*;
 import com.expecticament.helpful_commands.command.playersAndEntities.*;
@@ -29,6 +26,7 @@ public class ModCommandManager {
         FLY(CommandCategory.ABILITIES),
         GOD(CommandCategory.ABILITIES),
 
+        DISENCHANT(CommandCategory.ITEMS_AND_INVENTORY),
         INVSEE(CommandCategory.ITEMS_AND_INVENTORY),
         RENAME(CommandCategory.ITEMS_AND_INVENTORY),
         REPAIR(CommandCategory.ITEMS_AND_INVENTORY),
@@ -101,6 +99,7 @@ public class ModCommandManager {
         commands.add(new FlyCommand(ModCommand.FLY));
         commands.add(new GodCommand(ModCommand.GOD));
 
+        commands.add(new DisenchantCommand(ModCommand.DISENCHANT));
         commands.add(new InvseeCommand(ModCommand.INVSEE));
         commands.add(new RenameCommand(ModCommand.RENAME));
         commands.add(new RepairCommand(ModCommand.REPAIR));

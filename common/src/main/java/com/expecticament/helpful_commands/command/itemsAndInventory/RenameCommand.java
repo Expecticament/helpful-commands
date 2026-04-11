@@ -152,7 +152,7 @@ public class RenameCommand extends HelpfulCommandsCommand {
         }
 
         if (affected.isEmpty()) {
-            throw EntityArgument.NO_PLAYERS_FOUND.create();
+            throw NO_ITEMS_FOUND.create(src);
         }
 
         TextBuilder feedback = new TextBuilder(src);
