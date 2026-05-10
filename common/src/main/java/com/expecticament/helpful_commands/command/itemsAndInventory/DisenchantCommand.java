@@ -56,6 +56,7 @@ public class DisenchantCommand extends HelpfulCommandsCommand {
 
         dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
+                .executes(ctx -> executeSelf(ctx, null))
                 .then(Commands.argument("enchantment", ResourceArgument.resource(buildContext, Registries.ENCHANTMENT))
                         .executes(ctx -> executeSelf(ctx, ResourceArgument.getEnchantment(ctx, "enchantment")))
                         .then(Commands.argument("entities", EntityArgument.entities())
