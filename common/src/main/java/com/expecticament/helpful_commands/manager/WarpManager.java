@@ -2,7 +2,7 @@ package com.expecticament.helpful_commands.manager;
 
 import com.expecticament.helpful_commands.HelpfulCommands;
 import com.expecticament.helpful_commands.helper.ServerLevelHelper;
-import com.expecticament.helpful_commands.io.JsonIO;
+import com.expecticament.helpful_commands.util.io.JsonIO;
 import net.minecraft.core.Position;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -55,10 +55,10 @@ public class WarpManager {
     }
 
     public static void addWarp(String warpName, String description, Position position, ServerLevel serverLevel) throws WarpAlreadyExistsException {
-        Warps warps = Objects.requireNonNullElse(io.read(), new Warps());
+        Warps warps = Objects.requireNonNullElse(io.getData(), new Warps());
 
         if (warps.entries.putIfAbsent(warpName, new Warp(description, position, serverLevel)) == null) {
-            io.save(warps);
+            io.updateBuffer(warps);
             return;
         }
 
@@ -66,10 +66,10 @@ public class WarpManager {
     }
 
     public static void removeWarp(String warpName) throws WarpDoesntExistException {
-        Warps warps = Objects.requireNonNullElse(io.read(), new Warps());
+        Warps warps = Objects.requireNonNullElse(io.getData(), new Warps());
 
         if (warps.entries.remove(warpName) != null) {
-            io.save(warps);
+            io.updateBuffer(warps);
             return;
         }
 
@@ -81,7 +81,7 @@ public class WarpManager {
             throw new SameWarpNameProvided(newName);
         }
 
-        Warps warps = Objects.requireNonNullElse(io.read(), new Warps());
+        Warps warps = Objects.requireNonNullElse(io.getData(), new Warps());
 
         if (!warps.entries.containsKey(warpName)) {
             throw new WarpDoesntExistException(warpName);
@@ -93,16 +93,16 @@ public class WarpManager {
 
         Warp warp = warps.entries.remove(warpName);
         warps.entries.put(newName, warp);
-        io.save(warps);
+        io.updateBuffer(warps);
     }
 
     public static void editWarpDescription(String warpName, String newDescription) throws WarpDoesntExistException {
-        Warps warps = Objects.requireNonNullElse(io.read(), new Warps());
+        Warps warps = Objects.requireNonNullElse(io.getData(), new Warps());
 
         Warp warp = warps.entries.get(warpName);
         if (warp != null) {
             warp.description = newDescription;
-            io.save(warps);
+            io.updateBuffer(warps);
             return;
         }
 
@@ -110,7 +110,7 @@ public class WarpManager {
     }
 
     public static void editWarpLocation(String warpName, Position newPosition, ServerLevel newServerLevel) throws WarpDoesntExistException {
-        Warps warps = Objects.requireNonNullElse(io.read(), new Warps());
+        Warps warps = Objects.requireNonNullElse(io.getData(), new Warps());
 
         Warp warp = warps.entries.get(warpName);
         if (warp != null) {
@@ -118,7 +118,7 @@ public class WarpManager {
             warp.y = newPosition.y();
             warp.z = newPosition.z();
             warp.dimension = ServerLevelHelper.getLevelLocation(newServerLevel);
-            io.save(warps);
+            io.updateBuffer(warps);
             return;
         }
 
@@ -126,12 +126,12 @@ public class WarpManager {
     }
 
     public static boolean exists(String warpName) {
-        Warps warps = Objects.requireNonNullElse(io.read(), new Warps());
+        Warps warps = Objects.requireNonNullElse(io.getData(), new Warps());
         return warps.entries.containsKey(warpName);
     }
 
     public static Warp getWarp(String warpName) throws WarpDoesntExistException {
-        Warps warps = Objects.requireNonNullElse(io.read(), new Warps());
+        Warps warps = Objects.requireNonNullElse(io.getData(), new Warps());
 
         Warp warp = warps.entries.get(warpName);
         if (warp != null) {
@@ -142,12 +142,12 @@ public class WarpManager {
     }
 
     public static Map<String, Warp> getWarps() {
-        return Objects.requireNonNullElse(io.read(), new Warps()).entries;
+        return Objects.requireNonNullElse(io.getData(), new Warps()).entries;
     }
 
     public static int initialize(MinecraftServer server) {
         io = new JsonIO<>(server.getWorldPath(LevelResource.ROOT).resolve(HelpfulCommands.FOLDER_NAME), FILE_NAME, Warps.class);
-        Warps warps = io.read();
+        Warps warps = io.getData();
         if (warps == null) {
             return 0;
         }
@@ -155,6 +155,6 @@ public class WarpManager {
     }
 
     public static void writeToDisk() {
-        io.writeToDisk();
+        io.flush();
     }
 }

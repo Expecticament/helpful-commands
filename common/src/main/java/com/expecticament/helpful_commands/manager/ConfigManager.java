@@ -2,7 +2,7 @@ package com.expecticament.helpful_commands.manager;
 
 import com.expecticament.helpful_commands.HelpfulCommands;
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
-import com.expecticament.helpful_commands.io.JsonIO;
+import com.expecticament.helpful_commands.util.io.JsonIO;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
 
@@ -28,12 +28,12 @@ public class ConfigManager {
 
         public void writeField(CONFIG_FIELD configField, Object value) {
             fields.put(configField, value);
-            io.save(this);
+            io.updateBuffer(this);
         }
 
         public void writeField(String configField, Object value) {
             fields.put(CONFIG_FIELD.valueOf(configField.toUpperCase()), value);
-            io.save(this);
+            io.updateBuffer(this);
         }
 
         public <T> T readField(String configField) {
@@ -105,7 +105,7 @@ public class ConfigManager {
 
             entry.state = newState;
             command.commands.put(commandName, entry);
-            io.save(this);
+            io.updateBuffer(this);
 
             return true;
         }
@@ -241,7 +241,9 @@ public class ConfigManager {
     }
 
     public static void initialize(MinecraftServer server) {
-        io = new JsonIO<>(server.getWorldPath(LevelResource.ROOT).resolve(HelpfulCommands.FOLDER_NAME), FILE_NAME, HelpfulCommandsConfig.class);
+        io = new JsonIO<>(server.getWorldPath(LevelResource.ROOT).resolve(HelpfulCommands.FOLDER_NAME), FILE_NAME, HelpfulCommandsConfig.class, builder -> {
+            builder.registerTypeAdapter(HelpfulCommandsConfig.class, new CustomConfigDeserializer());
+        });
 
         HelpfulCommandsConfig config = readConfig();
 
@@ -255,14 +257,14 @@ public class ConfigManager {
             config.command.commands.putIfAbsent(modCommand.getName(), entry);
         }
 
-        io.save(config);
+        io.updateBuffer(config);
     }
 
     public static HelpfulCommandsConfig readConfig() {
-        return Objects.requireNonNullElse(io.read(), new HelpfulCommandsConfig());
+        return Objects.requireNonNullElse(io.getData(), new HelpfulCommandsConfig());
     }
 
     public static void writeToDisk() {
-        io.writeToDisk();
+        io.flush();
     }
 }

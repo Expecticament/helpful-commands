@@ -1,7 +1,7 @@
 package com.expecticament.helpful_commands.manager;
 
 import com.expecticament.helpful_commands.HelpfulCommands;
-import com.expecticament.helpful_commands.io.JsonIO;
+import com.expecticament.helpful_commands.util.io.JsonIO;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.storage.LevelResource;
@@ -41,7 +41,7 @@ public class CooldownManager {
             return false;
         }
 
-        Cooldowns cooldowns = Objects.requireNonNullElse(io.read(), new Cooldowns());
+        Cooldowns cooldowns = Objects.requireNonNullElse(io.getData(), new Cooldowns());
 
         EnumMap<CooldownType, Cooldown> playerCooldowns = cooldowns.entries.computeIfAbsent(uuid, id -> new EnumMap<>(CooldownType.class));
 
@@ -58,7 +58,7 @@ public class CooldownManager {
 
         playerCooldowns.put(cooldownType, cooldown);
 
-        io.save(cooldowns);
+        io.updateBuffer(cooldowns);
 
         return true;
     }
@@ -68,7 +68,7 @@ public class CooldownManager {
     }
 
     public static long getRemainingCooldown(UUID uuid, CooldownType cooldownType) {
-        Cooldowns cooldowns = Objects.requireNonNullElse(io.read(), new Cooldowns());
+        Cooldowns cooldowns = Objects.requireNonNullElse(io.getData(), new Cooldowns());
 
         EnumMap<CooldownType, Cooldown> playerCooldowns = cooldowns.entries.get(uuid);
         if (playerCooldowns == null) {
@@ -87,7 +87,7 @@ public class CooldownManager {
                 cooldowns.entries.remove(uuid);
             }
 
-            io.save(cooldowns);
+            io.updateBuffer(cooldowns);
             return 0;
         }
 
@@ -99,7 +99,7 @@ public class CooldownManager {
     }
 
     public static boolean removeCooldown(UUID uuid, CooldownType cooldownType) {
-        Cooldowns cooldowns = Objects.requireNonNullElse(io.read(), new Cooldowns());
+        Cooldowns cooldowns = Objects.requireNonNullElse(io.getData(), new Cooldowns());
 
         EnumMap<CooldownType, Cooldown> playerCooldowns = cooldowns.entries.get(uuid);
         if (playerCooldowns == null) {
@@ -118,13 +118,13 @@ public class CooldownManager {
                 cooldowns.entries.remove(uuid);
             }
 
-            io.save(cooldowns);
+            io.updateBuffer(cooldowns);
             return false;
         }
 
         playerCooldowns.remove(cooldownType);
 
-        io.save(cooldowns);
+        io.updateBuffer(cooldowns);
 
         return true;
     }
@@ -134,20 +134,20 @@ public class CooldownManager {
     }
 
     public static int removeAllCooldowns(UUID uuid) {
-        Cooldowns cooldowns = Objects.requireNonNullElse(io.read(), new Cooldowns());
+        Cooldowns cooldowns = Objects.requireNonNullElse(io.getData(), new Cooldowns());
 
         EnumMap<CooldownType, Cooldown> playerCooldowns = cooldowns.entries.remove(uuid);
         if (playerCooldowns == null || playerCooldowns.isEmpty()) {
             return 0;
         }
 
-        io.save(cooldowns);
+        io.updateBuffer(cooldowns);
 
         return playerCooldowns.size();
     }
 
     public static int removeAllCooldowns() {
-        Cooldowns cooldowns = Objects.requireNonNullElse(io.read(), new Cooldowns());
+        Cooldowns cooldowns = Objects.requireNonNullElse(io.getData(), new Cooldowns());
 
         int removed = cooldowns.entries.values()
                 .stream()
@@ -155,13 +155,13 @@ public class CooldownManager {
                 .sum();
 
         cooldowns.entries.clear();
-        io.save(cooldowns);
+        io.updateBuffer(cooldowns);
 
         return removed;
     }
 
     public static void removeExpired() {
-        Cooldowns cooldowns = Objects.requireNonNullElse(io.read(), new Cooldowns());
+        Cooldowns cooldowns = Objects.requireNonNullElse(io.getData(), new Cooldowns());
         boolean changed = false;
 
         Iterator<Map.Entry<UUID, EnumMap<CooldownType, Cooldown>>> playerIterator = cooldowns.entries.entrySet().iterator();
@@ -179,13 +179,13 @@ public class CooldownManager {
         }
 
         if (changed) {
-            io.save(cooldowns);
+            io.updateBuffer(cooldowns);
         }
     }
 
     public static int initialize(MinecraftServer server) {
         io = new JsonIO<>(server.getWorldPath(LevelResource.ROOT).resolve(HelpfulCommands.FOLDER_NAME), FILE_NAME, Cooldowns.class);
-        Cooldowns cooldowns = io.read();
+        Cooldowns cooldowns = io.getData();
         if (cooldowns == null) {
             return 0;
         }
@@ -196,6 +196,6 @@ public class CooldownManager {
     }
 
     public static void writeToDisk() {
-        io.writeToDisk();
+        io.flush();
     }
 }

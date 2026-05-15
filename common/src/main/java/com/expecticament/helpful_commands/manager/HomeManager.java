@@ -3,7 +3,7 @@ package com.expecticament.helpful_commands.manager;
 import com.expecticament.helpful_commands.HelpfulCommands;
 import com.expecticament.helpful_commands.helper.PermissionHelper;
 import com.expecticament.helpful_commands.helper.ServerLevelHelper;
-import com.expecticament.helpful_commands.io.JsonIO;
+import com.expecticament.helpful_commands.util.io.JsonIO;
 import net.minecraft.core.Position;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -63,7 +63,7 @@ public class HomeManager {
 
     public static int initialize(MinecraftServer server) {
         io = new JsonIO<>(server.getWorldPath(LevelResource.ROOT).resolve(HelpfulCommands.FOLDER_NAME), FILE_NAME, Homes.class);
-        Homes homes = io.read();
+        Homes homes = io.getData();
         if (homes == null) {
             return 0;
         }
@@ -74,7 +74,7 @@ public class HomeManager {
     }
 
     public static void addHome(ServerPlayer player, String homeName) throws HomeAlreadyExistsException, HomeLimitExceededException {
-        Homes homes = Objects.requireNonNullElse(io.read(), new Homes());
+        Homes homes = Objects.requireNonNullElse(io.getData(), new Homes());
         Map<String, Home> playerHomes = getHomesForPlayer(player, homes);
 
         int maxHomes = PermissionHelper.getMetaOrElseConfigValue(player, ConfigManager.CONFIG_FIELD.MAX_HOMES);
@@ -85,7 +85,7 @@ public class HomeManager {
 
         if (playerHomes.putIfAbsent(homeName, new Home(player.position(), player.level())) == null) {
             homes.entries.put(player.getUUID(), playerHomes);
-            io.save(homes);
+            io.updateBuffer(homes);
             return;
         }
 
@@ -93,12 +93,12 @@ public class HomeManager {
     }
 
     public static void removeHome(ServerPlayer player, String homeName) throws HomeDoesntExistException {
-        Homes homes = Objects.requireNonNullElse(io.read(), new Homes());
+        Homes homes = Objects.requireNonNullElse(io.getData(), new Homes());
         Map<String, Home> playerHomes = getHomesForPlayer(player, homes);
 
         if (playerHomes.remove(homeName) != null) {
             homes.entries.put(player.getUUID(), playerHomes);
-            io.save(homes);
+            io.updateBuffer(homes);
             return;
         }
 
@@ -110,7 +110,7 @@ public class HomeManager {
             throw new SameHomeNameProvidedException(newName);
         }
 
-        Homes homes = Objects.requireNonNullElse(io.read(), new Homes());
+        Homes homes = Objects.requireNonNullElse(io.getData(), new Homes());
         Map<String, Home> playerHomes = getHomesForPlayer(player, homes);
 
         if (playerHomes.containsKey(newName)) {
@@ -122,7 +122,7 @@ public class HomeManager {
         if (prev != null) {
             playerHomes.put(newName, prev);
             homes.entries.put(player.getUUID(), playerHomes);
-            io.save(homes);
+            io.updateBuffer(homes);
             return;
         }
 
@@ -130,7 +130,7 @@ public class HomeManager {
     }
 
     public static void editHomeLocation(ServerPlayer player, String homeName, Position newPosition, ServerLevel newServerLevel) throws HomeDoesntExistException {
-        Homes homes = Objects.requireNonNullElse(io.read(), new Homes());
+        Homes homes = Objects.requireNonNullElse(io.getData(), new Homes());
         Map<String, Home> playerHomes = getHomesForPlayer(player, homes);
 
         Home home = playerHomes.get(homeName);
@@ -142,7 +142,7 @@ public class HomeManager {
             home.dimension = ServerLevelHelper.getLevelLocation(newServerLevel);
             playerHomes.put(homeName, home);
             homes.entries.put(player.getUUID(), playerHomes);
-            io.save(homes);
+            io.updateBuffer(homes);
             return;
         }
 
@@ -150,13 +150,13 @@ public class HomeManager {
     }
 
     public static boolean hasHome(ServerPlayer player, String homeName) {
-        Homes homes = Objects.requireNonNullElse(io.read(), new Homes());
+        Homes homes = Objects.requireNonNullElse(io.getData(), new Homes());
         Map<String, Home> playerHomes = getHomesForPlayer(player, homes);
         return playerHomes.containsKey(homeName);
     }
 
     public static Home getHome(ServerPlayer player, String homeName) throws HomeDoesntExistException {
-        Homes homes = Objects.requireNonNullElse(io.read(), new Homes());
+        Homes homes = Objects.requireNonNullElse(io.getData(), new Homes());
         Map<String, Home> playerHomes = getHomesForPlayer(player, homes);
 
         Home home = playerHomes.get(homeName);
@@ -168,7 +168,7 @@ public class HomeManager {
     }
 
     public static Map<String, Home> getHomesForPlayer(ServerPlayer player) {
-        return getHomesForPlayer(player, Objects.requireNonNullElse(io.read(), new Homes()));
+        return getHomesForPlayer(player, Objects.requireNonNullElse(io.getData(), new Homes()));
     }
 
     private static Map<String, Home> getHomesForPlayer(ServerPlayer player, Homes homes) {
@@ -176,6 +176,6 @@ public class HomeManager {
     }
 
     public static void writeToDisk() {
-        io.writeToDisk();
+        io.flush();
     }
 }
