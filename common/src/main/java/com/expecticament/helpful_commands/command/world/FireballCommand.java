@@ -1,7 +1,7 @@
 package com.expecticament.helpful_commands.command.world;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
-import com.expecticament.helpful_commands.helper.PermissionHelper;
+import com.expecticament.helpful_commands.util.PermissionsUtil;
 import com.expecticament.helpful_commands.manager.ConfigManager;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
@@ -47,7 +47,7 @@ public class FireballCommand extends HelpfulCommandsCommand {
 
     @Override
     protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
-        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_FIREBALL);
+        return PermissionsUtil.hasPermission(source, ModPermissions.Permission.COMMAND_FIREBALL);
     }
 
     private int execute(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
@@ -61,7 +61,7 @@ public class FireballCommand extends HelpfulCommandsCommand {
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
-        int maxPower = PermissionHelper.getMetaOrElseConfigValue(src, ConfigManager.CONFIG_FIELD.FIREBALL_POWER_LIMIT);
+        int maxPower = PermissionsUtil.getMetaOrElseConfigValue(src, ConfigManager.CONFIG_FIELD.FIREBALL_POWER_LIMIT);
         if (power < 1) {
             power = Math.min(5, maxPower);
         } else if (power > maxPower) {

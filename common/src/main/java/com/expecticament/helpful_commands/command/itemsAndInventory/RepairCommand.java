@@ -1,9 +1,9 @@
 package com.expecticament.helpful_commands.command.itemsAndInventory;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
-import com.expecticament.helpful_commands.helper.GameRulesHelper;
-import com.expecticament.helpful_commands.helper.PermissionHelper;
-import com.expecticament.helpful_commands.helper.StylingHelper;
+import com.expecticament.helpful_commands.util.GameRulesUtil;
+import com.expecticament.helpful_commands.util.PermissionsUtil;
+import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
 import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
@@ -47,7 +47,7 @@ public class RepairCommand extends HelpfulCommandsCommand {
                 .requires(this::canExecute)
                 .executes(this::executeSelf)
                 .then(Commands.argument("players", EntityArgument.players())
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_REPAIR_OTHERS))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_REPAIR_OTHERS))
                         .executes(ctx -> executeOther(ctx, EntityArgument.getPlayers(ctx, "players")))
                 )
         );
@@ -55,7 +55,7 @@ public class RepairCommand extends HelpfulCommandsCommand {
 
     @Override
     protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
-        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_REPAIR);
+        return PermissionsUtil.hasPermission(source, ModPermissions.Permission.COMMAND_REPAIR);
     }
 
     private int executeSelf(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
@@ -80,7 +80,7 @@ public class RepairCommand extends HelpfulCommandsCommand {
             case -1:
                 throw ITEM_NOT_DAMAGEABLE.create(src);
             case 0:
-                textBuilder.appendTranslatable("commands.helpful_commands.repair.self", StylingHelper.getItemStackName(mainHandItemStack)).setStyle(textStyles.getPrimary());
+                textBuilder.appendTranslatable("commands.helpful_commands.repair.self", StylingUtil.getItemStackName(mainHandItemStack)).setStyle(textStyles.getPrimary());
                 break;
         }
 
@@ -101,7 +101,7 @@ public class RepairCommand extends HelpfulCommandsCommand {
         }
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
-        boolean commandFeedback = GameRulesHelper.commandFeedbackEnabled(src.getLevel());
+        boolean commandFeedback = GameRulesUtil.isCommandFeedbackEnabled(src.getLevel());
 
         Map<ServerPlayer, String> affected = new HashMap<>();
         for (ServerPlayer player : players) {
@@ -115,7 +115,7 @@ public class RepairCommand extends HelpfulCommandsCommand {
                 continue;
             }
 
-            Component itemNameComponent = StylingHelper.getItemStackName(mainHandItemStack);
+            Component itemNameComponent = StylingUtil.getItemStackName(mainHandItemStack);
 
             if (commandFeedback && sourcePlayer != player) {
                 TextBuilder textBuilder = new TextBuilder(player);
@@ -135,9 +135,9 @@ public class RepairCommand extends HelpfulCommandsCommand {
         TextBuilder feedback = new TextBuilder(src);
         feedback.setStyle(textStyles.getSuccess());
         if (affected.size() == 1) {
-            feedback.appendTranslatable("commands.helpful_commands.repair.other", StylingHelper.getAffectedEntityNameText(affected.keySet().iterator().next()), Component.literal(affected.values().iterator().next()).setStyle(textStyles.getPrimary()));
+            feedback.appendTranslatable("commands.helpful_commands.repair.other", StylingUtil.getAffectedEntityNameText(affected.keySet().iterator().next()), Component.literal(affected.values().iterator().next()).setStyle(textStyles.getPrimary()));
         } else {
-            feedback.appendTranslatable("commands.helpful_commands.repair.others", StylingHelper.getAffectedEntitiesNumberText(affected));
+            feedback.appendTranslatable("commands.helpful_commands.repair.others", StylingUtil.getAffectedEntitiesNumberText(affected));
         }
 
         src.sendSuccess(feedback::getComponent, true);

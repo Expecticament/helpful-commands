@@ -1,9 +1,9 @@
 package com.expecticament.helpful_commands.command.itemsAndInventory;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
-import com.expecticament.helpful_commands.helper.GameRulesHelper;
-import com.expecticament.helpful_commands.helper.PermissionHelper;
-import com.expecticament.helpful_commands.helper.StylingHelper;
+import com.expecticament.helpful_commands.util.GameRulesUtil;
+import com.expecticament.helpful_commands.util.PermissionsUtil;
+import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
 import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
@@ -53,7 +53,7 @@ public class RenameCommand extends HelpfulCommandsCommand {
                         })
                         .executes(ctx -> executeSelf(ctx, StringArgumentType.getString(ctx, "new_name")))
                         .then(Commands.argument("players", EntityArgument.players())
-                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_RENAME_OTHERS))
+                                .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_RENAME_OTHERS))
                                 .executes(ctx -> executeOther(ctx, StringArgumentType.getString(ctx, "new_name"), EntityArgument.getPlayers(ctx, "players")))
                         )
                 )
@@ -62,7 +62,7 @@ public class RenameCommand extends HelpfulCommandsCommand {
 
     @Override
     protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
-        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_RENAME);
+        return PermissionsUtil.hasPermission(source, ModPermissions.Permission.COMMAND_RENAME);
     }
 
     private int executeSelf(CommandContext<CommandSourceStack> ctx, String newName) throws CommandSyntaxException {
@@ -77,7 +77,7 @@ public class RenameCommand extends HelpfulCommandsCommand {
             throw EMPTY_ITEM_STACK_MAIN_HAND.create(src);
         }
 
-        Component oldNameComponent = StylingHelper.getItemStackName(mainHandItemStack);
+        Component oldNameComponent = StylingUtil.getItemStackName(mainHandItemStack);
 
         TextBuilder textBuilder = new TextBuilder(src);
 
@@ -114,7 +114,7 @@ public class RenameCommand extends HelpfulCommandsCommand {
         }
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
-        boolean commandFeedback = GameRulesHelper.commandFeedbackEnabled(src.getLevel());
+        boolean commandFeedback = GameRulesUtil.isCommandFeedbackEnabled(src.getLevel());
 
         Component newNameComponent = Component.literal(newName).setStyle(textStyles.getPrimary());
 
@@ -125,7 +125,7 @@ public class RenameCommand extends HelpfulCommandsCommand {
                 continue;
             }
 
-            String oldName = StylingHelper.getItemStackName(mainHandItemStack).getString();
+            String oldName = StylingUtil.getItemStackName(mainHandItemStack).getString();
 
             int result = rename(player.getMainHandItem(), newName);
             if (result < 0) {
@@ -158,7 +158,7 @@ public class RenameCommand extends HelpfulCommandsCommand {
         TextBuilder feedback = new TextBuilder(src);
         feedback.setStyle(textStyles.getSuccess());
         if (affected.size() == 1) {
-            Component affectedPlayer = StylingHelper.getAffectedEntityNameText(affected.keySet().iterator().next());
+            Component affectedPlayer = StylingUtil.getAffectedEntityNameText(affected.keySet().iterator().next());
             Component oldName = Component.literal(affected.values().iterator().next()).setStyle(textStyles.getPrimary());
             if (newName.isEmpty()) {
                 feedback.appendTranslatable("commands.helpful_commands.rename.remove.other", affectedPlayer, oldName);
@@ -167,9 +167,9 @@ public class RenameCommand extends HelpfulCommandsCommand {
             }
         } else {
             if (newName.isEmpty()) {
-                feedback.appendTranslatable("commands.helpful_commands.rename.remove.others", StylingHelper.getAffectedEntitiesNumberText(affected));
+                feedback.appendTranslatable("commands.helpful_commands.rename.remove.others", StylingUtil.getAffectedEntitiesNumberText(affected));
             } else {
-                feedback.appendTranslatable("commands.helpful_commands.rename.others", StylingHelper.getAffectedEntitiesNumberText(affected), newNameComponent);
+                feedback.appendTranslatable("commands.helpful_commands.rename.others", StylingUtil.getAffectedEntitiesNumberText(affected), newNameComponent);
             }
         }
 
@@ -188,7 +188,7 @@ public class RenameCommand extends HelpfulCommandsCommand {
 
             return 2;
         } else {
-            if (StylingHelper.getItemStackName(itemStack).getString().equals(newName)) {
+            if (StylingUtil.getItemStackName(itemStack).getString().equals(newName)) {
                 return -1;
             }
 

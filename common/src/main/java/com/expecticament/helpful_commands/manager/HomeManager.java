@@ -1,8 +1,8 @@
 package com.expecticament.helpful_commands.manager;
 
 import com.expecticament.helpful_commands.HelpfulCommands;
-import com.expecticament.helpful_commands.helper.PermissionHelper;
-import com.expecticament.helpful_commands.helper.ServerLevelHelper;
+import com.expecticament.helpful_commands.util.PermissionsUtil;
+import com.expecticament.helpful_commands.util.ServerLevelUtil;
 import com.expecticament.helpful_commands.util.io.JsonIO;
 import net.minecraft.core.Position;
 import net.minecraft.server.MinecraftServer;
@@ -25,7 +25,7 @@ public class HomeManager {
             x = position.x();
             y = position.y();
             z = position.z();
-            this.dimension = ServerLevelHelper.getLevelLocation(serverLevel);
+            this.dimension = ServerLevelUtil.getLevelLocation(serverLevel);
         }
     }
 
@@ -77,7 +77,7 @@ public class HomeManager {
         Homes homes = Objects.requireNonNullElse(io.getData(), new Homes());
         Map<String, Home> playerHomes = getHomesForPlayer(player, homes);
 
-        int maxHomes = PermissionHelper.getMetaOrElseConfigValue(player, ConfigManager.CONFIG_FIELD.MAX_HOMES);
+        int maxHomes = PermissionsUtil.getMetaOrElseConfigValue(player, ConfigManager.CONFIG_FIELD.MAX_HOMES);
 
         if (playerHomes.size() >= maxHomes) {
             throw new HomeLimitExceededException(player);
@@ -139,7 +139,7 @@ public class HomeManager {
             home.x = newPosition.x();
             home.y = newPosition.y();
             home.z = newPosition.z();
-            home.dimension = ServerLevelHelper.getLevelLocation(newServerLevel);
+            home.dimension = ServerLevelUtil.getLevelLocation(newServerLevel);
             playerHomes.put(homeName, home);
             homes.entries.put(player.getUUID(), playerHomes);
             io.updateBuffer(homes);

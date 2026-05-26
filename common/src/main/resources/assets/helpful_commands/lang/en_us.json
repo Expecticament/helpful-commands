@@ -123,7 +123,8 @@
   "commands.helpful_commands.disenchant.error.noEnchantments": "Your %s doesn't have any enchantments",
 
   "commands.helpful_commands.invsee": "Viewing %s's inventory...",
-  "commands.helpful_commands.invsee.screenTitle": "%s's Inventory",
+  "commands.helpful_commands.invsee.screenTitle": "%s's Inventory %s",
+  "commands.helpful_commands.invsee.screenTitle.offline": "(Offline)",
   "commands.helpful_commands.invsee.emptySlot": "Empty Slot",
   "commands.helpful_commands.invsee.infoSlot.name": "What are these slots for?",
   "commands.helpful_commands.invsee.infoSlot.lore": "Left to right: boots, leggings, chestplate, helmet, off-hand",
@@ -310,6 +311,7 @@
   "error.helpful_commands.targetMustBeOtherPlayer": "You can't use this command or argument on yourself",
   "error.helpful_commands.failedToTeleport": "Failed to teleport",
   "error.helpful_commands.onCooldown.teleport": "You must wait %s before teleporting",
+  "error.helpful_commands.playerDataNotFound": "No saved data found for %s",
 
 
   "helpful_commands.common.unknown": "Unknown",

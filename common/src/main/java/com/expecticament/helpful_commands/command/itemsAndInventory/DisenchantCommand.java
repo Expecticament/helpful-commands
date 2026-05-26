@@ -1,9 +1,9 @@
 package com.expecticament.helpful_commands.command.itemsAndInventory;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
-import com.expecticament.helpful_commands.helper.GameRulesHelper;
-import com.expecticament.helpful_commands.helper.PermissionHelper;
-import com.expecticament.helpful_commands.helper.StylingHelper;
+import com.expecticament.helpful_commands.util.GameRulesUtil;
+import com.expecticament.helpful_commands.util.PermissionsUtil;
+import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
 import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
@@ -60,14 +60,14 @@ public class DisenchantCommand extends HelpfulCommandsCommand {
                 .then(Commands.argument("enchantment", ResourceArgument.resource(buildContext, Registries.ENCHANTMENT))
                         .executes(ctx -> executeSelf(ctx, ResourceArgument.getEnchantment(ctx, "enchantment")))
                         .then(Commands.argument("entities", EntityArgument.entities())
-                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_DISENCHANT_OTHERS))
+                                .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_DISENCHANT_OTHERS))
                                 .executes(ctx -> executeOther(ctx, ResourceArgument.getEnchantment(ctx, "enchantment"), EntityArgument.getEntities(ctx, "entities")))
                         )
                 )
                 .then(Commands.literal("*")
                         .executes(ctx -> executeSelf(ctx, null))
                         .then(Commands.argument("entities", EntityArgument.entities())
-                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_DISENCHANT_OTHERS))
+                                .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_DISENCHANT_OTHERS))
                                 .executes(ctx -> executeOther(ctx, null, EntityArgument.getEntities(ctx, "entities")))
                         )
                 )
@@ -76,7 +76,7 @@ public class DisenchantCommand extends HelpfulCommandsCommand {
 
     @Override
     protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
-        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_DISENCHANT);
+        return PermissionsUtil.hasPermission(source, ModPermissions.Permission.COMMAND_DISENCHANT);
     }
 
     private int executeSelf(CommandContext<CommandSourceStack> ctx, Holder<Enchantment> enchantmentHolder) throws CommandSyntaxException {
@@ -91,7 +91,7 @@ public class DisenchantCommand extends HelpfulCommandsCommand {
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
         TextBuilder srcFeedback = new TextBuilder(src);
-        Component itemNameComponent = StylingHelper.getItemStackName(mainHandItemStack);
+        Component itemNameComponent = StylingUtil.getItemStackName(mainHandItemStack);
 
         if (enchantmentHolder != null) {
             EnchantmentData removedEnchantment = removeEnchantment(mainHandItemStack, enchantmentHolder);
@@ -135,7 +135,7 @@ public class DisenchantCommand extends HelpfulCommandsCommand {
         }
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
-        boolean commandFeedback = GameRulesHelper.commandFeedbackEnabled(src.getLevel());
+        boolean commandFeedback = GameRulesUtil.isCommandFeedbackEnabled(src.getLevel());
 
         Map<Entity, List<EnchantmentData>> affected = new HashMap<>();
         Map<Entity, ItemStack> affectedItems = new HashMap<>();
@@ -164,7 +164,7 @@ public class DisenchantCommand extends HelpfulCommandsCommand {
                                 getEnchantmentNameAndLevelComponent(removedEnchantment.enchantment(), removedEnchantment.level(), textStyles.getPrimary()),
                                 new TextBuilder(player).appendTranslatable("commands.helpful_commands.disenchant.enchantment").getComponent(),
                                 new TextBuilder(player).appendTranslatable("commands.helpful_commands.disenchant.affected.single").getComponent(),
-                                StylingHelper.getItemStackName(itemStack))
+                                StylingUtil.getItemStackName(itemStack))
                                 .setStyle(textStyles.getAffectedNeutral());
 
                         player.sendSystemMessage(textBuilder.getComponent());
@@ -189,7 +189,7 @@ public class DisenchantCommand extends HelpfulCommandsCommand {
                                         getRemovedEnchantmentsCountComponent(removedEnchantments, textStyles),
                                         new TextBuilder(player).appendTranslatable("commands.helpful_commands.disenchant.enchantment" + (removedSize == 1 ? "" : "s")).getComponent(),
                                         new TextBuilder(player).appendTranslatable("commands.helpful_commands.disenchant.affected." + (removedSize == 1 ? "single" : "multiple")).getComponent(),
-                                        StylingHelper.getItemStackName(itemStack))
+                                        StylingUtil.getItemStackName(itemStack))
                                 .setStyle(textStyles.getAffectedNeutral());
 
                         player.sendSystemMessage(textBuilder.getComponent());
@@ -298,7 +298,7 @@ public class DisenchantCommand extends HelpfulCommandsCommand {
 
             String entityName = entity.getName().getString();
             Component entityNameComponent = Component.literal(entityName).setStyle(entity.isAlwaysTicking() ? textStyles.getSecondary() : Style.EMPTY);
-            Component itemNameComponent = StylingHelper.getItemStackName(affectedItems.get(entity));
+            Component itemNameComponent = StylingUtil.getItemStackName(affectedItems.get(entity));
 
             MutableComponent enchantmentList = Component.empty();
             boolean isFirstRemoved = true;

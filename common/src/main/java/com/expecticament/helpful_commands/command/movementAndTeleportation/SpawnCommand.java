@@ -1,9 +1,9 @@
 package com.expecticament.helpful_commands.command.movementAndTeleportation;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
-import com.expecticament.helpful_commands.helper.PermissionHelper;
-import com.expecticament.helpful_commands.helper.ServerLevelHelper;
-import com.expecticament.helpful_commands.helper.StylingHelper;
+import com.expecticament.helpful_commands.util.PermissionsUtil;
+import com.expecticament.helpful_commands.util.ServerLevelUtil;
+import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
 import com.expecticament.helpful_commands.manager.TranslationManager;
@@ -36,7 +36,7 @@ public class SpawnCommand extends HelpfulCommandsCommand {
             new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.spawn.error.playerSpawnNotSet.self").getComponent()
     );
     private static final Dynamic2CommandExceptionType TARGET_PLAYER_SPAWN_NOT_SET = new Dynamic2CommandExceptionType((src, otherPlayer) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.spawn.error.playerSpawnNotSet.other", StylingHelper.getAffectedEntityNameText((ServerPlayer) otherPlayer)).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.spawn.error.playerSpawnNotSet.other", StylingUtil.getAffectedEntityNameText((ServerPlayer) otherPlayer)).getComponent()
     );
 
     public SpawnCommand(ModCommandManager.ModCommand modCommand) {
@@ -50,32 +50,32 @@ public class SpawnCommand extends HelpfulCommandsCommand {
         dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .then(Commands.literal("player")
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_SPAWN_PLAYER))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_SPAWN_PLAYER))
                         .then(Commands.literal("query")
-                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_SPAWN_PLAYER_QUERY))
+                                .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_SPAWN_PLAYER_QUERY))
                                 .then(Commands.argument("player", EntityArgument.player())
-                                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_SPAWN_PLAYER_QUERY_OTHER))
+                                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_SPAWN_PLAYER_QUERY_OTHER))
                                         .executes(ctx -> executePlayerQuery(ctx, EntityArgument.getPlayer(ctx, "player")))
                                 )
                                 .executes(ctx -> executePlayerQuery(ctx, null))
                         )
                         .then(Commands.literal("tp")
-                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_SPAWN_PLAYER_TP))
+                                .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_SPAWN_PLAYER_TP))
                                 .then(Commands.argument("player", EntityArgument.player())
-                                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_SPAWN_PLAYER_TP_OTHER))
+                                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_SPAWN_PLAYER_TP_OTHER))
                                         .executes(ctx -> executePlayerTp(ctx, EntityArgument.getPlayer(ctx, "player")))
                                 )
                                 .executes(ctx -> executePlayerTp(ctx, null))
                         )
                 )
                 .then(Commands.literal("world")
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_SPAWN_WORLD))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_SPAWN_WORLD))
                         .then(Commands.literal("query")
-                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_SPAWN_WORLD_QUERY))
+                                .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_SPAWN_WORLD_QUERY))
                                 .executes(this::executeWorldQuery)
                         )
                         .then(Commands.literal("tp")
-                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_SPAWN_WORLD_TP))
+                                .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_SPAWN_WORLD_TP))
                                 .executes(this::executeWorldTp)
                         )
                 )
@@ -84,7 +84,7 @@ public class SpawnCommand extends HelpfulCommandsCommand {
 
     @Override
     protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
-        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_SPAWN) || PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_SPAWN_WORLD);
+        return PermissionsUtil.hasPermission(source, ModPermissions.Permission.COMMAND_SPAWN) || PermissionsUtil.hasPermission(source, ModPermissions.Permission.COMMAND_SPAWN_WORLD);
     }
 
     private int executePlayerTp(CommandContext<CommandSourceStack> ctx, ServerPlayer otherPlayer) throws CommandSyntaxException {
@@ -119,7 +119,7 @@ public class SpawnCommand extends HelpfulCommandsCommand {
         if (self) {
             textBuilder.appendTranslatable("commands.helpful_commands.spawn.player.tp.self.own");
         } else {
-            textBuilder.appendTranslatable("commands.helpful_commands.spawn.player.tp.self.other", StylingHelper.getAffectedEntityNameText(otherPlayer));
+            textBuilder.appendTranslatable("commands.helpful_commands.spawn.player.tp.self.other", StylingUtil.getAffectedEntityNameText(otherPlayer));
         }
 
         textBuilder.setStyle(textStyles.getSuccess());
@@ -205,23 +205,23 @@ public class SpawnCommand extends HelpfulCommandsCommand {
 
         TextBuilder textBuilder = new TextBuilder(src);
         textBuilder
-                .appendComponent(StylingHelper.getTitle(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.spawn.info.title")), Component.literal(isPlayer ? playerName : TranslationManager.translate(src, "commands.helpful_commands.spawn.info.title.world"))))
+                .appendComponent(StylingUtil.getTitle(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.spawn.info.title")), Component.literal(isPlayer ? playerName : TranslationManager.translate(src, "commands.helpful_commands.spawn.info.title.world"))))
                 .appendNewline()
                 .appendLiteral(textDecorators.getBulletPoint())
                 .appendTranslatable("helpful_commands.common.position")
                 .appendLiteral(": ")
-                .appendComponent(StylingHelper.getPositionText(pos.x(), pos.y(), pos.z()))
+                .appendComponent(StylingUtil.getPositionText(pos.x(), pos.y(), pos.z()))
                 .appendNewline()
                 .appendLiteral(textDecorators.getBulletPoint())
                 .appendTranslatable("helpful_commands.common.dimension")
                 .appendLiteral(": ")
                 .appendComponent(Component.literal(dimensionLocation).setStyle(textStyles.getSecondary()));
 
-        if (src.isPlayer() && PermissionHelper.hasPermission(src, isPlayer ? (isOwnSpawn ? ModPermissions.Permission.COMMAND_SPAWN_PLAYER_TP : ModPermissions.Permission.COMMAND_SPAWN_PLAYER_TP_OTHER) : ModPermissions.Permission.COMMAND_SPAWN_WORLD_TP)) {
+        if (src.isPlayer() && PermissionsUtil.hasPermission(src, isPlayer ? (isOwnSpawn ? ModPermissions.Permission.COMMAND_SPAWN_PLAYER_TP : ModPermissions.Permission.COMMAND_SPAWN_PLAYER_TP_OTHER) : ModPermissions.Permission.COMMAND_SPAWN_WORLD_TP)) {
             textBuilder
                     .appendNewline()
                     .appendNewline()
-                    .appendComponent(StylingHelper.getButton(textDecorators.getTeleport(), Component.literal(TranslationManager.translate(src, "helpful_commands.common.teleport")), tpBtnStyle));
+                    .appendComponent(StylingUtil.getButton(textDecorators.getTeleport(), Component.literal(TranslationManager.translate(src, "helpful_commands.common.teleport")), tpBtnStyle));
         }
 
         textBuilder.setStyle(textStyles.getTertiary());
@@ -238,8 +238,8 @@ public class SpawnCommand extends HelpfulCommandsCommand {
         String dimensionLocation = respawnData.dimension().identifier().toString();
         ServerLevel serverLevel;
         try {
-            serverLevel = ServerLevelHelper.getLevel(dimensionLocation);
-        } catch (ServerLevelHelper.UnknownServerLevelException e) {
+            serverLevel = ServerLevelUtil.getLevel(dimensionLocation);
+        } catch (ServerLevelUtil.UnknownServerLevelException e) {
             throw UNKNOWN_DIMENSION.create(source, dimensionLocation);
         }
 
@@ -251,8 +251,8 @@ public class SpawnCommand extends HelpfulCommandsCommand {
         LevelData.RespawnData respawnData = serverLevel.getRespawnData();
         String dimensionLocation = respawnData.dimension().identifier().toString();
         try {
-            serverLevel = ServerLevelHelper.getLevel(dimensionLocation);
-        } catch (ServerLevelHelper.UnknownServerLevelException e) {
+            serverLevel = ServerLevelUtil.getLevel(dimensionLocation);
+        } catch (ServerLevelUtil.UnknownServerLevelException e) {
             throw UNKNOWN_DIMENSION.create(source, dimensionLocation);
         }
 

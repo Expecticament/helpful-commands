@@ -1,9 +1,9 @@
 package com.expecticament.helpful_commands.command.playersAndEntities;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
-import com.expecticament.helpful_commands.helper.PermissionHelper;
-import com.expecticament.helpful_commands.helper.ServerLevelHelper;
-import com.expecticament.helpful_commands.helper.StylingHelper;
+import com.expecticament.helpful_commands.util.PermissionsUtil;
+import com.expecticament.helpful_commands.util.ServerLevelUtil;
+import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
 import com.expecticament.helpful_commands.manager.TranslationManager;
@@ -38,23 +38,23 @@ public class CoordsCommand extends HelpfulCommandsCommand {
         dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .then(Commands.literal("broadcast")
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_COORDS_BROADCAST))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_COORDS_BROADCAST))
                         .then(Commands.argument("player", EntityArgument.player())
-                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_COORDS_BROADCAST_OTHER))
+                                .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_COORDS_BROADCAST_OTHER))
                                 .executes(ctx -> broadcast(ctx, EntityArgument.getPlayer(ctx, "player")))
                         )
                         .executes(this::broadcast)
                 )
                 .then(Commands.literal("share")
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_COORDS_SHARE))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_COORDS_SHARE))
                         .then(Commands.argument("players", EntityArgument.players())
                                 .executes(ctx -> share(ctx, EntityArgument.getPlayers(ctx, "players")))
                         )
                 )
                 .then(Commands.literal("query")
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_COORDS_QUERY))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_COORDS_QUERY))
                         .then(Commands.argument("player", EntityArgument.player())
-                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_COORDS_QUERY_OTHER))
+                                .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_COORDS_QUERY_OTHER))
                                 .executes(ctx -> query(ctx, EntityArgument.getPlayer(ctx, "player")))
                         )
                         .executes(this::execute)
@@ -65,7 +65,7 @@ public class CoordsCommand extends HelpfulCommandsCommand {
 
     @Override
     protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
-        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_COORDS);
+        return PermissionsUtil.hasPermission(source, ModPermissions.Permission.COMMAND_COORDS);
     }
 
     private int execute(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
@@ -73,10 +73,10 @@ public class CoordsCommand extends HelpfulCommandsCommand {
 
         ServerPlayer sourcePlayer = validatePlayerOnly(src);
 
-        String dimensionKey = ServerLevelHelper.getLevelLocation(sourcePlayer.level());
+        String dimensionKey = ServerLevelUtil.getLevelLocation(sourcePlayer.level());
 
         TextBuilder textBuilder = new TextBuilder(src);
-        textBuilder.appendTranslatable("commands.helpful_commands.coords.self", StylingHelper.getLocationText(sourcePlayer.position(), dimensionKey));
+        textBuilder.appendTranslatable("commands.helpful_commands.coords.self", StylingUtil.getLocationText(sourcePlayer.position(), dimensionKey));
 
         src.sendSuccess(textBuilder::getComponent, true);
 
@@ -100,7 +100,7 @@ public class CoordsCommand extends HelpfulCommandsCommand {
             player = sourcePlayer;
         }
 
-        String dimensionKey = ServerLevelHelper.getLevelLocation(player.level());
+        String dimensionKey = ServerLevelUtil.getLevelLocation(player.level());
 
         List<ServerPlayer> playerList = new ArrayList<>(player.level().getServer().getPlayerList().getPlayers());
 
@@ -110,13 +110,13 @@ public class CoordsCommand extends HelpfulCommandsCommand {
 
         for (ServerPlayer plr : playerList) {
             TextBuilder textBuilder = new TextBuilder(plr);
-            textBuilder.appendTranslatable("commands.helpful_commands.coords.other", StylingHelper.getAffectedEntityNameText(player), StylingHelper.getLocationText(player.position(), dimensionKey));
+            textBuilder.appendTranslatable("commands.helpful_commands.coords.other", StylingUtil.getAffectedEntityNameText(player), StylingUtil.getLocationText(player.position(), dimensionKey));
             plr.sendSystemMessage(textBuilder.getComponent());
         }
 
         if (sourcePlayer == null) {
             TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.coords.other", StylingHelper.getAffectedEntityNameText(player), StylingHelper.getLocationText(player.position(), dimensionKey));
+            textBuilder.appendTranslatable("commands.helpful_commands.coords.other", StylingUtil.getAffectedEntityNameText(player), StylingUtil.getLocationText(player.position(), dimensionKey));
             src.sendSystemMessage(textBuilder.getComponent());
         }
 
@@ -137,10 +137,10 @@ public class CoordsCommand extends HelpfulCommandsCommand {
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
-        String dimensionKey = ServerLevelHelper.getLevelLocation(sourcePlayer.level());
+        String dimensionKey = ServerLevelUtil.getLevelLocation(sourcePlayer.level());
         for (ServerPlayer player : playerList) {
             TextBuilder textBuilder = new TextBuilder(player);
-            textBuilder.appendTranslatable("commands.helpful_commands.coords.share.affected", StylingHelper.getAffectedEntityNameText(sourcePlayer), StylingHelper.getLocationText(sourcePlayer.position(), dimensionKey));
+            textBuilder.appendTranslatable("commands.helpful_commands.coords.share.affected", StylingUtil.getAffectedEntityNameText(sourcePlayer), StylingUtil.getLocationText(sourcePlayer.position(), dimensionKey));
             player.sendSystemMessage(textBuilder.getComponent());
         }
 
@@ -149,10 +149,10 @@ public class CoordsCommand extends HelpfulCommandsCommand {
 
         MutableComponent affected = Component.empty();
         if (playerList.size() == 1) {
-            affected.append(StylingHelper.getAffectedEntityNameText(playerList.getFirst()));
+            affected.append(StylingUtil.getAffectedEntityNameText(playerList.getFirst()));
         } else {
             affected
-                    .append(StylingHelper.getAffectedEntitiesNumberText(playerList))
+                    .append(StylingUtil.getAffectedEntitiesNumberText(playerList))
                     .append(TranslationManager.translate(src, "commands.helpful_commands.coords.share.multiple"));
         }
 
@@ -172,10 +172,10 @@ public class CoordsCommand extends HelpfulCommandsCommand {
             return execute(ctx);
         }
 
-        String dimensionKey = ServerLevelHelper.getLevelLocation(player.level());
+        String dimensionKey = ServerLevelUtil.getLevelLocation(player.level());
 
         TextBuilder textBuilder = new TextBuilder(src);
-        textBuilder.appendTranslatable("commands.helpful_commands.coords.other", StylingHelper.getAffectedEntityNameText(player), StylingHelper.getLocationText(player.position(), dimensionKey));
+        textBuilder.appendTranslatable("commands.helpful_commands.coords.other", StylingUtil.getAffectedEntityNameText(player), StylingUtil.getLocationText(player.position(), dimensionKey));
 
         src.sendSuccess(textBuilder::getComponent, true);
 

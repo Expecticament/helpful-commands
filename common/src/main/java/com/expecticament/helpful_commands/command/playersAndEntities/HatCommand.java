@@ -1,10 +1,10 @@
 package com.expecticament.helpful_commands.command.playersAndEntities;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
-import com.expecticament.helpful_commands.helper.GameRulesHelper;
-import com.expecticament.helpful_commands.helper.PermissionHelper;
-import com.expecticament.helpful_commands.helper.SoundHelper;
-import com.expecticament.helpful_commands.helper.StylingHelper;
+import com.expecticament.helpful_commands.util.GameRulesUtil;
+import com.expecticament.helpful_commands.util.PermissionsUtil;
+import com.expecticament.helpful_commands.util.SoundUtil;
+import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
 import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
@@ -43,15 +43,15 @@ public class HatCommand extends HelpfulCommandsCommand {
                 .requires(this::canExecute)
                 .executes(this::executeSelf)
                 .then(Commands.argument("players", EntityArgument.players())
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HAT_OTHERS))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_HAT_OTHERS))
                         .executes(ctx -> executeOther(ctx, EntityArgument.getPlayers(ctx, "players"), null))
                         .then(Commands.argument("item", ItemArgument.item(buildContext))
-                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HAT_ITEM))
+                                .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_HAT_ITEM))
                                 .executes(ctx -> executeOther(ctx, EntityArgument.getPlayers(ctx, "players"), ItemArgument.getItem(ctx, "item").createItemStack(1)))
                         )
                 )
                 .then(Commands.argument("item", ItemArgument.item(buildContext))
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HAT_ITEM) && !PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HAT_OTHERS))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_HAT_ITEM) && !PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_HAT_OTHERS))
                         .executes(ctx -> executeSelf(ctx, ItemArgument.getItem(ctx, "item").createItemStack(1), false))
                 )
         );
@@ -59,7 +59,7 @@ public class HatCommand extends HelpfulCommandsCommand {
 
     @Override
     protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
-        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_HAT);
+        return PermissionsUtil.hasPermission(source, ModPermissions.Permission.COMMAND_HAT);
     }
 
     private int executeSelf(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
@@ -120,7 +120,7 @@ public class HatCommand extends HelpfulCommandsCommand {
         }
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
-        boolean commandFeedback = GameRulesHelper.commandFeedbackEnabled(src.getLevel());
+        boolean commandFeedback = GameRulesUtil.isCommandFeedbackEnabled(src.getLevel());
 
         boolean isAir = itemStack.getItem() == Items.AIR;
 
@@ -154,15 +154,15 @@ public class HatCommand extends HelpfulCommandsCommand {
 
         if (affected.size() == 1) {
             if (isAir) {
-                textBuilder.appendTranslatable("commands.helpful_commands.hat.remove.other", StylingHelper.getAffectedEntityNameText(affected.getFirst()));
+                textBuilder.appendTranslatable("commands.helpful_commands.hat.remove.other", StylingUtil.getAffectedEntityNameText(affected.getFirst()));
             } else {
-                textBuilder.appendTranslatable("commands.helpful_commands.hat.other", itemNameComponent, StylingHelper.getAffectedEntityNameText(affected.getFirst()));
+                textBuilder.appendTranslatable("commands.helpful_commands.hat.other", itemNameComponent, StylingUtil.getAffectedEntityNameText(affected.getFirst()));
             }
         } else {
             if (isAir) {
-                textBuilder.appendTranslatable("commands.helpful_commands.hat.remove.others", StylingHelper.getAffectedEntitiesNumberText(affected));
+                textBuilder.appendTranslatable("commands.helpful_commands.hat.remove.others", StylingUtil.getAffectedEntitiesNumberText(affected));
             } else {
-                textBuilder.appendTranslatable("commands.helpful_commands.hat.others", itemNameComponent, StylingHelper.getAffectedEntitiesNumberText(affected));
+                textBuilder.appendTranslatable("commands.helpful_commands.hat.others", itemNameComponent, StylingUtil.getAffectedEntitiesNumberText(affected));
             }
         }
 
@@ -186,7 +186,7 @@ public class HatCommand extends HelpfulCommandsCommand {
 
         inventory.setItem(39, itemStack.copy());
 
-        SoundHelper.playSound(player, SoundEvents.ARMOR_EQUIP_GENERIC.value(), 0.5f, 1);
+        SoundUtil.playSound(player, SoundEvents.ARMOR_EQUIP_GENERIC.value(), 0.5f, 1);
 
         return true;
     }

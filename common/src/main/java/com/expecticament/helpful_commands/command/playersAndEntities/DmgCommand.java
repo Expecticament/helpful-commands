@@ -1,8 +1,8 @@
 package com.expecticament.helpful_commands.command.playersAndEntities;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
-import com.expecticament.helpful_commands.helper.PermissionHelper;
-import com.expecticament.helpful_commands.helper.StylingHelper;
+import com.expecticament.helpful_commands.util.PermissionsUtil;
+import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
 import com.expecticament.helpful_commands.manager.TranslationManager;
@@ -48,16 +48,16 @@ public class DmgCommand extends HelpfulCommandsCommand {
                                 .then(Commands.argument("damage_type", ResourceArgument.resource(buildContext, Registries.DAMAGE_TYPE))
                                         .executes(context -> execute(context, EntityArgument.getEntities(context, "entities"), FloatArgumentType.getFloat(context, "amount"), new DamageSource(ResourceArgument.getResource(context, "damage_type", Registries.DAMAGE_TYPE))))
                                         .then(Commands.literal("at")
-                                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_DMG_AT))
+                                                .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_DMG_AT))
                                                 .then(Commands.argument("location", Vec3Argument.vec3())
                                                         .executes(context -> execute(context, EntityArgument.getEntities(context, "entities"), FloatArgumentType.getFloat(context, "amount"), new DamageSource(ResourceArgument.getResource(context, "damage_type", Registries.DAMAGE_TYPE), Vec3Argument.getVec3(context, "location")))))
                                         )
                                         .then(Commands.literal("by")
-                                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_DMG_BY))
+                                                .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_DMG_BY))
                                                 .then(Commands.argument("entity", EntityArgument.entity())
                                                         .executes(context -> execute(context, EntityArgument.getEntities(context, "entities"), FloatArgumentType.getFloat(context, "amount"), new DamageSource(ResourceArgument.getResource(context, "damage_type", Registries.DAMAGE_TYPE), EntityArgument.getEntity(context, "entity"))))
                                                         .then(Commands.literal("from")
-                                                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_DMG_BY_FROM))
+                                                                .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_DMG_BY_FROM))
                                                                 .then(Commands.argument("cause", EntityArgument.entity())
                                                                         .executes(context -> execute(context, EntityArgument.getEntities(context, "entities"), FloatArgumentType.getFloat(context, "amount"), new DamageSource(ResourceArgument.getResource(context, "damage_type", Registries.DAMAGE_TYPE), EntityArgument.getEntity(context, "entity"), EntityArgument.getEntity(context, "cause"))))
                                                                 )
@@ -72,7 +72,7 @@ public class DmgCommand extends HelpfulCommandsCommand {
 
     @Override
     protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
-        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_DMG);
+        return PermissionsUtil.hasPermission(source, ModPermissions.Permission.COMMAND_DMG);
     }
 
     private int execute(CommandContext<CommandSourceStack> ctx, Collection<? extends Entity> entities, float amount, DamageSource damageSource) throws CommandSyntaxException {
@@ -93,7 +93,7 @@ public class DmgCommand extends HelpfulCommandsCommand {
         if (entities.size() == 1) {
             Entity entity = entities.iterator().next();
             if (entity.hurtServer(serverLevel, damageSource, amount)) {
-                textBuilder.appendTranslatable("commands.helpful_commands.dmg.other.single", Component.literal(String.valueOf(amount)).setStyle(textStyles.getPrimary()), StylingHelper.getAffectedEntityNameText(entity));
+                textBuilder.appendTranslatable("commands.helpful_commands.dmg.other.single", Component.literal(String.valueOf(amount)).setStyle(textStyles.getPrimary()), StylingUtil.getAffectedEntityNameText(entity));
                 src.sendSuccess(textBuilder::getComponent, true);
                 return Command.SINGLE_SUCCESS;
             } else {
@@ -112,7 +112,7 @@ public class DmgCommand extends HelpfulCommandsCommand {
             throw EntityArgument.NO_ENTITIES_FOUND.create();
         }
 
-        textBuilder.appendTranslatable("commands.helpful_commands.dmg.other.multiple", Component.literal(String.valueOf(amount)).setStyle(textStyles.getPrimary()), StylingHelper.getAffectedEntitiesNumberText(affected));
+        textBuilder.appendTranslatable("commands.helpful_commands.dmg.other.multiple", Component.literal(String.valueOf(amount)).setStyle(textStyles.getPrimary()), StylingUtil.getAffectedEntitiesNumberText(affected));
 
         src.sendSuccess(textBuilder::getComponent, true);
 

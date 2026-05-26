@@ -1,10 +1,10 @@
 package com.expecticament.helpful_commands.command.movementAndTeleportation;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
-import com.expecticament.helpful_commands.helper.GameRulesHelper;
-import com.expecticament.helpful_commands.helper.PermissionHelper;
-import com.expecticament.helpful_commands.helper.ServerLevelHelper;
-import com.expecticament.helpful_commands.helper.StylingHelper;
+import com.expecticament.helpful_commands.util.GameRulesUtil;
+import com.expecticament.helpful_commands.util.PermissionsUtil;
+import com.expecticament.helpful_commands.util.ServerLevelUtil;
+import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
 import com.expecticament.helpful_commands.manager.TranslationManager;
@@ -69,10 +69,10 @@ public class WarpCommand extends HelpfulCommandsCommand {
         dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .then(Commands.literal("tp")
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_TP))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_TP))
                         .then(Commands.argument("warp_name", StringArgumentType.word())
                                 .then(Commands.argument("entities", EntityArgument.entities())
-                                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_TP_OTHERS))
+                                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_TP_OTHERS))
                                         .executes(ctx -> teleport(ctx, StringArgumentType.getString(ctx, "warp_name"), EntityArgument.getEntities(ctx, "entities")))
                                 )
                                 .executes(ctx -> teleport(ctx, StringArgumentType.getString(ctx, "warp_name")))
@@ -80,7 +80,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
                         )
                 )
                 .then(Commands.literal("add")
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_ADD))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_ADD))
                         .then(Commands.argument("warp_name", StringArgumentType.word())
                                 .then(Commands.argument("description", StringArgumentType.string())
                                         .executes(ctx -> addWarp(ctx, StringArgumentType.getString(ctx, "warp_name"), StringArgumentType.getString(ctx, "description")))
@@ -95,14 +95,14 @@ public class WarpCommand extends HelpfulCommandsCommand {
                         )
                 )
                 .then(Commands.literal("remove")
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_REMOVE))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_REMOVE))
                         .then(Commands.argument("warp_name", StringArgumentType.word())
                                 .executes(ctx -> removeWarp(ctx, StringArgumentType.getString(ctx, "warp_name")))
                                 .suggests(warpNameSuggestionProvider)
                         )
                 )
                 .then(Commands.literal("edit")
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_EDIT))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_EDIT))
                         .then(Commands.argument("warp_name", StringArgumentType.word())
                                 .then(Commands.literal("name")
                                         .then(Commands.argument("new_name", StringArgumentType.word())
@@ -128,7 +128,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
                         )
                 )
                 .then(Commands.literal("info")
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_INFO))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_INFO))
                         .then(Commands.argument("warp_name", StringArgumentType.word())
                                 .suggests(warpNameSuggestionProvider)
                                 .executes(ctx -> warpInfo(ctx, StringArgumentType.getString(ctx, "warp_name")))
@@ -139,7 +139,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
 
     @Override
     protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
-        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_WARP);
+        return PermissionsUtil.hasPermission(source, ModPermissions.Permission.COMMAND_WARP);
     }
 
     private int teleport(CommandContext<CommandSourceStack> ctx, String warpName) throws CommandSyntaxException {
@@ -166,9 +166,9 @@ public class WarpCommand extends HelpfulCommandsCommand {
         try {
             WarpManager.Warp warp = WarpManager.getWarp(warpName);
             try {
-                ServerLevel dimension = ServerLevelHelper.getLevel(warp.dimension);
+                ServerLevel dimension = ServerLevelUtil.getLevel(warp.dimension);
 
-                boolean commandFeedback = GameRulesHelper.commandFeedbackEnabled(src.getLevel());
+                boolean commandFeedback = GameRulesUtil.isCommandFeedbackEnabled(src.getLevel());
 
                 List<Entity> affected = targets.stream()
                         .filter(e -> e.teleportTo(dimension, warp.x, warp.y, warp.z, Relative.DELTA, e.getYRot(), e.getXRot(), false))
@@ -191,7 +191,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
                 src.sendSuccess(() -> buildTeleportFeedbackMessage(src, multiple, self, warpName, affected), true);
 
                 return affected.size();
-            } catch (ServerLevelHelper.UnknownServerLevelException e) {
+            } catch (ServerLevelUtil.UnknownServerLevelException e) {
                 throw UNKNOWN_DIMENSION.create(src, warp.dimension);
             }
         } catch (WarpManager.WarpDoesntExistException e) {
@@ -206,11 +206,11 @@ public class WarpCommand extends HelpfulCommandsCommand {
         TextBuilder textBuilder = new TextBuilder(src);
 
         if (multiple) {
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.teleport.others", StylingHelper.getAffectedEntitiesNumberText(affected), warpNameText);
+            textBuilder.appendTranslatable("commands.helpful_commands.warp.teleport.others", StylingUtil.getAffectedEntitiesNumberText(affected), warpNameText);
         } else if (self) {
             textBuilder.appendTranslatable("commands.helpful_commands.warp.teleport.self", warpNameText);
         } else {
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.teleport.others", StylingHelper.getAffectedEntityNameText(affected.getFirst()), warpNameText);
+            textBuilder.appendTranslatable("commands.helpful_commands.warp.teleport.others", StylingUtil.getAffectedEntityNameText(affected.getFirst()), warpNameText);
         }
 
         textBuilder.setStyle(textStyles.getSuccess());
@@ -384,7 +384,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
             Component bulletPointComponent = Component.literal(textDecorators.getBulletPoint()).setStyle(textStyles.getTertiary());
             Component colonComponent = Component.literal(": ").setStyle(textStyles.getTertiary());
 
-            textBuilder.appendComponent(StylingHelper.getTitle(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.warp.info.title")), Component.literal(warpName)));
+            textBuilder.appendComponent(StylingUtil.getTitle(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.warp.info.title")), Component.literal(warpName)));
             if (!warp.description.isEmpty() && !warp.description.equals(" ")) {
                 textBuilder
                         .appendNewline()
@@ -398,7 +398,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
                     .appendComponent(bulletPointComponent)
                     .appendComponent(Component.literal(TranslationManager.translate(src, "helpful_commands.common.position")).setStyle(textStyles.getTertiary()))
                     .appendComponent(colonComponent)
-                    .appendComponent(StylingHelper.getPositionText(warp.x, warp.y, warp.z))
+                    .appendComponent(StylingUtil.getPositionText(warp.x, warp.y, warp.z))
                     .appendNewline()
                     .appendComponent(bulletPointComponent)
                     .appendComponent(Component.literal(TranslationManager.translate(src, "helpful_commands.common.dimension")).setStyle(textStyles.getTertiary()))
@@ -415,9 +415,9 @@ public class WarpCommand extends HelpfulCommandsCommand {
                         .appendNewline()
                         .appendLiteral(TranslationManager.translate(src, "helpful_commands.common.remove") + ": /warp remove %s".formatted(warpName));
             } else {
-                boolean canTp = PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_TP);
-                boolean canEdit = PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_EDIT);
-                boolean canRemove = PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_REMOVE);
+                boolean canTp = PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_TP);
+                boolean canEdit = PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_EDIT);
+                boolean canRemove = PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_REMOVE);
                 if (canTp || canEdit || canRemove) {
                     textBuilder
                             .appendNewline()
@@ -427,7 +427,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
                         HoverEvent tpBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "hover.helpful_commands.clickToTeleport")));
                         ClickEvent tpBtnClickEvent = new ClickEvent.RunCommand("/warp tp " + warpName);
                         Style tpBtnStyle = textStyles.getSecondary().withHoverEvent(tpBtnHoverEvent).withClickEvent(tpBtnClickEvent);
-                        textBuilder.appendComponent(StylingHelper.getButton(textDecorators.getTeleport(), Component.literal(TranslationManager.translate(src, "helpful_commands.common.teleport")), tpBtnStyle));
+                        textBuilder.appendComponent(StylingUtil.getButton(textDecorators.getTeleport(), Component.literal(TranslationManager.translate(src, "helpful_commands.common.teleport")), tpBtnStyle));
                     }
                     if (canEdit) {
                         HoverEvent editBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "hover.helpful_commands.clickToEdit")));
@@ -436,7 +436,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
                         if (canTp) {
                             textBuilder.appendWhitespace();
                         }
-                        textBuilder.appendComponent(StylingHelper.getButton(Component.literal(textDecorators.getEdit()), editBtnStyle));
+                        textBuilder.appendComponent(StylingUtil.getButton(Component.literal(textDecorators.getEdit()), editBtnStyle));
                     }
                     if (canRemove) {
                         HoverEvent removeBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "hover.helpful_commands.clickToRemove")));
@@ -445,7 +445,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
                         if (canTp || canEdit) {
                             textBuilder.appendWhitespace();
                         }
-                        textBuilder.appendComponent(StylingHelper.getButton(Component.literal(textDecorators.getRemove()), removeBtnStyle));
+                        textBuilder.appendComponent(StylingUtil.getButton(Component.literal(textDecorators.getRemove()), removeBtnStyle));
                     }
                 }
             }

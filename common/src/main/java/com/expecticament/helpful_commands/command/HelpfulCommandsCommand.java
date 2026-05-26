@@ -1,6 +1,6 @@
 package com.expecticament.helpful_commands.command;
 
-import com.expecticament.helpful_commands.helper.StylingHelper;
+import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ConfigManager;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
@@ -32,7 +32,10 @@ public abstract class HelpfulCommandsCommand {
             new TextBuilder((CommandSourceStack) src).appendTranslatable("error.helpful_commands.failedToTeleport").getComponent()
     );
     protected static final Dynamic2CommandExceptionType ON_COOLDOWN_TELEPORT = new Dynamic2CommandExceptionType((src, remaining) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("error.helpful_commands.onCooldown.teleport", StylingHelper.formatDuration((long) remaining, (CommandSourceStack) src)).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("error.helpful_commands.onCooldown.teleport", StylingUtil.formatDuration((long) remaining, (CommandSourceStack) src)).getComponent()
+    );
+    protected static final Dynamic2CommandExceptionType PLAYER_DATA_NOT_FOUND = new Dynamic2CommandExceptionType((src, playerName) ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("error.helpful_commands.playerDataNotFound", Component.literal(playerName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
 
     private final ModCommandManager.ModCommand modCommand;

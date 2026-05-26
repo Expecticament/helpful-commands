@@ -1,8 +1,8 @@
 package com.expecticament.helpful_commands.command.world;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
-import com.expecticament.helpful_commands.helper.PermissionHelper;
-import com.expecticament.helpful_commands.helper.StylingHelper;
+import com.expecticament.helpful_commands.util.PermissionsUtil;
+import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ConfigManager;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
@@ -57,7 +57,7 @@ public class KillitemsCommand extends HelpfulCommandsCommand {
 
     @Override
     protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
-        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_KILLITEMS);
+        return PermissionsUtil.hasPermission(source, ModPermissions.Permission.COMMAND_KILLITEMS);
     }
 
     private int execute(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
@@ -75,7 +75,7 @@ public class KillitemsCommand extends HelpfulCommandsCommand {
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
-        int maxRange = PermissionHelper.getMetaOrElseConfigValue(src, ConfigManager.CONFIG_FIELD.KILLITEMS_MAX_RANGE);
+        int maxRange = PermissionsUtil.getMetaOrElseConfigValue(src, ConfigManager.CONFIG_FIELD.KILLITEMS_MAX_RANGE);
 
         if (range < 1) {
             range = Math.clamp(64, 1, maxRange);
@@ -108,7 +108,7 @@ public class KillitemsCommand extends HelpfulCommandsCommand {
         }
 
         TextBuilder textBuilder = new TextBuilder(src);
-        textBuilder.appendTranslatable("commands.helpful_commands.killitems", StylingHelper.getAffectedEntitiesNumberText(itemEntities), Component.literal(TranslationManager.translate(src, "commands.helpful_commands.killitems." + ((itemEntities.size() == 1 && !multiple) ? "single" : "multiple"))));
+        textBuilder.appendTranslatable("commands.helpful_commands.killitems", StylingUtil.getAffectedEntitiesNumberText(itemEntities), Component.literal(TranslationManager.translate(src, "commands.helpful_commands.killitems." + ((itemEntities.size() == 1 && !multiple) ? "single" : "multiple"))));
         textBuilder.setStyle(textStyles.getSuccess());
 
         src.sendSuccess(textBuilder::getComponent, true);

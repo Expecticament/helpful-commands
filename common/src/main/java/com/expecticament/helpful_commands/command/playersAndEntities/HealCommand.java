@@ -1,9 +1,9 @@
 package com.expecticament.helpful_commands.command.playersAndEntities;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
-import com.expecticament.helpful_commands.helper.GameRulesHelper;
-import com.expecticament.helpful_commands.helper.PermissionHelper;
-import com.expecticament.helpful_commands.helper.StylingHelper;
+import com.expecticament.helpful_commands.util.GameRulesUtil;
+import com.expecticament.helpful_commands.util.PermissionsUtil;
+import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
 import com.expecticament.helpful_commands.manager.TranslationManager;
@@ -40,7 +40,7 @@ public class HealCommand extends HelpfulCommandsCommand {
                 .requires(this::canExecute)
                 .executes(this::executeSelf)
                 .then(Commands.argument("entities", EntityArgument.entities())
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HEAL_OTHERS))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_HEAL_OTHERS))
                         .executes(ctx -> executeOther(ctx, EntityArgument.getEntities(ctx, "entities"), 0))
                         .then(Commands.argument("hearts", FloatArgumentType.floatArg(0))
                                 .executes(ctx -> executeOther(ctx, EntityArgument.getEntities(ctx, "entities"), FloatArgumentType.getFloat(ctx, "hearts")))
@@ -48,7 +48,7 @@ public class HealCommand extends HelpfulCommandsCommand {
                         )
                 )
                 .then(Commands.argument("hearts", FloatArgumentType.floatArg(0))
-                        .requires(src -> !PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HEAL_OTHERS))
+                        .requires(src -> !PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_HEAL_OTHERS))
                         .executes(ctx -> executeSelf(ctx, FloatArgumentType.getFloat(ctx, "hearts")))
                 )
         );
@@ -56,7 +56,7 @@ public class HealCommand extends HelpfulCommandsCommand {
 
     @Override
     protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
-        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_HEAL);
+        return PermissionsUtil.hasPermission(source, ModPermissions.Permission.COMMAND_HEAL);
     }
 
     private int executeSelf(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
@@ -94,7 +94,7 @@ public class HealCommand extends HelpfulCommandsCommand {
         }
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
-        boolean commandFeedback = GameRulesHelper.commandFeedbackEnabled(src.getLevel());
+        boolean commandFeedback = GameRulesUtil.isCommandFeedbackEnabled(src.getLevel());
 
         List<? extends Entity> affected = entities.stream()
                 .filter(entity -> heal(entity, hearts))
@@ -116,10 +116,10 @@ public class HealCommand extends HelpfulCommandsCommand {
 
         MutableComponent affectedText = Component.empty();
         if (affected.size() == 1) {
-            affectedText.append(StylingHelper.getAffectedEntityNameText(affected.getFirst()));
+            affectedText.append(StylingUtil.getAffectedEntityNameText(affected.getFirst()));
         } else {
             affectedText
-                    .append(StylingHelper.getAffectedEntitiesNumberText(affected))
+                    .append(StylingUtil.getAffectedEntitiesNumberText(affected))
                     .append(" ")
                     .append(TranslationManager.translate(src, "commands.helpful_commands.heal.other.multiple"));
         }

@@ -1,7 +1,7 @@
 package com.expecticament.helpful_commands.manager;
 
 import com.expecticament.helpful_commands.HelpfulCommands;
-import com.expecticament.helpful_commands.helper.ServerLevelHelper;
+import com.expecticament.helpful_commands.util.ServerLevelUtil;
 import com.expecticament.helpful_commands.util.io.JsonIO;
 import net.minecraft.core.Position;
 import net.minecraft.server.MinecraftServer;
@@ -24,7 +24,7 @@ public class WarpManager {
             x = position.x();
             y = position.y();
             z = position.z();
-            this.dimension = ServerLevelHelper.getLevelLocation(serverLevel);
+            this.dimension = ServerLevelUtil.getLevelLocation(serverLevel);
         }
     }
 
@@ -117,7 +117,7 @@ public class WarpManager {
             warp.x = newPosition.x();
             warp.y = newPosition.y();
             warp.z = newPosition.z();
-            warp.dimension = ServerLevelHelper.getLevelLocation(newServerLevel);
+            warp.dimension = ServerLevelUtil.getLevelLocation(newServerLevel);
             io.updateBuffer(warps);
             return;
         }

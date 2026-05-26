@@ -1,6 +1,6 @@
 package com.expecticament.helpful_commands;
 
-import com.expecticament.helpful_commands.helper.ServerLevelHelper;
+import com.expecticament.helpful_commands.util.ServerLevelUtil;
 import com.expecticament.helpful_commands.manager.*;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
@@ -57,7 +57,7 @@ public final class HelpfulCommands {
         int cooldowns = CooldownManager.initialize(server);
         LOGGER.info("Loaded {} active cooldown{}", cooldowns, cooldowns == 1 ? "" : "s");
         TranslationManager.initialize();
-        ServerLevelHelper.initialize(server);
+        ServerLevelUtil.initialize(server);
     }
 
     public static void save(MinecraftServer minecraftServer) {

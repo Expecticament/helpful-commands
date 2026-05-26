@@ -1,4 +1,4 @@
-package com.expecticament.helpful_commands.helper;
+package com.expecticament.helpful_commands.util;
 
 import com.expecticament.helpful_commands.manager.StylingManager;
 import com.expecticament.helpful_commands.manager.TranslationManager;
@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class StylingHelper {
+public class StylingUtil {
 
     public static Component getAffectedEntityNameText(Entity entity) {
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();

@@ -1,6 +1,6 @@
 package com.expecticament.helpful_commands.permission;
 
-import com.expecticament.helpful_commands.helper.PermissionHelper;
+import com.expecticament.helpful_commands.util.PermissionsUtil;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permission;
@@ -14,6 +14,6 @@ public class PermissionHandlerNeoForgeImpl implements PermissionHandler {
             return source.permissions().hasPermission(new Permission.HasCommandLevel(permission.getDefaultRequiredPermission()));
         }
 
-        return PermissionHelper.hasPermissionLuckPerms(player, permission);
+        return PermissionsUtil.hasPermissionLuckPerms(player, permission);
     }
 }

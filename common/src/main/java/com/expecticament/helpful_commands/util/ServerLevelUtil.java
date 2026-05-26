@@ -1,9 +1,9 @@
-package com.expecticament.helpful_commands.helper;
+package com.expecticament.helpful_commands.util;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 
-public class ServerLevelHelper {
+public class ServerLevelUtil {
     private static MinecraftServer server;
 
     public static class UnknownServerLevelException extends Exception {

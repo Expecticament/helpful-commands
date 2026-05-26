@@ -1,8 +1,8 @@
 package com.expecticament.helpful_commands.command.movementAndTeleportation;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
-import com.expecticament.helpful_commands.helper.PermissionHelper;
-import com.expecticament.helpful_commands.helper.StylingHelper;
+import com.expecticament.helpful_commands.util.PermissionsUtil;
+import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ConfigManager;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
@@ -52,7 +52,7 @@ public class JumpCommand extends HelpfulCommandsCommand {
 
     @Override
     protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
-        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_JUMP);
+        return PermissionsUtil.hasPermission(source, ModPermissions.Permission.COMMAND_JUMP);
     }
 
     private int execute(CommandContext<CommandSourceStack> ctx, Double distance, boolean checkBlocks) throws CommandSyntaxException {
@@ -63,7 +63,7 @@ public class JumpCommand extends HelpfulCommandsCommand {
         Vec3 eyePos = sourcePlayer.getEyePosition();
         Vec3 look = sourcePlayer.getLookAngle();
 
-        double distanceLimit = PermissionHelper.getMetaOrElseConfigValue(src, ConfigManager.CONFIG_FIELD.JUMP_DISTANCE_LIMIT);
+        double distanceLimit = PermissionsUtil.getMetaOrElseConfigValue(src, ConfigManager.CONFIG_FIELD.JUMP_DISTANCE_LIMIT);
         if (distance == null) {
             distance = distanceLimit;
         } else if (distance > distanceLimit) {
@@ -92,7 +92,7 @@ public class JumpCommand extends HelpfulCommandsCommand {
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
         TranslationManager.TextBuilder textBuilder = new TranslationManager.TextBuilder(src);
         textBuilder.setStyle(textStyles.getSuccess());
-        textBuilder.appendTranslatable("commands.helpful_commands.jump", StylingHelper.getPositionText(safePos));
+        textBuilder.appendTranslatable("commands.helpful_commands.jump", StylingUtil.getPositionText(safePos));
 
         src.sendSuccess(textBuilder::getComponent, true);
 

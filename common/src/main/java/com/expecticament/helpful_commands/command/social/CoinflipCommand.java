@@ -1,9 +1,9 @@
 package com.expecticament.helpful_commands.command.social;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
-import com.expecticament.helpful_commands.helper.PermissionHelper;
-import com.expecticament.helpful_commands.helper.SoundHelper;
-import com.expecticament.helpful_commands.helper.StylingHelper;
+import com.expecticament.helpful_commands.util.PermissionsUtil;
+import com.expecticament.helpful_commands.util.SoundUtil;
+import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
 import com.expecticament.helpful_commands.manager.TranslationManager;
@@ -56,7 +56,7 @@ public class CoinflipCommand extends HelpfulCommandsCommand {
 
     @Override
     protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
-        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_COINFLIP);
+        return PermissionsUtil.hasPermission(source, ModPermissions.Permission.COMMAND_COINFLIP);
     }
 
     private int execute(CommandContext<CommandSourceStack> ctx, CoinSide guessedCoinSide) throws CommandSyntaxException {
@@ -71,7 +71,7 @@ public class CoinflipCommand extends HelpfulCommandsCommand {
 
         List<ServerPlayer> playerList = new ArrayList<>(sourcePlayer.level().getServer().getPlayerList().getPlayers());
 
-        Component affectedPlayerText = StylingHelper.getAffectedEntityNameText(sourcePlayer);
+        Component affectedPlayerText = StylingUtil.getAffectedEntityNameText(sourcePlayer);
 
         for (ServerPlayer player : playerList) {
             Component pickedCoinSideComponent = Component.literal(TranslationManager.translate(player, "commands.helpful_commands.coinflip." + guessedCoinSide.toString().toLowerCase())).setStyle(textStyles.getPrimary());
@@ -87,7 +87,7 @@ public class CoinflipCommand extends HelpfulCommandsCommand {
             player.sendSystemMessage(textBuilder.getComponent());
         }
 
-        SoundHelper.playSound(sourcePlayer, won ? SoundEvents.PLAYER_LEVELUP : SoundEvents.WANDERING_TRADER_NO, 0.5f, 1);
+        SoundUtil.playSound(sourcePlayer, won ? SoundEvents.PLAYER_LEVELUP : SoundEvents.WANDERING_TRADER_NO, 0.5f, 1);
 
         return Command.SINGLE_SUCCESS;
     }

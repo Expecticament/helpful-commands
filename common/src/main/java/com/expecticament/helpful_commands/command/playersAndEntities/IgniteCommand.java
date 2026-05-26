@@ -1,9 +1,9 @@
 package com.expecticament.helpful_commands.command.playersAndEntities;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
-import com.expecticament.helpful_commands.helper.GameRulesHelper;
-import com.expecticament.helpful_commands.helper.PermissionHelper;
-import com.expecticament.helpful_commands.helper.StylingHelper;
+import com.expecticament.helpful_commands.util.GameRulesUtil;
+import com.expecticament.helpful_commands.util.PermissionsUtil;
+import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
 import com.expecticament.helpful_commands.manager.TranslationManager;
@@ -40,7 +40,7 @@ public class IgniteCommand extends HelpfulCommandsCommand {
                 .then(Commands.argument("duration_seconds", FloatArgumentType.floatArg(1f))
                         .executes(ctx -> executeSelf(ctx, FloatArgumentType.getFloat(ctx, "duration_seconds")))
                         .then(Commands.argument("entities", EntityArgument.entities())
-                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_IGNITE_OTHERS))
+                                .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_IGNITE_OTHERS))
                                 .executes(ctx -> executeOther(ctx, FloatArgumentType.getFloat(ctx, "duration_seconds"), EntityArgument.getEntities(ctx, "entities")))
                         )
                 )
@@ -49,7 +49,7 @@ public class IgniteCommand extends HelpfulCommandsCommand {
 
     @Override
     protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
-        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_IGNITE);
+        return PermissionsUtil.hasPermission(source, ModPermissions.Permission.COMMAND_IGNITE);
     }
 
     private int executeSelf(CommandContext<CommandSourceStack> ctx, float duration) throws CommandSyntaxException {
@@ -83,7 +83,7 @@ public class IgniteCommand extends HelpfulCommandsCommand {
         }
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
-        boolean commandFeedback = GameRulesHelper.commandFeedbackEnabled(src.getLevel());
+        boolean commandFeedback = GameRulesUtil.isCommandFeedbackEnabled(src.getLevel());
 
         List<? extends Entity> affected = entities.stream()
                 .filter(entity -> ignite(entity, duration))
@@ -105,10 +105,10 @@ public class IgniteCommand extends HelpfulCommandsCommand {
 
         MutableComponent affectedText = Component.empty();
         if (affected.size() == 1) {
-            affectedText.append(StylingHelper.getAffectedEntityNameText(affected.getFirst()));
+            affectedText.append(StylingUtil.getAffectedEntityNameText(affected.getFirst()));
         } else {
             affectedText
-                    .append(StylingHelper.getAffectedEntitiesNumberText(affected))
+                    .append(StylingUtil.getAffectedEntitiesNumberText(affected))
                     .append(" ")
                     .append(TranslationManager.translate(src, "commands.helpful_commands.ignite.other.multiple"));
         }

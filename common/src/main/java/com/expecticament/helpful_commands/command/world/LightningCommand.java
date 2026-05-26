@@ -1,9 +1,9 @@
 package com.expecticament.helpful_commands.command.world;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
-import com.expecticament.helpful_commands.helper.PermissionHelper;
-import com.expecticament.helpful_commands.helper.ServerLevelHelper;
-import com.expecticament.helpful_commands.helper.StylingHelper;
+import com.expecticament.helpful_commands.util.PermissionsUtil;
+import com.expecticament.helpful_commands.util.ServerLevelUtil;
+import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
 import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
@@ -35,11 +35,11 @@ public class LightningCommand extends HelpfulCommandsCommand {
         dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .then(Commands.argument("position", Vec3Argument.vec3())
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_LIGHTNING_POSITION))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_LIGHTNING_POSITION))
                         .executes(ctx -> executePosition(ctx, Vec3Argument.getVec3(ctx, "position")))
                 )
                 .then(Commands.argument("entity", EntityArgument.entity())
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_LIGHTNING_ENTITY))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_LIGHTNING_ENTITY))
                         .executes(ctx -> executeTarget(ctx, EntityArgument.getEntity(ctx, "entity")))
                 )
         );
@@ -47,7 +47,7 @@ public class LightningCommand extends HelpfulCommandsCommand {
 
     @Override
     protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
-        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_LIGHTNING);
+        return PermissionsUtil.hasPermission(source, ModPermissions.Permission.COMMAND_LIGHTNING);
     }
 
     private int executePosition(CommandContext<CommandSourceStack> ctx, Vec3 position) {
@@ -64,7 +64,7 @@ public class LightningCommand extends HelpfulCommandsCommand {
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
         TextBuilder textBuilder = new TextBuilder(src);
         textBuilder.setStyle(textStyles.getSuccess());
-        textBuilder.appendTranslatable("commands.helpful_commands.lightning", StylingHelper.getLocationText(position, ServerLevelHelper.getLevelLocation(serverLevel)));
+        textBuilder.appendTranslatable("commands.helpful_commands.lightning", StylingUtil.getLocationText(position, ServerLevelUtil.getLevelLocation(serverLevel)));
 
         src.sendSuccess(textBuilder::getComponent, true);
 

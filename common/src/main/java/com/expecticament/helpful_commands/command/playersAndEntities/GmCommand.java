@@ -1,9 +1,9 @@
 package com.expecticament.helpful_commands.command.playersAndEntities;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
-import com.expecticament.helpful_commands.helper.GameRulesHelper;
-import com.expecticament.helpful_commands.helper.PermissionHelper;
-import com.expecticament.helpful_commands.helper.StylingHelper;
+import com.expecticament.helpful_commands.util.GameRulesUtil;
+import com.expecticament.helpful_commands.util.PermissionsUtil;
+import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
 import com.expecticament.helpful_commands.manager.TranslationManager;
@@ -37,34 +37,34 @@ public class GmCommand extends HelpfulCommandsCommand {
         dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .then(Commands.literal("a")
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_GM_A))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_GM_A))
                         .executes(ctx -> executeSelf(ctx, GameType.ADVENTURE))
                         .then(Commands.argument("players", EntityArgument.players())
-                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_GM_A_OTHERS))
+                                .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_GM_A_OTHERS))
                                 .executes(ctx -> executeOther(ctx, GameType.ADVENTURE, EntityArgument.getPlayers(ctx, "players")))
                         )
                 )
                 .then(Commands.literal("c")
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_GM_C))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_GM_C))
                         .executes(ctx -> executeSelf(ctx, GameType.CREATIVE))
                         .then(Commands.argument("players", EntityArgument.players())
-                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_GM_C_OTHERS))
+                                .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_GM_C_OTHERS))
                                 .executes(ctx -> executeOther(ctx, GameType.CREATIVE, EntityArgument.getPlayers(ctx, "players")))
                         )
                 )
                 .then(Commands.literal("s")
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_GM_S))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_GM_S))
                         .executes(ctx -> executeSelf(ctx, GameType.SURVIVAL))
                         .then(Commands.argument("players", EntityArgument.players())
-                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_GM_S_OTHERS))
+                                .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_GM_S_OTHERS))
                                 .executes(ctx -> executeOther(ctx, GameType.SURVIVAL, EntityArgument.getPlayers(ctx, "players")))
                         )
                 )
                 .then(Commands.literal("sp")
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_GM_SP))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_GM_SP))
                         .executes(ctx -> executeSelf(ctx, GameType.SPECTATOR))
                         .then(Commands.argument("players", EntityArgument.players())
-                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_GM_SP_OTHERS))
+                                .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_GM_SP_OTHERS))
                                 .executes(ctx -> executeOther(ctx, GameType.SPECTATOR, EntityArgument.getPlayers(ctx, "players")))
                         )
                 )
@@ -73,7 +73,7 @@ public class GmCommand extends HelpfulCommandsCommand {
 
     @Override
     protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
-        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_GM);
+        return PermissionsUtil.hasPermission(source, ModPermissions.Permission.COMMAND_GM);
     }
 
     private int executeSelf(CommandContext<CommandSourceStack> ctx, GameType gameType) throws CommandSyntaxException {
@@ -107,7 +107,7 @@ public class GmCommand extends HelpfulCommandsCommand {
         }
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
-        boolean commandFeedback = GameRulesHelper.commandFeedbackEnabled(src.getLevel());
+        boolean commandFeedback = GameRulesUtil.isCommandFeedbackEnabled(src.getLevel());
 
         Component gameModeNameComponent = Component.translatable("gameMode." + gameType.getName()).setStyle(textStyles.getPrimary());
 
@@ -130,10 +130,10 @@ public class GmCommand extends HelpfulCommandsCommand {
 
         MutableComponent affectedText = Component.empty();
         if (affected.size() == 1) {
-            affectedText.append(StylingHelper.getAffectedEntityNameText(affected.getFirst()));
+            affectedText.append(StylingUtil.getAffectedEntityNameText(affected.getFirst()));
         } else {
             affectedText
-                    .append(StylingHelper.getAffectedEntitiesNumberText(affected))
+                    .append(StylingUtil.getAffectedEntitiesNumberText(affected))
                     .append(" ")
                     .append(TranslationManager.translate(src, "commands.helpful_commands.gm.other.multiple"));
         }

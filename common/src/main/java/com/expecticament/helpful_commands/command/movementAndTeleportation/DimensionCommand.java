@@ -1,10 +1,10 @@
 package com.expecticament.helpful_commands.command.movementAndTeleportation;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
-import com.expecticament.helpful_commands.helper.GameRulesHelper;
-import com.expecticament.helpful_commands.helper.PermissionHelper;
-import com.expecticament.helpful_commands.helper.ServerLevelHelper;
-import com.expecticament.helpful_commands.helper.StylingHelper;
+import com.expecticament.helpful_commands.util.GameRulesUtil;
+import com.expecticament.helpful_commands.util.PermissionsUtil;
+import com.expecticament.helpful_commands.util.ServerLevelUtil;
+import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
 import com.expecticament.helpful_commands.manager.TranslationManager;
@@ -49,7 +49,7 @@ public class DimensionCommand extends HelpfulCommandsCommand {
                 .requires(this::canExecute)
                 .then(Commands.argument("dimension", DimensionArgument.dimension())
                         .then(Commands.argument("entities", EntityArgument.entities())
-                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_DIMENSION_OTHERS))
+                                .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_DIMENSION_OTHERS))
                                 .executes(ctx -> executeOther(ctx, DimensionArgument.getDimension(ctx, "dimension"), EntityArgument.getEntities(ctx, "entities")))
                         )
                         .executes(ctx -> executeSelf(ctx, DimensionArgument.getDimension(ctx, "dimension")))
@@ -59,7 +59,7 @@ public class DimensionCommand extends HelpfulCommandsCommand {
 
     @Override
     protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
-        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_DIMENSION);
+        return PermissionsUtil.hasPermission(source, ModPermissions.Permission.COMMAND_DIMENSION);
     }
 
     private int executeSelf(CommandContext<CommandSourceStack> ctx, ServerLevel serverLevel) throws CommandSyntaxException {
@@ -75,7 +75,7 @@ public class DimensionCommand extends HelpfulCommandsCommand {
         TextBuilder textBuilder = new TextBuilder(src);
 
         if (result == 1) {
-            throw ALREADY_IN_DIMENSION.create(src, ServerLevelHelper.getLevelLocation(serverLevel));
+            throw ALREADY_IN_DIMENSION.create(src, ServerLevelUtil.getLevelLocation(serverLevel));
         }
         if (result == 2) {
             throw FAILED_TO_TELEPORT.create(src);
@@ -99,7 +99,7 @@ public class DimensionCommand extends HelpfulCommandsCommand {
         }
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
-        boolean commandFeedback = GameRulesHelper.commandFeedbackEnabled(src.getLevel());
+        boolean commandFeedback = GameRulesUtil.isCommandFeedbackEnabled(src.getLevel());
 
         Component dimensionText = getDimensionText(serverLevel, textStyles);
 
@@ -123,10 +123,10 @@ public class DimensionCommand extends HelpfulCommandsCommand {
 
         MutableComponent affectedText = Component.empty();
         if (affected.size() == 1) {
-            affectedText.append(StylingHelper.getAffectedEntityNameText(affected.getFirst()));
+            affectedText.append(StylingUtil.getAffectedEntityNameText(affected.getFirst()));
         } else {
             affectedText
-                    .append(StylingHelper.getAffectedEntitiesNumberText(affected))
+                    .append(StylingUtil.getAffectedEntitiesNumberText(affected))
                     .append(" ")
                     .append(TranslationManager.translate(src, "commands.helpful_commands.dimension.other.multiple"));
         }
@@ -149,6 +149,6 @@ public class DimensionCommand extends HelpfulCommandsCommand {
     }
 
     private Component getDimensionText(ServerLevel serverLevel, HelpfulCommandsStyle.TextStyles textStyles) {
-        return Component.literal(ServerLevelHelper.getLevelLocation(serverLevel)).setStyle(textStyles.getPrimary());
+        return Component.literal(ServerLevelUtil.getLevelLocation(serverLevel)).setStyle(textStyles.getPrimary());
     }
 }

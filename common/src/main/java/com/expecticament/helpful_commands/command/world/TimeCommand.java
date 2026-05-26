@@ -1,8 +1,8 @@
 package com.expecticament.helpful_commands.command.world;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
-import com.expecticament.helpful_commands.helper.PermissionHelper;
-import com.expecticament.helpful_commands.helper.ServerLevelHelper;
+import com.expecticament.helpful_commands.util.PermissionsUtil;
+import com.expecticament.helpful_commands.util.ServerLevelUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
 import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
@@ -49,7 +49,7 @@ public class TimeCommand extends HelpfulCommandsCommand {
 
     @Override
     protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
-        return PermissionHelper.hasPermission(source, permission);
+        return PermissionsUtil.hasPermission(source, permission);
     }
 
     private int execute(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
@@ -81,7 +81,7 @@ public class TimeCommand extends HelpfulCommandsCommand {
         timeTextBuilder.appendTranslatable("commands.helpful_commands.time." + time).setStyle(textStyles.getPrimary().withHoverEvent(new HoverEvent.ShowText(hoverTextBuilder.getComponent())));
 
         TextBuilder messageTextBuilder = new TextBuilder(src);
-        messageTextBuilder.appendTranslatable("commands.helpful_commands.time", Component.literal(ServerLevelHelper.getLevelLocation(level)).setStyle(textStyles.getPrimary()), timeTextBuilder.getComponent()).setStyle(textStyles.getSuccess());
+        messageTextBuilder.appendTranslatable("commands.helpful_commands.time", Component.literal(ServerLevelUtil.getLevelLocation(level)).setStyle(textStyles.getPrimary()), timeTextBuilder.getComponent()).setStyle(textStyles.getSuccess());
 
         src.sendSuccess(messageTextBuilder::getComponent, true);
 

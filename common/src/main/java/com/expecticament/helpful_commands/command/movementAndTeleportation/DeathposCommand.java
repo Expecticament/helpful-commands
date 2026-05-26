@@ -1,9 +1,9 @@
 package com.expecticament.helpful_commands.command.movementAndTeleportation;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
-import com.expecticament.helpful_commands.helper.PermissionHelper;
-import com.expecticament.helpful_commands.helper.ServerLevelHelper;
-import com.expecticament.helpful_commands.helper.StylingHelper;
+import com.expecticament.helpful_commands.util.PermissionsUtil;
+import com.expecticament.helpful_commands.util.ServerLevelUtil;
+import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
 import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
@@ -33,7 +33,7 @@ public class DeathposCommand extends HelpfulCommandsCommand {
             new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.deathpos.error.noDeathPos.self").getComponent()
     );
     private static final Dynamic2CommandExceptionType NO_DEATH_POS_OTHER = new Dynamic2CommandExceptionType((src, otherPlayer) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.deathpos.error.noDeathPos.other", StylingHelper.getAffectedEntityNameText((ServerPlayer) otherPlayer)).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.deathpos.error.noDeathPos.other", StylingUtil.getAffectedEntityNameText((ServerPlayer) otherPlayer)).getComponent()
     );
 
     public DeathposCommand(ModCommandManager.ModCommand modCommand) {
@@ -47,17 +47,17 @@ public class DeathposCommand extends HelpfulCommandsCommand {
         dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .then(Commands.literal("tp")
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_DEATHPOS_TP))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_DEATHPOS_TP))
                         .then(Commands.argument("player", EntityArgument.player())
-                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_DEATHPOS_TP_OTHER))
+                                .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_DEATHPOS_TP_OTHER))
                                 .executes(ctx -> teleport(ctx, EntityArgument.getPlayer(ctx, "player")))
                         )
                         .executes(this::teleport)
                 )
                 .then(Commands.literal("query")
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_DEATHPOS_QUERY))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_DEATHPOS_QUERY))
                         .then(Commands.argument("player", EntityArgument.player())
-                                .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_DEATHPOS_QUERY_OTHER))
+                                .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_DEATHPOS_QUERY_OTHER))
                                 .executes(ctx -> query(ctx, EntityArgument.getPlayer(ctx, "player")))
                         )
                         .executes(this::query)
@@ -67,7 +67,7 @@ public class DeathposCommand extends HelpfulCommandsCommand {
 
     @Override
     protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
-        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_DEATHPOS);
+        return PermissionsUtil.hasPermission(source, ModPermissions.Permission.COMMAND_DEATHPOS);
     }
 
     private int query(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
@@ -99,14 +99,14 @@ public class DeathposCommand extends HelpfulCommandsCommand {
         }
 
         GlobalPos globalPos = deathPos.get();
-        Component deathPosComponent = StylingHelper.getLocationText(globalPos);
+        Component deathPosComponent = StylingUtil.getLocationText(globalPos);
 
         TextBuilder textBuilder = new TextBuilder(src);
 
         if (self) {
             textBuilder.appendTranslatable("commands.helpful_commands.deathpos.query.self", deathPosComponent);
         } else {
-            textBuilder.appendTranslatable("commands.helpful_commands.deathpos.query.other", StylingHelper.getAffectedEntityNameText(player), deathPosComponent);
+            textBuilder.appendTranslatable("commands.helpful_commands.deathpos.query.other", StylingUtil.getAffectedEntityNameText(player), deathPosComponent);
         }
 
         src.sendSuccess(textBuilder::getComponent, true);
@@ -148,7 +148,7 @@ public class DeathposCommand extends HelpfulCommandsCommand {
         String levelLocation = globalPos.dimension().identifier().toString();
 
         try {
-            ServerLevel level = ServerLevelHelper.getLevel(levelLocation);
+            ServerLevel level = ServerLevelUtil.getLevel(levelLocation);
             BlockPos blockPos = globalPos.pos();
 
             sourcePlayer.teleportTo(level, blockPos.getX(), blockPos.getY(), blockPos.getZ(), Relative.DELTA, sourcePlayer.getYRot(), sourcePlayer.getXRot(), false);
@@ -158,13 +158,13 @@ public class DeathposCommand extends HelpfulCommandsCommand {
             if (self) {
                 textBuilder.appendTranslatable("commands.helpful_commands.deathpos.teleport.self");
             } else {
-                textBuilder.appendTranslatable("commands.helpful_commands.deathpos.teleport.other", StylingHelper.getAffectedEntityNameText(player));
+                textBuilder.appendTranslatable("commands.helpful_commands.deathpos.teleport.other", StylingUtil.getAffectedEntityNameText(player));
             }
 
             textBuilder.setStyle(textStyles.getSuccess());
 
             src.sendSuccess(textBuilder::getComponent, true);
-        } catch (ServerLevelHelper.UnknownServerLevelException e) {
+        } catch (ServerLevelUtil.UnknownServerLevelException e) {
             throw UNKNOWN_DIMENSION.create(src, levelLocation);
         }
 

@@ -1,9 +1,9 @@
 package com.expecticament.helpful_commands.command.playersAndEntities;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
-import com.expecticament.helpful_commands.helper.GameRulesHelper;
-import com.expecticament.helpful_commands.helper.PermissionHelper;
-import com.expecticament.helpful_commands.helper.StylingHelper;
+import com.expecticament.helpful_commands.util.GameRulesUtil;
+import com.expecticament.helpful_commands.util.PermissionsUtil;
+import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
 import com.expecticament.helpful_commands.manager.TranslationManager;
@@ -38,7 +38,7 @@ public class ExtinguishCommand extends HelpfulCommandsCommand {
                 .requires(this::canExecute)
                 .executes(this::executeSelf)
                 .then(Commands.argument("entities", EntityArgument.entities())
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_EXTINGUISH_OTHERS))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_EXTINGUISH_OTHERS))
                         .executes(ctx -> executeOther(ctx, EntityArgument.getEntities(ctx, "entities")))
                 )
         );
@@ -46,7 +46,7 @@ public class ExtinguishCommand extends HelpfulCommandsCommand {
 
     @Override
     protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
-        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_EXTINGUISH);
+        return PermissionsUtil.hasPermission(source, ModPermissions.Permission.COMMAND_EXTINGUISH);
     }
 
     private int executeSelf(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
@@ -80,7 +80,7 @@ public class ExtinguishCommand extends HelpfulCommandsCommand {
         }
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
-        boolean commandFeedback = GameRulesHelper.commandFeedbackEnabled(src.getLevel());
+        boolean commandFeedback = GameRulesUtil.isCommandFeedbackEnabled(src.getLevel());
 
         List<? extends Entity> affected = entities.stream()
                 .filter(this::extinguish)
@@ -102,10 +102,10 @@ public class ExtinguishCommand extends HelpfulCommandsCommand {
 
         MutableComponent affectedText = Component.empty();
         if (affected.size() == 1) {
-            affectedText.append(StylingHelper.getAffectedEntityNameText(affected.getFirst()));
+            affectedText.append(StylingUtil.getAffectedEntityNameText(affected.getFirst()));
         } else {
             affectedText
-                    .append(StylingHelper.getAffectedEntitiesNumberText(affected))
+                    .append(StylingUtil.getAffectedEntitiesNumberText(affected))
                     .append(" ")
                     .append(TranslationManager.translate(src, "commands.helpful_commands.extinguish.other.multiple"));
         }

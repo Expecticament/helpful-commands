@@ -1,9 +1,9 @@
 package com.expecticament.helpful_commands.command.movementAndTeleportation;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
-import com.expecticament.helpful_commands.helper.PermissionHelper;
-import com.expecticament.helpful_commands.helper.ServerLevelHelper;
-import com.expecticament.helpful_commands.helper.StylingHelper;
+import com.expecticament.helpful_commands.util.PermissionsUtil;
+import com.expecticament.helpful_commands.util.ServerLevelUtil;
+import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.*;
 import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
 import com.expecticament.helpful_commands.permission.ModPermissions;
@@ -54,27 +54,27 @@ public class HomeCommand extends HelpfulCommandsCommand {
         dispatcher.register(Commands.literal(modCommand.getName())
                 .requires(this::canExecute)
                 .then(Commands.literal("tp")
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_TP))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_TP))
                         .then(Commands.argument("home_name", StringArgumentType.word())
                                 .suggests(homeNameSuggestionProvider)
                                 .executes(ctx -> teleport(ctx, StringArgumentType.getString(ctx, "home_name")))
                         )
                 )
                 .then(Commands.literal("add")
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_ADD))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_ADD))
                         .then(Commands.argument("home_name", StringArgumentType.word())
                                 .executes(ctx -> addHome(ctx, StringArgumentType.getString(ctx, "home_name")))
                         )
                 )
                 .then(Commands.literal("remove")
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_REMOVE))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_REMOVE))
                         .then(Commands.argument("home_name", StringArgumentType.word())
                                 .suggests(homeNameSuggestionProvider)
                                 .executes(ctx -> removeHome(ctx, StringArgumentType.getString(ctx, "home_name")))
                         )
                 )
                 .then(Commands.literal("edit")
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_EDIT))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_EDIT))
                         .then(Commands.argument("home_name", StringArgumentType.word())
                                 .suggests(homeNameSuggestionProvider)
                                 .then(Commands.literal("name")
@@ -88,7 +88,7 @@ public class HomeCommand extends HelpfulCommandsCommand {
                         )
                 )
                 .then(Commands.literal("info")
-                        .requires(src -> PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_INFO))
+                        .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_INFO))
                         .then(Commands.argument("home_name", StringArgumentType.word())
                                 .suggests(homeNameSuggestionProvider)
                                 .executes(ctx -> homeInfo(ctx, StringArgumentType.getString(ctx, "home_name")))
@@ -99,7 +99,7 @@ public class HomeCommand extends HelpfulCommandsCommand {
 
     @Override
     protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
-        return PermissionHelper.hasPermission(source, ModPermissions.Permission.COMMAND_HOME);
+        return PermissionsUtil.hasPermission(source, ModPermissions.Permission.COMMAND_HOME);
     }
 
     private int teleport(CommandContext<CommandSourceStack> ctx, String homeName) throws CommandSyntaxException {
@@ -117,17 +117,17 @@ public class HomeCommand extends HelpfulCommandsCommand {
         try {
             HomeManager.Home home = HomeManager.getHome(sourcePlayer, homeName);
             try {
-                ServerLevel level = ServerLevelHelper.getLevel(home.dimension);
+                ServerLevel level = ServerLevelUtil.getLevel(home.dimension);
                 sourcePlayer.teleportTo(level, home.x, home.y, home.z, Relative.DELTA, sourcePlayer.getYRot(), sourcePlayer.getXRot(), false);
 
-                CooldownManager.applyCooldown(sourcePlayer, CooldownManager.CooldownType.HOME_TP, PermissionHelper.getMetaOrElseConfigValue(sourcePlayer, ConfigManager.CONFIG_FIELD.HOME_TP_COOLDOWN));
+                CooldownManager.applyCooldown(sourcePlayer, CooldownManager.CooldownType.HOME_TP, PermissionsUtil.getMetaOrElseConfigValue(sourcePlayer, ConfigManager.CONFIG_FIELD.HOME_TP_COOLDOWN));
 
                 TextBuilder textBuilder = new TextBuilder(sourcePlayer);
                 textBuilder.appendTranslatable("commands.helpful_commands.home.teleport", Component.literal(homeName).setStyle(textStyles.getPrimary()));
                 textBuilder.setStyle(textStyles.getSuccess());
 
                 src.sendSuccess(textBuilder::getComponent, true);
-            } catch (ServerLevelHelper.UnknownServerLevelException e) {
+            } catch (ServerLevelUtil.UnknownServerLevelException e) {
                 throw UNKNOWN_DIMENSION.create(src, home.dimension);
             }
         } catch (HomeManager.HomeDoesntExistException e) {
@@ -244,21 +244,21 @@ public class HomeCommand extends HelpfulCommandsCommand {
             TextBuilder textBuilder = new TextBuilder(sourcePlayer);
 
             textBuilder
-                    .appendComponent(StylingHelper.getTitle(Component.literal(TranslationManager.translate(sourcePlayer, "commands.helpful_commands.home.info.title")), Component.literal(homeName)))
+                    .appendComponent(StylingUtil.getTitle(Component.literal(TranslationManager.translate(sourcePlayer, "commands.helpful_commands.home.info.title")), Component.literal(homeName)))
                     .appendNewline()
                     .appendComponent(Component.literal(textDecorators.getBulletPoint()).setStyle(textStyles.getTertiary()))
                     .appendComponent(Component.literal(TranslationManager.translate(sourcePlayer, "helpful_commands.common.position")).setStyle(textStyles.getTertiary()))
                     .appendComponent(Component.literal(": ").setStyle(textStyles.getTertiary()))
-                    .appendComponent(StylingHelper.getPositionText(home.x, home.y, home.z))
+                    .appendComponent(StylingUtil.getPositionText(home.x, home.y, home.z))
                     .appendNewline()
                     .appendComponent(Component.literal(textDecorators.getBulletPoint()).setStyle(textStyles.getTertiary()))
                     .appendComponent(Component.literal(TranslationManager.translate(sourcePlayer, "helpful_commands.common.dimension")).setStyle(textStyles.getTertiary()))
                     .appendComponent(Component.literal(": ").setStyle(textStyles.getTertiary()))
                     .appendComponent(Component.literal(home.dimension).setStyle(textStyles.getSecondary()));
 
-            boolean canTp = PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_TP);
-            boolean canEdit = PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_EDIT);
-            boolean canRemove = PermissionHelper.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_REMOVE);
+            boolean canTp = PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_TP);
+            boolean canEdit = PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_EDIT);
+            boolean canRemove = PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_REMOVE);
 
             if (canTp || canEdit || canRemove) {
                 textBuilder
@@ -269,7 +269,7 @@ public class HomeCommand extends HelpfulCommandsCommand {
                     HoverEvent tpBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(sourcePlayer, "hover.helpful_commands.clickToTeleport")));
                     ClickEvent tpBtnClickEvent = new ClickEvent.RunCommand("/home tp " + homeName);
                     Style tpBtnStyle = textStyles.getSecondary().withHoverEvent(tpBtnHoverEvent).withClickEvent(tpBtnClickEvent);
-                    textBuilder.appendComponent(StylingHelper.getButton(textDecorators.getTeleport(), Component.literal(TranslationManager.translate(src, "helpful_commands.common.teleport")), tpBtnStyle));
+                    textBuilder.appendComponent(StylingUtil.getButton(textDecorators.getTeleport(), Component.literal(TranslationManager.translate(src, "helpful_commands.common.teleport")), tpBtnStyle));
                 }
 
                 if (canEdit) {
@@ -279,7 +279,7 @@ public class HomeCommand extends HelpfulCommandsCommand {
                     if (canTp) {
                         textBuilder.appendWhitespace();
                     }
-                    textBuilder.appendComponent(StylingHelper.getButton(Component.literal(textDecorators.getEdit()), editBtnStyle));
+                    textBuilder.appendComponent(StylingUtil.getButton(Component.literal(textDecorators.getEdit()), editBtnStyle));
                 }
 
                 if (canRemove) {
@@ -289,7 +289,7 @@ public class HomeCommand extends HelpfulCommandsCommand {
                     if (canTp || canEdit) {
                         textBuilder.appendWhitespace();
                     }
-                    textBuilder.appendComponent(StylingHelper.getButton(Component.literal(textDecorators.getRemove()), removeBtnStyle));
+                    textBuilder.appendComponent(StylingUtil.getButton(Component.literal(textDecorators.getRemove()), removeBtnStyle));
                 }
             }
 
