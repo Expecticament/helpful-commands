@@ -16,6 +16,7 @@
   "commands.helpful_commands.fly.description": "Toggle flying for players",
   "commands.helpful_commands.god.description": "Toggle invulnerability for players",
   "commands.helpful_commands.disenchant.description": "Remove one or more enchantments from the item in the target's main hand",
+  "commands.helpful_commands.echest.description": "View or edit another player's Ender chest",
   "commands.helpful_commands.invsee.description": "View or edit another player's inventory",
   "commands.helpful_commands.rename.description": "Set or remove a custom name for the item in the target's main hand",
   "commands.helpful_commands.repair.description": "Repair the item in the target's main hand",
@@ -122,9 +123,12 @@
   "commands.helpful_commands.disenchant.error.noEnchantment": "Your %s doesn't have %s enchantment",
   "commands.helpful_commands.disenchant.error.noEnchantments": "Your %s doesn't have any enchantments",
 
+  "commands.helpful_commands.echest.other": "Viewing %s's Ender Chest...",
+  "commands.helpful_commands.echest.self": "Viewing your Ender Chest...",
+  "commands.helpful_commands.echest.screenTitle": "%s's Ender Chest %s",
+
   "commands.helpful_commands.invsee": "Viewing %s's inventory...",
   "commands.helpful_commands.invsee.screenTitle": "%s's Inventory %s",
-  "commands.helpful_commands.invsee.screenTitle.offline": "(Offline)",
   "commands.helpful_commands.invsee.emptySlot": "Empty Slot",
   "commands.helpful_commands.invsee.infoSlot.name": "What are these slots for?",
   "commands.helpful_commands.invsee.infoSlot.lore": "Left to right: boots, leggings, chestplate, helmet, off-hand",
@@ -327,5 +331,6 @@
   "helpful_commands.common.second": "%ss",
   "helpful_commands.common.minute": "%smin",
   "helpful_commands.common.hour": "%shr",
-  "helpful_commands.common.day": "%sd"
+  "helpful_commands.common.day": "%sd",
+  "helpful_commands.common.offline": "(Offline)"
 }

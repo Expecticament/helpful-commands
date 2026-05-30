@@ -45,13 +45,12 @@ public class TranslationManager {
         public TextBuilder appendTranslatable(String translationKey, Component... components) {
             String translated = translate(language, translationKey);
             String[] split = translated.split("%s", -1);
-            int count = 0;
+            int maxComponents = split.length - 1;
 
-            for (String str : split) {
-                component.append(Component.literal(str));
-                if (components != null && count < components.length) {
-                    component.append(components[count]);
-                    count++;
+            for (int i = 0; i < split.length; i++) {
+                component.append(Component.literal(split[i]));
+                if (components != null && i < maxComponents && i < components.length) {
+                    component.append(components[i]);
                 }
             }
 

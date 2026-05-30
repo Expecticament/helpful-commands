@@ -27,6 +27,7 @@ public class ModCommandManager {
         GOD(CommandCategory.ABILITIES),
 
         DISENCHANT(CommandCategory.ITEMS_AND_INVENTORY),
+        ECHEST(CommandCategory.ITEMS_AND_INVENTORY),
         INVSEE(CommandCategory.ITEMS_AND_INVENTORY),
         RENAME(CommandCategory.ITEMS_AND_INVENTORY),
         REPAIR(CommandCategory.ITEMS_AND_INVENTORY),
@@ -100,6 +101,7 @@ public class ModCommandManager {
         commands.add(new GodCommand(ModCommand.GOD));
 
         commands.add(new DisenchantCommand(ModCommand.DISENCHANT));
+        commands.add(new EchestCommand(ModCommand.ECHEST));
         commands.add(new InvseeCommand(ModCommand.INVSEE));
         commands.add(new RenameCommand(ModCommand.RENAME));
         commands.add(new RepairCommand(ModCommand.REPAIR));
