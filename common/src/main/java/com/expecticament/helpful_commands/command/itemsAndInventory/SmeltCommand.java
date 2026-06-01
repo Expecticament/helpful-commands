@@ -32,7 +32,7 @@ import java.util.Optional;
 
 public class SmeltCommand extends HelpfulCommandsCommand {
     private static final DynamicCommandExceptionType ITEM_NOT_SMELTABLE = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.smelt.error.itemNotSmeltable").getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.smelt.error.item_not_smeltable").getComponent()
     );
 
     public SmeltCommand(ModCommandManager.ModCommand modCommand) {

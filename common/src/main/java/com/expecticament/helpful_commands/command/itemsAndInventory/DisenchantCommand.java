@@ -37,12 +37,12 @@ public class DisenchantCommand extends HelpfulCommandsCommand {
     public record EnchantmentData(Enchantment enchantment, int level) {}
 
     private static final Dynamic3CommandExceptionType NO_ENCHANTMENT_SELF = new Dynamic3CommandExceptionType((src, itemName, enchantmentName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.disenchant.error.noEnchantment",
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.disenchant.error.no_enchantment",
                     Component.literal(itemName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary()),
                     (Component) enchantmentName).getComponent()
     );
     private static final Dynamic2CommandExceptionType NO_ENCHANTMENTS_SELF = new Dynamic2CommandExceptionType((src, itemName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.disenchant.error.noEnchantments",
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.disenchant.error.no_enchantments",
                     Component.literal(itemName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
 

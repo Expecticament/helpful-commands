@@ -30,7 +30,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class ExplosionCommand extends HelpfulCommandsCommand {
     private static final Dynamic2CommandExceptionType POWER_CONFIG_VALUE_EXCEEDED = new Dynamic2CommandExceptionType((src, maxPower) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.explosion.powerConfigValueExceeded", Component.literal(String.valueOf(maxPower)).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.explosion.power_config_value_exceeded", Component.literal(String.valueOf(maxPower)).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
 
     public ExplosionCommand(ModCommandManager.ModCommand modCommand) {

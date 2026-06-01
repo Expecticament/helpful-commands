@@ -32,7 +32,7 @@ import java.util.function.Predicate;
 
 public class KillitemsCommand extends HelpfulCommandsCommand {
     private static final Dynamic2CommandExceptionType RANGE_CONFIG_VALUE_EXCEEDED = new Dynamic2CommandExceptionType((src, maxRange) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.killitems.rangeConfigValueExceeded", Component.literal(String.valueOf(maxRange)).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.killitems.range_config_value_exceeded", Component.literal(String.valueOf(maxRange)).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
 
     public KillitemsCommand(ModCommandManager.ModCommand modCommand) {

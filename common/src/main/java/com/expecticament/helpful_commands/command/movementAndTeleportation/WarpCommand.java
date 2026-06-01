@@ -41,19 +41,19 @@ import java.util.Objects;
 
 public class WarpCommand extends HelpfulCommandsCommand {
     private static final Dynamic2CommandExceptionType WARP_DOESNT_EXIST = new Dynamic2CommandExceptionType((src, warpName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.warpDoesntExist", Component.literal(warpName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.warp_doesnt_exist", Component.literal(warpName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
     private static final Dynamic2CommandExceptionType WARP_ALREADY_EXISTS = new Dynamic2CommandExceptionType((src, warpName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.warpAlreadyExists", Component.literal(warpName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.warp_already_exists", Component.literal(warpName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
     private static final Dynamic2CommandExceptionType SAME_WARP_NAME_PROVIDED = new Dynamic2CommandExceptionType((src, warpName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.edit.name.error.sameWarpNameProvided", Component.literal(warpName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.edit.name.error.same_warp_name_provided", Component.literal(warpName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
     private static final DynamicCommandExceptionType NO_POSITION_PROVIDED = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.noPositionProvided").getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.no_position_provided").getComponent()
     );
     private static final DynamicCommandExceptionType NO_DIMENSION_PROVIDED = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.noDimensionProvided").getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.no_dimension_provided").getComponent()
     );
 
     public WarpCommand(ModCommandManager.ModCommand modCommand) {
@@ -424,13 +424,13 @@ public class WarpCommand extends HelpfulCommandsCommand {
                             .appendNewline();
 
                     if (canTp) {
-                        HoverEvent tpBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "hover.helpful_commands.clickToTeleport")));
+                        HoverEvent tpBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "helpful_commands.hover.click_to_teleport")));
                         ClickEvent tpBtnClickEvent = new ClickEvent.RunCommand("/warp tp " + warpName);
                         Style tpBtnStyle = textStyles.getSecondary().withHoverEvent(tpBtnHoverEvent).withClickEvent(tpBtnClickEvent);
                         textBuilder.appendComponent(StylingUtil.getButton(textDecorators.getTeleport(), Component.literal(TranslationManager.translate(src, "helpful_commands.common.teleport")), tpBtnStyle));
                     }
                     if (canEdit) {
-                        HoverEvent editBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "hover.helpful_commands.clickToEdit")));
+                        HoverEvent editBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "helpful_commands.hover.click_to_edit")));
                         ClickEvent editBtnClickEvent = new ClickEvent.SuggestCommand("/warp edit " + warpName + " ");
                         Style editBtnStyle = textStyles.getTertiary().withHoverEvent(editBtnHoverEvent).withClickEvent(editBtnClickEvent);
                         if (canTp) {
@@ -439,7 +439,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
                         textBuilder.appendComponent(StylingUtil.getButton(Component.literal(textDecorators.getEdit()), editBtnStyle));
                     }
                     if (canRemove) {
-                        HoverEvent removeBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "hover.helpful_commands.clickToRemove")));
+                        HoverEvent removeBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "helpful_commands.hover.click_to_remove")));
                         ClickEvent removeBtnClickEvent = new ClickEvent.RunCommand("/warp remove " + warpName);
                         Style removeBtnStyle = textStyles.getDangerousAction().withHoverEvent(removeBtnHoverEvent).withClickEvent(removeBtnClickEvent);
                         if (canTp || canEdit) {

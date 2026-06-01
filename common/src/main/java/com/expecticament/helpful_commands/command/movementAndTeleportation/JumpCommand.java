@@ -27,7 +27,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class JumpCommand extends HelpfulCommandsCommand {
     private static final Dynamic2CommandExceptionType DISTANCE_CONFIG_VALUE_EXCEEDED = new Dynamic2CommandExceptionType((src, maxDistance) ->
-            new TranslationManager.TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.jump.error.distanceConfigvalueExceeded", Component.literal(String.valueOf(maxDistance)).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new TranslationManager.TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.jump.error.distance_config_value_exceeded", Component.literal(String.valueOf(maxDistance)).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
 
     public JumpCommand(ModCommandManager.ModCommand modCommand) {

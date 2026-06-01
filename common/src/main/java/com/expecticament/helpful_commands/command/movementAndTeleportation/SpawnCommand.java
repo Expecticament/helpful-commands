@@ -33,10 +33,10 @@ import java.util.HashSet;
 
 public class SpawnCommand extends HelpfulCommandsCommand {
     private static final DynamicCommandExceptionType PLAYER_SPAWN_NOT_SET = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.spawn.error.playerSpawnNotSet.self").getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.spawn.error.player_spawn_not_set.self").getComponent()
     );
     private static final Dynamic2CommandExceptionType TARGET_PLAYER_SPAWN_NOT_SET = new Dynamic2CommandExceptionType((src, otherPlayer) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.spawn.error.playerSpawnNotSet.other", StylingUtil.getAffectedEntityNameText((ServerPlayer) otherPlayer)).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.spawn.error.player_spawn_not_set.other", StylingUtil.getAffectedEntityNameText((ServerPlayer) otherPlayer)).getComponent()
     );
 
     public SpawnCommand(ModCommandManager.ModCommand modCommand) {
@@ -196,7 +196,7 @@ public class SpawnCommand extends HelpfulCommandsCommand {
         HelpfulCommandsStyle.TextDecorators textDecorators = currentStyle.getTextDecorators();
 
         boolean isPlayer = !playerName.isEmpty();
-        HoverEvent tpBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "hover.helpful_commands.clickToTeleport")));
+        HoverEvent tpBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "helpful_commands.hover.click_to_teleport")));
         ClickEvent tpBtnClickEvent = new ClickEvent.RunCommand("/spawn " + (isPlayer ? "player tp" + (isOwnSpawn ? "" : " " + playerName) : "world tp"));
         Style tpBtnStyle = textStyles.getSecondary().withHoverEvent(tpBtnHoverEvent).withClickEvent(tpBtnClickEvent);
 

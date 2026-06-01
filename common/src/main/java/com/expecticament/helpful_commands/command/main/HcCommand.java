@@ -35,13 +35,13 @@ import java.util.*;
 
 public class HcCommand extends HelpfulCommandsCommand {
     private static final Dynamic2CommandExceptionType INVALID_HC_COMMAND = new Dynamic2CommandExceptionType((src, commandName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.hc.config.command.error.invalidHcCommand", Component.literal(commandName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.hc.config.command.error.invalid_hc_command", Component.literal(commandName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
     private static final Dynamic2CommandExceptionType COMMAND_NOT_CONFIGURABLE = new Dynamic2CommandExceptionType((src, commandName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.hc.config.command.error.commandNotConfigurable", Component.literal(commandName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.hc.config.command.error.command_not_configurable", Component.literal(commandName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
     private static final DynamicCommandExceptionType NO_ACTIVE_COOLDOWNS_FOUND = new DynamicCommandExceptionType((src) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.hc.cooldowns.error.noActiveCooldownsFound").getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.hc.cooldowns.error.no_active_cooldowns_found").getComponent()
     );
 
     public HcCommand(ModCommandManager.ModCommand modCommand) {
@@ -171,9 +171,9 @@ public class HcCommand extends HelpfulCommandsCommand {
         HelpfulCommandsStyle.TextStyles textStyles = hcStyle.getTextStyles();
         HelpfulCommandsStyle.TextDecorators textDecorators = hcStyle.getTextDecorators();
 
-        HoverEvent linkHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "hover.helpful_commands.clickToOpenTheLink")));
+        HoverEvent linkHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "helpful_commands.hover.click_to_open_link")));
 
-        Component quickActionCommandListBtn = StylingUtil.getButton("\uD83D\uDCC3", Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.actions.commandList")), new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.hover.commandList"))), new ClickEvent.RunCommand("/hc commands"));
+        Component quickActionCommandListBtn = StylingUtil.getButton("\uD83D\uDCC3", Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.actions.command_list")), new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.hover.command_list"))), new ClickEvent.RunCommand("/hc commands"));
         Component quickActionConfigureBtn = StylingUtil.getButton("\uD83D\uDD27", Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.actions.config")), new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.hover.config"))), new ClickEvent.RunCommand("/hc config"));
 
         String linkSeparator = isPlayer ? " " + textDecorators.getBulletPoint() : "\n";
@@ -248,7 +248,7 @@ public class HcCommand extends HelpfulCommandsCommand {
         } else {
             textBuilder
                     .appendNewline()
-                    .appendTranslatable("commands.helpful_commands.hc.about.actions.commandList")
+                    .appendTranslatable("commands.helpful_commands.hc.about.actions.command_list")
                     .appendLiteral(": /hc commands")
                     .appendNewline()
                     .appendTranslatable("commands.helpful_commands.hc.about.actions.config")
@@ -290,7 +290,7 @@ public class HcCommand extends HelpfulCommandsCommand {
                 continue;
             }
 
-            textBuilder.appendNewline().appendComponent(Component.literal(textDecorators.getCategoryStartingChar()).setStyle(categoryStyle)).appendComponent(Component.literal(TranslationManager.translate(src, "helpful_commands.commandCategory.%s".formatted(entry.getKey().toString().toLowerCase()))).setStyle(categoryStyle));
+            textBuilder.appendNewline().appendComponent(Component.literal(textDecorators.getCategoryStartingChar()).setStyle(categoryStyle)).appendComponent(Component.literal(TranslationManager.translate(src, "helpful_commands.command_category.%s".formatted(entry.getKey().toString().toLowerCase()))).setStyle(categoryStyle));
             HelpfulCommandsCommand lastCommand = entry.getValue().getLast();
 
             for (HelpfulCommandsCommand command : entry.getValue()) {
@@ -362,9 +362,9 @@ public class HcCommand extends HelpfulCommandsCommand {
         textBuilder
                 .appendNewline()
                 .appendComponent(Component.literal("[!] ").setStyle(textStyles.getWarning()))
-                .appendComponent(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.commandList.availableOnly")).setStyle(textStyles.getWarning()))
+                .appendComponent(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.commandList.available_only")).setStyle(textStyles.getWarning()))
                 .appendWhitespace()
-                .appendComponent(StylingUtil.getButton(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.commandList.availableOnly.showAll")), textStyles.getButton().withClickEvent(new ClickEvent.RunCommand("/hc commands true"))))
+                .appendComponent(StylingUtil.getButton(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.commandList.available_only.show_all")), textStyles.getButton().withClickEvent(new ClickEvent.RunCommand("/hc commands true"))))
                 .appendNewline();
 
         for (Map.Entry<ModCommandManager.CommandCategory, List<HelpfulCommandsCommand>> entry : available.entrySet()) {
@@ -372,7 +372,7 @@ public class HcCommand extends HelpfulCommandsCommand {
                 continue;
             }
 
-            textBuilder.appendNewline().appendComponent(Component.literal(textDecorators.getCategoryStartingChar()).setStyle(categoryStyle)).appendComponent(Component.literal(TranslationManager.translate(src, "helpful_commands.commandCategory.%s".formatted(entry.getKey().toString().toLowerCase()))).setStyle(categoryStyle));
+            textBuilder.appendNewline().appendComponent(Component.literal(textDecorators.getCategoryStartingChar()).setStyle(categoryStyle)).appendComponent(Component.literal(TranslationManager.translate(src, "helpful_commands.command_category.%s".formatted(entry.getKey().toString().toLowerCase()))).setStyle(categoryStyle));
             HelpfulCommandsCommand lastCommand = entry.getValue().getLast();
 
             for (HelpfulCommandsCommand command : entry.getValue()) {
@@ -401,7 +401,7 @@ public class HcCommand extends HelpfulCommandsCommand {
         textBuilder
                 .appendComponent(Component.literal("/" + commandName).setStyle(canUse ? textStyles.getAvailable() : textStyles.getUnavailable()))
                 .appendNewline()
-                .appendTranslatable("commands.helpful_commands." + commandName + ".description");
+                .appendTranslatable("commands.%s.description".formatted(commandName));
 
         if (canUse) {
             MutableComponent usagesText = Component.empty().setStyle(textStyles.getSubtle());
@@ -422,9 +422,9 @@ public class HcCommand extends HelpfulCommandsCommand {
             textBuilder
                     .appendNewline()
                     .appendNewline()
-                    .appendComponent(Component.literal(TranslationManager.translate(src,"commands.helpful_commands.hc.commandList.cantUse")).setStyle(textStyles.getUnavailable()))
+                    .appendComponent(Component.literal(TranslationManager.translate(src,"commands.helpful_commands.hc.commandList.cant_use")).setStyle(textStyles.getUnavailable()))
                     .appendWhitespace()
-                    .appendComponent(Component.literal(TranslationManager.translate(src, !enabled ? "error.helpful_commands.commandDisabled" : "error.helpful_commands.notPermitted").toLowerCase()).setStyle(textStyles.getUnavailable()));
+                    .appendComponent(Component.literal(TranslationManager.translate(src, !enabled ? "helpful_commands.error.command.disabled" : "helpful_commands.error.command.not_allowed").toLowerCase()).setStyle(textStyles.getUnavailable()));
         }
 
         return new HoverEvent.ShowText(textBuilder.getComponent());
@@ -436,7 +436,7 @@ public class HcCommand extends HelpfulCommandsCommand {
                 .appendComponent(Component.literal(TranslationManager.translate(source, "helpful_commands.common." + (currentState ? "enabled" : "disabled"))).setStyle(currentState ? textStyles.getEnabled() : textStyles.getDisabled()))
                 .appendNewline()
                 .appendNewline()
-                .appendTranslatable("commands.helpful_commands.hc.commandList.clickToToggleCommand", Component.literal(TranslationManager.translate(source, "commands.helpful_commands.hc.commandList.clickToToggleCommand." + String.valueOf(currentState).toLowerCase())), Component.literal("/" + commandName).setStyle(textStyles.getPrimary()));
+                .appendTranslatable("commands.helpful_commands.hc.commandList.click_to_toggle_command", Component.literal(TranslationManager.translate(source, "commands.helpful_commands.hc.commandList.click_to_toggle_command." + String.valueOf(currentState).toLowerCase())), Component.literal("/" + commandName).setStyle(textStyles.getPrimary()));
 
         return new HoverEvent.ShowText(textBuilder.getComponent());
     }
@@ -466,9 +466,9 @@ public class HcCommand extends HelpfulCommandsCommand {
                     .appendComponent(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.config.command.title")).setStyle(textStyles.getTertiary()))
                     .appendNewline()
                     .appendWhitespace()
-                    .appendTranslatable("commands.helpful_commands.hc.config.command.description", Component.literal("/hc config command").setStyle(textStyles.getSecondary().withClickEvent(new ClickEvent.SuggestCommand("/hc config command ")).withHoverEvent(new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "hover.helpful_commands.clickToPasteCommand"))))));
+                    .appendTranslatable("commands.helpful_commands.hc.config.command.description", Component.literal("/hc config command").setStyle(textStyles.getSecondary().withClickEvent(new ClickEvent.SuggestCommand("/hc config command ")).withHoverEvent(new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "helpful_commands.hover.click_to_paste_command"))))));
             if (isPlayer) {
-                Component commandListBtn = StylingUtil.getButton("\uD83D\uDCC3", Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.actions.commandList")), new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.hover.commandList"))), new ClickEvent.RunCommand("/hc commands"));
+                Component commandListBtn = StylingUtil.getButton("\uD83D\uDCC3", Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.actions.command_list")), new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.hover.command_list"))), new ClickEvent.RunCommand("/hc commands"));
                 textBuilder
                         .appendNewline()
                         .appendWhitespace()
@@ -496,7 +496,7 @@ public class HcCommand extends HelpfulCommandsCommand {
                         .appendComponent(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.config.field.title")).setStyle(textStyles.getTertiary()))
                         .appendNewline()
                         .appendWhitespace()
-                        .appendTranslatable("commands.helpful_commands.hc.config.field.description.use", Component.literal("/hc config field").setStyle(textStyles.getSecondary().withClickEvent(new ClickEvent.SuggestCommand("/hc config field ")).withHoverEvent(new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "hover.helpful_commands.clickToPasteCommand"))))))
+                        .appendTranslatable("commands.helpful_commands.hc.config.field.description.use", Component.literal("/hc config field").setStyle(textStyles.getSecondary().withClickEvent(new ClickEvent.SuggestCommand("/hc config field ")).withHoverEvent(new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "helpful_commands.hover.click_to_paste_command"))))))
                         .appendNewline()
                         .appendWhitespace()
                         .appendTranslatable("commands.helpful_commands.hc.config.field.description");
@@ -537,10 +537,10 @@ public class HcCommand extends HelpfulCommandsCommand {
             fieldNameTextBuilder
                     .appendComponent(Component.literal(name).setStyle(textStyles.getTertiary()))
                     .appendNewline()
-                    .appendLiteral(TranslationManager.translate(src, "%s.configField.%s".formatted(HelpfulCommands.MOD_ID, name)))
+                    .appendLiteral(TranslationManager.translate(src, "%s.config_field.%s.description".formatted(HelpfulCommands.MOD_ID, name)))
                     .appendNewline()
                     .appendNewline()
-                    .appendComponent(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.config.field.defaultValue")).setStyle(textStyles.getSubtle()))
+                    .appendComponent(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.config.field.default_value")).setStyle(textStyles.getSubtle()))
                     .appendWhitespace()
                     .appendComponent(Component.literal(String.valueOf(properties.getDefaultValue())).setStyle(textStyles.getPrimary()));
             Component fieldNameComponent = Component.literal(name).setStyle(textStyles.getTertiary().withHoverEvent(new HoverEvent.ShowText(fieldNameTextBuilder.getComponent())));
@@ -553,11 +553,11 @@ public class HcCommand extends HelpfulCommandsCommand {
                     .appendComponent(Component.literal(String.valueOf(value)).setStyle(textStyles.getPrimary()));
 
             if (isPlayer) {
-                HoverEvent editBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "hover.helpful_commands.clickToEdit")));
+                HoverEvent editBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "helpful_commands.hover.click_to_edit")));
                 ClickEvent editBtnClickEvent = new ClickEvent.SuggestCommand("/hc config field %s set ".formatted(name));
                 Style editBtnStyle = textStyles.getTertiary().withHoverEvent(editBtnHoverEvent).withClickEvent(editBtnClickEvent);
 
-                HoverEvent resetBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.config.field.hover.clickToReset")));
+                HoverEvent resetBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.config.field.hover.click_to_reset")));
                 ClickEvent resetBtnClickEvent = new ClickEvent.RunCommand("/hc config field %s reset".formatted(name));
                 Style resetBtnStyle = textStyles.getDangerousAction().withHoverEvent(resetBtnHoverEvent).withClickEvent(resetBtnClickEvent);
 
@@ -574,12 +574,12 @@ public class HcCommand extends HelpfulCommandsCommand {
 
                 TextBuilder metaTextBuilder = new TextBuilder(src);
                 metaTextBuilder
-                        .appendComponent(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.config.field.lpMeta")).setStyle(lpStyle))
+                        .appendComponent(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.config.field.lp_meta")).setStyle(lpStyle))
                         .appendNewline()
-                        .appendTranslatable("commands.helpful_commands.hc.config.field.lpMeta.permissionID", Component.literal(metaPermId).setStyle(textStyles.getPrimary()))
+                        .appendTranslatable("commands.helpful_commands.hc.config.field.lp_meta.permission_id", Component.literal(metaPermId).setStyle(textStyles.getPrimary()))
                         .appendNewline()
                         .appendNewline()
-                        .appendComponent(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.config.field.lpMeta.fallback")).setStyle(textStyles.getSubtle()));
+                        .appendComponent(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.config.field.lp_meta.fallback")).setStyle(textStyles.getSubtle()));
                 HoverEvent metaBtnHoverEvent = new HoverEvent.ShowText(metaTextBuilder.getComponent());
 
                 ClickEvent metaBtnClickEvent = new ClickEvent.CopyToClipboard(metaPermId);

@@ -16,26 +16,27 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 
 public abstract class HelpfulCommandsCommand {
-    protected static final DynamicCommandExceptionType NO_ITEMS_FOUND = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("error.helpful_commands.noItemsFound").getComponent()
-    );
-    protected static final DynamicCommandExceptionType EMPTY_ITEM_STACK_MAIN_HAND = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("error.helpful_commands.emptyItemStack.mainHand").getComponent()
-    );
-    protected static final Dynamic2CommandExceptionType UNKNOWN_DIMENSION = new Dynamic2CommandExceptionType((src, dimensionName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("error.helpful_commands.unknownDimension", Component.literal(dimensionName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
-    );
     protected static final DynamicCommandExceptionType TARGET_MUST_BE_OTHER_PLAYER = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("error.helpful_commands.targetMustBeOtherPlayer").getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("helpful_commands.error.target_must_be_other_player").getComponent()
+    );
+    protected static final DynamicCommandExceptionType NO_ITEMS_FOUND = new DynamicCommandExceptionType(src ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("helpful_commands.error.no_items_found").getComponent()
     );
     protected static final DynamicCommandExceptionType FAILED_TO_TELEPORT = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("error.helpful_commands.failedToTeleport").getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("helpful_commands.error.failed_to_teleport").getComponent()
+    );
+    protected static final DynamicCommandExceptionType EMPTY_ITEM_STACK_MAIN_HAND = new DynamicCommandExceptionType(src ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("helpful_commands.error.empty_item_stack.main_hand").getComponent()
+    );
+
+    protected static final Dynamic2CommandExceptionType PLAYER_DATA_NOT_FOUND = new Dynamic2CommandExceptionType((src, playerName) ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("helpful_commands.error.player_data_not_found", Component.literal(playerName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+    );
+    protected static final Dynamic2CommandExceptionType UNKNOWN_DIMENSION = new Dynamic2CommandExceptionType((src, dimensionName) ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("helpful_commands.error.unknown_dimension", Component.literal(dimensionName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
     protected static final Dynamic2CommandExceptionType ON_COOLDOWN_TELEPORT = new Dynamic2CommandExceptionType((src, remaining) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("error.helpful_commands.onCooldown.teleport", StylingUtil.formatDuration((long) remaining, (CommandSourceStack) src)).getComponent()
-    );
-    protected static final Dynamic2CommandExceptionType PLAYER_DATA_NOT_FOUND = new Dynamic2CommandExceptionType((src, playerName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("error.helpful_commands.playerDataNotFound", Component.literal(playerName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("helpful_commands.error.on_cooldown.teleport", StylingUtil.formatDuration((long) remaining, (CommandSourceStack) src)).getComponent()
     );
 
     private final ModCommandManager.ModCommand modCommand;

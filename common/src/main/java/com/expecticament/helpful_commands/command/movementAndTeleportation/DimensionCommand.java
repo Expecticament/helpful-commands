@@ -34,7 +34,7 @@ import java.util.List;
 
 public class DimensionCommand extends HelpfulCommandsCommand {
     private static final Dynamic2CommandExceptionType ALREADY_IN_DIMENSION = new Dynamic2CommandExceptionType((src, dimensionName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.dimension.error.alreadyInDimension", Component.literal(dimensionName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.dimension.error.already_in_dimension", Component.literal(dimensionName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
 
     public DimensionCommand(ModCommandManager.ModCommand modCommand) {

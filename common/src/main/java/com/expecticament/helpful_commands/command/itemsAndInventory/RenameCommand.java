@@ -30,10 +30,10 @@ import java.util.Map;
 
 public class RenameCommand extends HelpfulCommandsCommand {
     private static final DynamicCommandExceptionType SAME_NAME_PROVIDED = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.rename.error.sameNameProvided").getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.rename.error.same_name_provided").getComponent()
     );
     private static final DynamicCommandExceptionType NO_CUSTOM_NAME = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.rename.error.noCustomName").getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.rename.error.no_custom_name").getComponent()
     );
 
     public RenameCommand(ModCommandManager.ModCommand modCommand) {

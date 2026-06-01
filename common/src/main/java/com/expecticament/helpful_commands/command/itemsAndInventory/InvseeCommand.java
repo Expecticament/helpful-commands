@@ -106,7 +106,7 @@ public class InvseeCommand extends HelpfulCommandsCommand {
 
     private void openOnlineInventory(CommandSourceStack src, ServerPlayer viewer, ServerPlayer onlinePlayer) {
         TextBuilder screenTitleTextBuilder = new TextBuilder(src);
-        screenTitleTextBuilder.appendTranslatable("commands.helpful_commands.invsee.screenTitle", Component.literal(onlinePlayer.getName().getString()));
+        screenTitleTextBuilder.appendTranslatable("commands.helpful_commands.invsee.screen_title", Component.literal(onlinePlayer.getName().getString()));
         viewer.openMenu(new SimpleMenuProvider((syncId, inv, player) -> new OnlineInvseeMenu(syncId, inv, onlinePlayer), screenTitleTextBuilder.getComponent()));
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
@@ -159,7 +159,7 @@ public class InvseeCommand extends HelpfulCommandsCommand {
         MinecraftServer server = src.getServer();
 
         TextBuilder screenTitleTextBuilder = new TextBuilder(src);
-        screenTitleTextBuilder.appendTranslatable("commands.helpful_commands.invsee.screenTitle", Component.literal(targetName), Component.literal(TranslationManager.translate(src, "helpful_commands.common.offline")));
+        screenTitleTextBuilder.appendTranslatable("commands.helpful_commands.invsee.screen_title", Component.literal(targetName), Component.literal(TranslationManager.translate(src, "helpful_commands.common.offline")));
         viewer.openMenu(new SimpleMenuProvider((syncId, viewerInv, player) -> new OfflineInvseeMenu(syncId, viewerInv, offlineInv, updatedInv -> saveOfflineInventory(server, targetUUID, playerData, updatedInv, ops)), screenTitleTextBuilder.getComponent()));
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
@@ -389,7 +389,7 @@ public class InvseeCommand extends HelpfulCommandsCommand {
             super(inventory, index, x, y);
 
             ItemStack itemStack = new ItemStack(Items.BARRIER);
-            itemStack.set(DataComponents.CUSTOM_NAME, Component.literal(TranslationManager.translate((ServerPlayer) inventory.player, "commands.helpful_commands.invsee.emptySlot")).setStyle(Style.EMPTY.withColor(ChatFormatting.RED)));
+            itemStack.set(DataComponents.CUSTOM_NAME, Component.literal(TranslationManager.translate((ServerPlayer) inventory.player, "commands.helpful_commands.invsee.empty_slot")).setStyle(Style.EMPTY.withColor(ChatFormatting.RED)));
 
             set(itemStack);
         }
@@ -410,8 +410,8 @@ public class InvseeCommand extends HelpfulCommandsCommand {
             super(inventory, index, x, y);
 
             ItemStack itemStack = new ItemStack(Items.ENCHANTED_BOOK);
-            itemStack.set(DataComponents.CUSTOM_NAME, Component.literal(TranslationManager.translate((ServerPlayer) inventory.player, "commands.helpful_commands.invsee.infoSlot.name")));
-            itemStack.set(DataComponents.LORE, new ItemLore(List.of(Component.literal(TranslationManager.translate((ServerPlayer) inventory.player, "commands.helpful_commands.invsee.infoSlot.lore")))));
+            itemStack.set(DataComponents.CUSTOM_NAME, Component.literal(TranslationManager.translate((ServerPlayer) inventory.player, "commands.helpful_commands.invsee.info_slot.name")));
+            itemStack.set(DataComponents.LORE, new ItemLore(List.of(Component.literal(TranslationManager.translate((ServerPlayer) inventory.player, "commands.helpful_commands.invsee.info_slot.lore")))));
 
             set(itemStack);
         }

@@ -117,7 +117,7 @@ public class EchestCommand extends HelpfulCommandsCommand {
         Component screenTitle = Component.translatable("container.enderchest");
         if (viewer != onlinePlayer) {
             TextBuilder screenTitleTextBuilder = new TextBuilder(src);
-            screenTitleTextBuilder.appendTranslatable("commands.helpful_commands.echest.screenTitle", Component.literal(onlinePlayer.getName().getString()));
+            screenTitleTextBuilder.appendTranslatable("commands.helpful_commands.echest.screen_title", Component.literal(onlinePlayer.getName().getString()));
             screenTitle = screenTitleTextBuilder.getComponent();
         }
         viewer.openMenu(new SimpleMenuProvider((syncId, inv, player) -> new OnlineEchestMenu(syncId, inv, onlinePlayer), screenTitle));
@@ -157,7 +157,7 @@ public class EchestCommand extends HelpfulCommandsCommand {
         MinecraftServer server = src.getServer();
 
         TextBuilder screenTitleTextBuilder = new TextBuilder(src);
-        screenTitleTextBuilder.appendTranslatable("commands.helpful_commands.echest.screenTitle", Component.literal(targetName), Component.literal(TranslationManager.translate(src, "helpful_commands.common.offline")));
+        screenTitleTextBuilder.appendTranslatable("commands.helpful_commands.echest.screen_title", Component.literal(targetName), Component.literal(TranslationManager.translate(src, "helpful_commands.common.offline")));
         viewer.openMenu(new SimpleMenuProvider((syncId, viewerInv, player) -> new OfflineEchestMenu(syncId, viewerInv, offlineInv, updatedInv -> saveOfflineInventory(server, targetUUID, playerData, updatedInv, ops)), screenTitleTextBuilder.getComponent()));
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();

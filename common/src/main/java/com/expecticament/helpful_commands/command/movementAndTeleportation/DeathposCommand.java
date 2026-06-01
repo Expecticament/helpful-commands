@@ -30,10 +30,10 @@ import java.util.Optional;
 
 public class DeathposCommand extends HelpfulCommandsCommand {
     private static final DynamicCommandExceptionType NO_DEATH_POS = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.deathpos.error.noDeathPos.self").getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.deathpos.error.no_death_pos.self").getComponent()
     );
     private static final Dynamic2CommandExceptionType NO_DEATH_POS_OTHER = new Dynamic2CommandExceptionType((src, otherPlayer) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.deathpos.error.noDeathPos.other", StylingUtil.getAffectedEntityNameText((ServerPlayer) otherPlayer)).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.deathpos.error.no_death_pos.other", StylingUtil.getAffectedEntityNameText((ServerPlayer) otherPlayer)).getComponent()
     );
 
     public DeathposCommand(ModCommandManager.ModCommand modCommand) {

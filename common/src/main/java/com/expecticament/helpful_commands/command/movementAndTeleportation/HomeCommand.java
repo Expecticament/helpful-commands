@@ -29,16 +29,16 @@ import net.minecraft.world.entity.Relative;
 
 public class HomeCommand extends HelpfulCommandsCommand {
     private static final Dynamic2CommandExceptionType HOME_DOESNT_EXIST = new Dynamic2CommandExceptionType((src, homeName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.error.homeDoesntExist", Component.literal(homeName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.error.home_doesnt_exist", Component.literal(homeName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
     private static final Dynamic2CommandExceptionType HOME_ALREADY_EXISTS = new Dynamic2CommandExceptionType((src, homeName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.error.homeAlreadyExists", Component.literal(homeName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.error.home_already_exists", Component.literal(homeName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
     private static final DynamicCommandExceptionType HOME_LIMIT_EXCEEDED = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.add.error.homeLimitExceeded").getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.add.error.home_limit_exceeded").getComponent()
     );
     private static final Dynamic2CommandExceptionType SAME_HOME_NAME_PROVIDED = new Dynamic2CommandExceptionType((src, homeName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.edit.name.error.sameHomeNameProvided", Component.literal(homeName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.edit.name.error.same_home_name_provided", Component.literal(homeName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
 
     public HomeCommand(ModCommandManager.ModCommand modCommand) {
@@ -266,14 +266,14 @@ public class HomeCommand extends HelpfulCommandsCommand {
                         .appendNewline();
 
                 if (canTp) {
-                    HoverEvent tpBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(sourcePlayer, "hover.helpful_commands.clickToTeleport")));
+                    HoverEvent tpBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(sourcePlayer, "helpful_commands.hover.click_to_teleport")));
                     ClickEvent tpBtnClickEvent = new ClickEvent.RunCommand("/home tp " + homeName);
                     Style tpBtnStyle = textStyles.getSecondary().withHoverEvent(tpBtnHoverEvent).withClickEvent(tpBtnClickEvent);
                     textBuilder.appendComponent(StylingUtil.getButton(textDecorators.getTeleport(), Component.literal(TranslationManager.translate(src, "helpful_commands.common.teleport")), tpBtnStyle));
                 }
 
                 if (canEdit) {
-                    HoverEvent editBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(sourcePlayer, "hover.helpful_commands.clickToEdit")));
+                    HoverEvent editBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(sourcePlayer, "helpful_commands.hover.click_to_edit")));
                     ClickEvent editBtnClickEvent = new ClickEvent.SuggestCommand("/home edit " + homeName + " ");
                     Style editBtnStyle = textStyles.getTertiary().withHoverEvent(editBtnHoverEvent).withClickEvent(editBtnClickEvent);
                     if (canTp) {
@@ -283,7 +283,7 @@ public class HomeCommand extends HelpfulCommandsCommand {
                 }
 
                 if (canRemove) {
-                    HoverEvent removeBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(sourcePlayer, "hover.helpful_commands.clickToRemove")));
+                    HoverEvent removeBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(sourcePlayer, "helpful_commands.hover.click_to_remove")));
                     ClickEvent removeBtnClickEvent = new ClickEvent.RunCommand("/home remove " + homeName);
                     Style removeBtnStyle = textStyles.getDangerousAction().withHoverEvent(removeBtnHoverEvent).withClickEvent(removeBtnClickEvent);
                     if (canTp || canEdit) {

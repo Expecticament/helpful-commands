@@ -29,10 +29,10 @@ import java.util.Map;
 
 public class RepairCommand extends HelpfulCommandsCommand {
     private static final DynamicCommandExceptionType ITEM_NOT_DAMAGEABLE = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.repair.error.itemNotDamageable").getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.repair.error.item_not_damageable").getComponent()
     );
     private static final DynamicCommandExceptionType ITEM_NOT_DAMAGED = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.repair.error.itemNotDamaged").getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.repair.error.item_not_damaged").getComponent()
     );
 
     public RepairCommand(ModCommandManager.ModCommand modCommand) {

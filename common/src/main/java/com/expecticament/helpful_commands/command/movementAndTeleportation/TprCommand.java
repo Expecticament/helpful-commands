@@ -30,22 +30,22 @@ import java.util.List;
 
 public class TprCommand extends HelpfulCommandsCommand {
     private static final Dynamic2CommandExceptionType TARGET_CANT_ACCEPT_REQUESTS = new Dynamic2CommandExceptionType((src, targetPlayer) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.request.error.targetCantAcceptRequests", StylingUtil.getAffectedEntityNameText((ServerPlayer) targetPlayer)).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.request.error.target_cant_accept_requests", StylingUtil.getAffectedEntityNameText((ServerPlayer) targetPlayer)).getComponent()
     );
     private static final Dynamic2CommandExceptionType ON_COOLDOWN = new Dynamic2CommandExceptionType((src, remaining) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.request.error.onCooldown", StylingUtil.formatDuration((long) remaining, (CommandSourceStack) src)).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.request.error.on_cooldown", StylingUtil.formatDuration((long) remaining, (CommandSourceStack) src)).getComponent()
     );
     private static final DynamicCommandExceptionType PENDING_REQUEST_EXISTS = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.request.error.pendingRequestExists").getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.request.error.pending_request_exists").getComponent()
     );
     private static final DynamicCommandExceptionType NO_PENDING_REQUEST = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.cancel.error.noPendingRequest").getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.cancel.error.no_pending_request").getComponent()
     );
     private static final Dynamic2CommandExceptionType NO_PENDING_INCOMING_REQUEST = new Dynamic2CommandExceptionType((src, otherPlayer) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.error.noPendingIncomingRequest", StylingUtil.getAffectedEntityNameText((ServerPlayer) otherPlayer)).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.error.no_pending_incoming_request", StylingUtil.getAffectedEntityNameText((ServerPlayer) otherPlayer)).getComponent()
     );
     private static final DynamicCommandExceptionType FAILED_TO_TELEPORT = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.accept.error.failedToTeleport").getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.accept.error.failed_to_teleport").getComponent()
     );
 
     public TprCommand(ModCommandManager.ModCommand modCommand) {
