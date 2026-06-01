@@ -1,6 +1,9 @@
 package com.expecticament.helpful_commands.command.movementAndTeleportation;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
+import com.expecticament.helpful_commands.manager.home.Home;
+import com.expecticament.helpful_commands.manager.home.HomeException;
+import com.expecticament.helpful_commands.manager.home.HomeManager;
 import com.expecticament.helpful_commands.util.PermissionsUtil;
 import com.expecticament.helpful_commands.util.ServerLevelUtil;
 import com.expecticament.helpful_commands.util.StylingUtil;
@@ -115,7 +118,7 @@ public class HomeCommand extends HelpfulCommandsCommand {
         }
 
         try {
-            HomeManager.Home home = HomeManager.getHome(sourcePlayer, homeName);
+            Home home = HomeManager.getHome(sourcePlayer, homeName);
             try {
                 ServerLevel level = ServerLevelUtil.getLevel(home.dimension);
                 sourcePlayer.teleportTo(level, home.x, home.y, home.z, Relative.DELTA, sourcePlayer.getYRot(), sourcePlayer.getXRot(), false);
@@ -130,7 +133,7 @@ public class HomeCommand extends HelpfulCommandsCommand {
             } catch (ServerLevelUtil.UnknownServerLevelException e) {
                 throw UNKNOWN_DIMENSION.create(src, home.dimension);
             }
-        } catch (HomeManager.HomeDoesntExistException e) {
+        } catch (HomeException.DoesntExist e) {
             throw HOME_DOESNT_EXIST.create(src, homeName);
         }
 
@@ -145,16 +148,16 @@ public class HomeCommand extends HelpfulCommandsCommand {
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
         try {
-            HomeManager.addHome(sourcePlayer, homeName);
+            HomeManager.createHome(sourcePlayer, homeName);
 
             TextBuilder textBuilder = new TextBuilder(sourcePlayer);
             textBuilder.appendTranslatable("commands.helpful_commands.home.add", Component.literal(homeName).setStyle(textStyles.getPrimary()));
             textBuilder.setStyle(textStyles.getSuccess());
 
             src.sendSuccess(textBuilder::getComponent, true);
-        } catch (HomeManager.HomeAlreadyExistsException e) {
+        } catch (HomeException.AlreadyExists e) {
             throw HOME_ALREADY_EXISTS.create(src, homeName);
-        } catch (HomeManager.HomeLimitExceededException e) {
+        } catch (HomeException.LimitReached e) {
             throw HOME_LIMIT_EXCEEDED.create(src);
         }
 
@@ -176,7 +179,7 @@ public class HomeCommand extends HelpfulCommandsCommand {
             textBuilder.setStyle(textStyles.getSuccess());
 
             src.sendSuccess(textBuilder::getComponent, true);
-        } catch (HomeManager.HomeDoesntExistException e) {
+        } catch (HomeException.DoesntExist e) {
             throw HOME_DOESNT_EXIST.create(src, homeName);
         }
 
@@ -191,18 +194,18 @@ public class HomeCommand extends HelpfulCommandsCommand {
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
         try {
-            HomeManager.editHomeName(sourcePlayer, homeName, newName);
+            HomeManager.setHomeName(sourcePlayer, homeName, newName);
 
             TextBuilder textBuilder = new TextBuilder(sourcePlayer);
             textBuilder.appendTranslatable("commands.helpful_commands.home.edit.name", Component.literal(homeName).setStyle(textStyles.getPrimary()), Component.literal(newName).setStyle(textStyles.getPrimary()));
             textBuilder.setStyle(textStyles.getSuccess());
 
             src.sendSuccess(textBuilder::getComponent, true);
-        } catch (HomeManager.HomeDoesntExistException e) {
+        } catch (HomeException.DoesntExist e) {
             throw HOME_DOESNT_EXIST.create(src, homeName);
-        } catch (HomeManager.SameHomeNameProvidedException e) {
+        } catch (HomeException.SameName e) {
             throw SAME_HOME_NAME_PROVIDED.create(src, newName);
-        } catch (HomeManager.HomeAlreadyExistsException e) {
+        } catch (HomeException.AlreadyExists e) {
             throw HOME_ALREADY_EXISTS.create(src, newName);
         }
 
@@ -217,14 +220,14 @@ public class HomeCommand extends HelpfulCommandsCommand {
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
         try {
-            HomeManager.editHomeLocation(sourcePlayer, homeName, sourcePlayer.position(), sourcePlayer.level());
+            HomeManager.setHomeLocation(sourcePlayer, homeName, sourcePlayer.position(), sourcePlayer.level());
 
             TextBuilder textBuilder = new TextBuilder(sourcePlayer);
             textBuilder.appendTranslatable("commands.helpful_commands.home.edit.location", Component.literal(homeName).setStyle(textStyles.getPrimary()));
             textBuilder.setStyle(textStyles.getSuccess());
 
             src.sendSuccess(textBuilder::getComponent, true);
-        } catch (HomeManager.HomeDoesntExistException e) {
+        } catch (HomeException.DoesntExist e) {
             throw HOME_DOESNT_EXIST.create(src, homeName);
         }
 
@@ -240,7 +243,7 @@ public class HomeCommand extends HelpfulCommandsCommand {
         HelpfulCommandsStyle.TextDecorators textDecorators = StylingManager.getCurrentStyle().getTextDecorators();
 
         try {
-            HomeManager.Home home = HomeManager.getHome(sourcePlayer, homeName);
+            Home home = HomeManager.getHome(sourcePlayer, homeName);
             TextBuilder textBuilder = new TextBuilder(sourcePlayer);
 
             textBuilder
@@ -294,7 +297,7 @@ public class HomeCommand extends HelpfulCommandsCommand {
             }
 
             src.sendSystemMessage(textBuilder.getComponent());
-        } catch (HomeManager.HomeDoesntExistException e) {
+        } catch (HomeException.DoesntExist e) {
             throw HOME_DOESNT_EXIST.create(src, homeName);
         }
 

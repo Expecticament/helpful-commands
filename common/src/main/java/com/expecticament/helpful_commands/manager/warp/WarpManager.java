@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Manages server warps (named locations players can teleport to).
+ * Manages server warps.
  *
  * <p>All mutating methods update an in-memory buffer. {@link #flush()}
  * writes the current memory buffer to disk.</p>
@@ -91,7 +91,7 @@ public class WarpManager {
      */
     public static void createWarp(String name, String description, Position position, ServerLevel level) throws WarpException.AlreadyExists {
         WarpsData data = getData();
-        if (data.entries.putIfAbsent(name, new Warp(description, position, level)) != null){
+        if (data.entries.putIfAbsent(name, new Warp(description, position, level)) != null) {
             throw new WarpException.AlreadyExists(name);
         }
         io.updateBuffer(data);
@@ -105,7 +105,7 @@ public class WarpManager {
      */
     public static void removeWarp(String name) throws WarpException.DoesntExist {
         WarpsData data = getData();
-        if (data.entries.remove(name) == null){
+        if (data.entries.remove(name) == null) {
             throw new WarpException.DoesntExist(name);
         }
         io.updateBuffer(data);
