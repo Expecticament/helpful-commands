@@ -43,19 +43,19 @@ import java.util.Objects;
 
 public class WarpCommand extends HelpfulCommandsCommand {
     private static final Dynamic2CommandExceptionType WARP_DOESNT_EXIST = new Dynamic2CommandExceptionType((src, warpName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.warp_doesnt_exist", Component.literal(warpName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.doesnt_exist", Component.literal(warpName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
     private static final Dynamic2CommandExceptionType WARP_ALREADY_EXISTS = new Dynamic2CommandExceptionType((src, warpName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.warp_already_exists", Component.literal(warpName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.already_exists", Component.literal(warpName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
     private static final Dynamic2CommandExceptionType SAME_WARP_NAME_PROVIDED = new Dynamic2CommandExceptionType((src, warpName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.edit.name.error.same_warp_name_provided", Component.literal(warpName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.edit.name.error.same_name", Component.literal(warpName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
     private static final DynamicCommandExceptionType NO_POSITION_PROVIDED = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.no_position_provided").getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.no_position").getComponent()
     );
     private static final DynamicCommandExceptionType NO_DIMENSION_PROVIDED = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.no_dimension_provided").getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.no_dimension").getComponent()
     );
 
     public WarpCommand(ModCommandManager.ModCommand modCommand) {
@@ -212,7 +212,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
         } else if (self) {
             textBuilder.appendTranslatable("commands.helpful_commands.warp.teleport.self", warpNameText);
         } else {
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.teleport.others", StylingUtil.getAffectedEntityNameText(affected.getFirst()), warpNameText);
+            textBuilder.appendTranslatable("commands.helpful_commands.warp.teleport.other", StylingUtil.getAffectedEntityNameText(affected.getFirst()), warpNameText);
         }
 
         textBuilder.setStyle(textStyles.getSuccess());

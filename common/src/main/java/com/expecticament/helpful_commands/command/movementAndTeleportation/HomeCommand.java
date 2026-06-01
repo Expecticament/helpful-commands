@@ -32,16 +32,16 @@ import net.minecraft.world.entity.Relative;
 
 public class HomeCommand extends HelpfulCommandsCommand {
     private static final Dynamic2CommandExceptionType HOME_DOESNT_EXIST = new Dynamic2CommandExceptionType((src, homeName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.error.home_doesnt_exist", Component.literal(homeName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.error.doesnt_exist", Component.literal(homeName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
     private static final Dynamic2CommandExceptionType HOME_ALREADY_EXISTS = new Dynamic2CommandExceptionType((src, homeName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.error.home_already_exists", Component.literal(homeName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.error.already_exists", Component.literal(homeName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
-    private static final DynamicCommandExceptionType HOME_LIMIT_EXCEEDED = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.add.error.home_limit_exceeded").getComponent()
+    private static final DynamicCommandExceptionType HOME_LIMIT_REACHED = new DynamicCommandExceptionType(src ->
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.add.error.limit_reached").getComponent()
     );
     private static final Dynamic2CommandExceptionType SAME_HOME_NAME_PROVIDED = new Dynamic2CommandExceptionType((src, homeName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.edit.name.error.same_home_name_provided", Component.literal(homeName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.edit.name.error.same_name", Component.literal(homeName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
     );
 
     public HomeCommand(ModCommandManager.ModCommand modCommand) {
@@ -158,7 +158,7 @@ public class HomeCommand extends HelpfulCommandsCommand {
         } catch (HomeException.AlreadyExists e) {
             throw HOME_ALREADY_EXISTS.create(src, homeName);
         } catch (HomeException.LimitReached e) {
-            throw HOME_LIMIT_EXCEEDED.create(src);
+            throw HOME_LIMIT_REACHED.create(src);
         }
 
         return Command.SINGLE_SUCCESS;

@@ -145,9 +145,16 @@ public class WarpManager {
      * @throws WarpException.DoesntExist if no warp with that name exists
      */
     public static void setWarpDescription(String name, String newDescription) throws WarpException.DoesntExist {
-        Warp warp = getWarp(name);
+        WarpsData data = getData();
+        Warp warp = data.entries.get(name);
+
+        if (warp == null){
+            throw new WarpException.DoesntExist(name);
+        }
+
         warp.description = newDescription;
-        io.updateBuffer(getData());
+
+        io.updateBuffer(data);
     }
 
     /**
@@ -159,12 +166,19 @@ public class WarpManager {
      * @throws WarpException.DoesntExist if no warp with that name exists
      */
     public static void setWarpLocation(String name, Position newPosition, ServerLevel newLevel) throws WarpException.DoesntExist {
-        Warp warp = getWarp(name);
+        WarpsData data = getData();
+        Warp warp = data.entries.get(name);
+
+        if (warp == null){
+            throw new WarpException.DoesntExist(name);
+        }
+
         warp.x = newPosition.x();
         warp.y = newPosition.y();
         warp.z = newPosition.z();
         warp.dimension = ServerLevelUtil.getLevelLocation(newLevel);
-        io.updateBuffer(getData());
+
+        io.updateBuffer(data);
     }
 
     private static WarpsData getData() {
