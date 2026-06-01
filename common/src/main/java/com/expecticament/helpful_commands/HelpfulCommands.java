@@ -1,5 +1,6 @@
 package com.expecticament.helpful_commands;
 
+import com.expecticament.helpful_commands.manager.warp.WarpManager;
 import com.expecticament.helpful_commands.util.ServerLevelUtil;
 import com.expecticament.helpful_commands.manager.*;
 import net.minecraft.server.MinecraftServer;
@@ -63,7 +64,7 @@ public final class HelpfulCommands {
     public static void save(MinecraftServer minecraftServer) {
         ConfigManager.writeToDisk();
         HomeManager.writeToDisk();
-        WarpManager.writeToDisk();
+        WarpManager.flush();
         CooldownManager.removeExpired();
         CooldownManager.writeToDisk();
     }

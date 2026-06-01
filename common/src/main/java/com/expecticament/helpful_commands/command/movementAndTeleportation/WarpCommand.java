@@ -1,6 +1,8 @@
 package com.expecticament.helpful_commands.command.movementAndTeleportation;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
+import com.expecticament.helpful_commands.manager.warp.Warp;
+import com.expecticament.helpful_commands.manager.warp.WarpException;
 import com.expecticament.helpful_commands.util.GameRulesUtil;
 import com.expecticament.helpful_commands.util.PermissionsUtil;
 import com.expecticament.helpful_commands.util.ServerLevelUtil;
@@ -9,7 +11,7 @@ import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
 import com.expecticament.helpful_commands.manager.TranslationManager;
 import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
-import com.expecticament.helpful_commands.manager.WarpManager;
+import com.expecticament.helpful_commands.manager.warp.WarpManager;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
 import com.expecticament.helpful_commands.suggestionProvider.WarpDescriptionSuggestionProvider;
@@ -164,7 +166,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
         try {
-            WarpManager.Warp warp = WarpManager.getWarp(warpName);
+            Warp warp = WarpManager.getWarp(warpName);
             try {
                 ServerLevel dimension = ServerLevelUtil.getLevel(warp.dimension);
 
@@ -194,7 +196,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
             } catch (ServerLevelUtil.UnknownServerLevelException e) {
                 throw UNKNOWN_DIMENSION.create(src, warp.dimension);
             }
-        } catch (WarpManager.WarpDoesntExistException e) {
+        } catch (WarpException.DoesntExist e) {
             throw WARP_DOESNT_EXIST.create(src, warpName);
         }
     }
@@ -254,11 +256,11 @@ public class WarpCommand extends HelpfulCommandsCommand {
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
         try {
-            WarpManager.addWarp(warpName, warpDescription, position, serverLevel);
+            WarpManager.createWarp(warpName, warpDescription, position, serverLevel);
             TextBuilder textBuilder = new TextBuilder(src);
             textBuilder.appendTranslatable("commands.helpful_commands.warp.add", Component.literal(warpName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
             src.sendSuccess(textBuilder::getComponent, true);
-        } catch (WarpManager.WarpAlreadyExistsException e) {
+        } catch (WarpException.AlreadyExists e) {
             throw WARP_ALREADY_EXISTS.create(src, warpName);
         }
 
@@ -277,7 +279,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
             TextBuilder textBuilder = new TextBuilder(src);
             textBuilder.appendTranslatable("commands.helpful_commands.warp.remove", Component.literal(warpName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
             src.sendSuccess(textBuilder::getComponent, true);
-        } catch (WarpManager.WarpDoesntExistException e) {
+        } catch (WarpException.DoesntExist e) {
             throw WARP_DOESNT_EXIST.create(src, warpName);
         }
 
@@ -292,15 +294,15 @@ public class WarpCommand extends HelpfulCommandsCommand {
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
         try {
-            WarpManager.editWarpName(warpName, newName);
+            WarpManager.setWarpName(warpName, newName);
             TextBuilder textBuilder = new TextBuilder(src);
             textBuilder.appendTranslatable("commands.helpful_commands.warp.edit.name", Component.literal(warpName).setStyle(textStyles.getPrimary()), Component.literal(newName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
             src.sendSuccess(textBuilder::getComponent, true);
-        } catch (WarpManager.WarpDoesntExistException e) {
+        } catch (WarpException.DoesntExist e) {
             throw WARP_DOESNT_EXIST.create(src, warpName);
-        } catch (WarpManager.SameWarpNameProvided e) {
+        } catch (WarpException.SameName e) {
             throw SAME_WARP_NAME_PROVIDED.create(src, newName);
-        } catch (WarpManager.WarpAlreadyExistsException e) {
+        } catch (WarpException.AlreadyExists e) {
             throw WARP_ALREADY_EXISTS.create(src, newName);
         }
 
@@ -315,11 +317,11 @@ public class WarpCommand extends HelpfulCommandsCommand {
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
         try {
-            WarpManager.editWarpDescription(warpName, newDescription);
+            WarpManager.setWarpDescription(warpName, newDescription);
             TextBuilder textBuilder = new TextBuilder(src);
             textBuilder.appendTranslatable("commands.helpful_commands.warp.edit.description", Component.literal(warpName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
             src.sendSuccess(textBuilder::getComponent, true);
-        } catch (WarpManager.WarpDoesntExistException e) {
+        } catch (WarpException.DoesntExist e) {
             throw WARP_DOESNT_EXIST.create(src, warpName);
         }
 
@@ -358,11 +360,11 @@ public class WarpCommand extends HelpfulCommandsCommand {
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
         try {
-            WarpManager.editWarpLocation(warpName, newPosition, newServerLevel);
+            WarpManager.setWarpLocation(warpName, newPosition, newServerLevel);
             TextBuilder textBuilder = new TextBuilder(src);
             textBuilder.appendTranslatable("commands.helpful_commands.warp.edit.location", Component.literal(warpName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
             src.sendSuccess(textBuilder::getComponent, true);
-        } catch (WarpManager.WarpDoesntExistException e) {
+        } catch (WarpException.DoesntExist e) {
             throw WARP_DOESNT_EXIST.create(src, warpName);
         }
 
@@ -378,7 +380,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
         HelpfulCommandsStyle.TextDecorators textDecorators = StylingManager.getCurrentStyle().getTextDecorators();
 
         try{
-            WarpManager.Warp warp = WarpManager.getWarp(warpName);
+            Warp warp = WarpManager.getWarp(warpName);
             TextBuilder textBuilder = new TextBuilder(src);
 
             Component bulletPointComponent = Component.literal(textDecorators.getBulletPoint()).setStyle(textStyles.getTertiary());
@@ -451,7 +453,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
             }
 
             src.sendSystemMessage(textBuilder.getComponent());
-        } catch (WarpManager.WarpDoesntExistException e) {
+        } catch (WarpException.DoesntExist e) {
             throw WARP_DOESNT_EXIST.create(src, warpName);
         }
 
