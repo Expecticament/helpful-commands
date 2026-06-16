@@ -6,8 +6,8 @@ import com.expecticament.helpful_commands.util.ServerLevelUtil;
 import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
-import com.expecticament.helpful_commands.manager.TranslationManager;
-import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpful_commands.manager.translation.TranslationManager;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
@@ -33,10 +33,10 @@ import java.util.HashSet;
 
 public class SpawnCommand extends HelpfulCommandsCommand {
     private static final DynamicCommandExceptionType PLAYER_SPAWN_NOT_SET = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.spawn.error.player_spawn_not_set.self").getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.spawn.error.player_spawn_not_set.self").build()
     );
     private static final Dynamic2CommandExceptionType TARGET_PLAYER_SPAWN_NOT_SET = new Dynamic2CommandExceptionType((src, otherPlayer) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.spawn.error.player_spawn_not_set.other", StylingUtil.getAffectedEntityNameText((ServerPlayer) otherPlayer)).getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.spawn.error.player_spawn_not_set.other", StylingUtil.getAffectedEntityNameText((ServerPlayer) otherPlayer)).build()
     );
 
     public SpawnCommand(ModCommandManager.ModCommand modCommand) {
@@ -94,7 +94,7 @@ public class SpawnCommand extends HelpfulCommandsCommand {
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
-        TextBuilder textBuilder = new TextBuilder(src);
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
 
         boolean self = false;
         if (otherPlayer == null || otherPlayer == sourcePlayer) {
@@ -117,14 +117,14 @@ public class SpawnCommand extends HelpfulCommandsCommand {
         }
 
         if (self) {
-            textBuilder.appendTranslatable("commands.helpful_commands.spawn.player.tp.self.own");
+            componentBuilder.appendTranslatable("commands.helpful_commands.spawn.player.tp.self.own");
         } else {
-            textBuilder.appendTranslatable("commands.helpful_commands.spawn.player.tp.self.other", StylingUtil.getAffectedEntityNameText(otherPlayer));
+            componentBuilder.appendTranslatable("commands.helpful_commands.spawn.player.tp.self.other", StylingUtil.getAffectedEntityNameText(otherPlayer));
         }
 
-        textBuilder.setStyle(textStyles.getSuccess());
+        componentBuilder.setStyle(textStyles.getSuccess());
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -136,15 +136,15 @@ public class SpawnCommand extends HelpfulCommandsCommand {
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
-        TextBuilder textBuilder = new TextBuilder(src);
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
 
         if (!teleportToWorldSpawn(src, sourcePlayer, sourcePlayer.level())) {
             throw FAILED_TO_TELEPORT.create(src);
         }
 
-        textBuilder.appendTranslatable("commands.helpful_commands.spawn.world.tp").setStyle(textStyles.getSuccess());
+        componentBuilder.appendTranslatable("commands.helpful_commands.spawn.world.tp").setStyle(textStyles.getSuccess());
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -154,7 +154,7 @@ public class SpawnCommand extends HelpfulCommandsCommand {
 
         ServerPlayer sourcePlayer = validateAnySource(src);
 
-        TextBuilder textBuilder = new TextBuilder(src);
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
 
         if (otherPlayer == null && sourcePlayer == null) {
             throw CommandSourceStack.ERROR_NOT_PLAYER.create();
@@ -203,8 +203,8 @@ public class SpawnCommand extends HelpfulCommandsCommand {
         Vec3 pos = respawnData.pos().getCenter();
         String dimensionLocation = respawnData.dimension().identifier().toString();
 
-        TextBuilder textBuilder = new TextBuilder(src);
-        textBuilder
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
+        componentBuilder
                 .appendComponent(StylingUtil.getTitle(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.spawn.info.title")), Component.literal(isPlayer ? playerName : TranslationManager.translate(src, "commands.helpful_commands.spawn.info.title.world"))))
                 .appendNewline()
                 .appendLiteral(textDecorators.getBulletPoint())
@@ -218,15 +218,15 @@ public class SpawnCommand extends HelpfulCommandsCommand {
                 .appendComponent(Component.literal(dimensionLocation).setStyle(textStyles.getSecondary()));
 
         if (src.isPlayer() && PermissionsUtil.hasPermission(src, isPlayer ? (isOwnSpawn ? ModPermissions.Permission.COMMAND_SPAWN_PLAYER_TP : ModPermissions.Permission.COMMAND_SPAWN_PLAYER_TP_OTHER) : ModPermissions.Permission.COMMAND_SPAWN_WORLD_TP)) {
-            textBuilder
+            componentBuilder
                     .appendNewline()
                     .appendNewline()
                     .appendComponent(StylingUtil.getButton(textDecorators.getTeleport(), Component.literal(TranslationManager.translate(src, "helpful_commands.common.teleport")), tpBtnStyle));
         }
 
-        textBuilder.setStyle(textStyles.getTertiary());
+        componentBuilder.setStyle(textStyles.getTertiary());
 
-        return textBuilder.getComponent();
+        return componentBuilder.build();
     }
 
     private int teleportToPlayerSpawn(CommandSourceStack source, ServerPlayer teleportedPlayer, ServerPlayer otherPlayer) throws CommandSyntaxException {

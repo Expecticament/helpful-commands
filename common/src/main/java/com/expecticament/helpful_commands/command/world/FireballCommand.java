@@ -5,7 +5,7 @@ import com.expecticament.helpful_commands.util.PermissionsUtil;
 import com.expecticament.helpful_commands.manager.ConfigManager;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
-import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
@@ -25,7 +25,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class FireballCommand extends HelpfulCommandsCommand {
     private static final Dynamic2CommandExceptionType POWER_CONFIG_VALUE_EXCEEDED = new Dynamic2CommandExceptionType((src, maxPower) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.fireball.power_config_value_exceeded", Component.literal(String.valueOf(maxPower)).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.fireball.power_config_value_exceeded", Component.literal(String.valueOf(maxPower)).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).build()
     );
 
     public FireballCommand(ModCommandManager.ModCommand modCommand) {
@@ -78,11 +78,11 @@ public class FireballCommand extends HelpfulCommandsCommand {
 
         level.addFreshEntity(fireball);
 
-        TextBuilder textBuilder = new TextBuilder(src);
-        textBuilder.appendTranslatable("commands.helpful_commands.fireball");
-        textBuilder.setStyle(textStyles.getSuccess());
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
+        componentBuilder.appendTranslatable("commands.helpful_commands.fireball");
+        componentBuilder.setStyle(textStyles.getSuccess());
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return Command.SINGLE_SUCCESS;
     }

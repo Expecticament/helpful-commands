@@ -6,7 +6,7 @@ import com.expecticament.helpful_commands.util.PermissionsUtil;
 import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
-import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
@@ -30,10 +30,10 @@ import java.util.Map;
 
 public class RenameCommand extends HelpfulCommandsCommand {
     private static final DynamicCommandExceptionType SAME_NAME_PROVIDED = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.rename.error.same_name_provided").getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.rename.error.same_name_provided").build()
     );
     private static final DynamicCommandExceptionType NO_CUSTOM_NAME = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.rename.error.no_custom_name").getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.rename.error.no_custom_name").build()
     );
 
     public RenameCommand(ModCommandManager.ModCommand modCommand) {
@@ -79,7 +79,7 @@ public class RenameCommand extends HelpfulCommandsCommand {
 
         Component oldNameComponent = StylingUtil.getItemStackName(mainHandItemStack);
 
-        TextBuilder textBuilder = new TextBuilder(src);
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
 
         int result = rename(mainHandItemStack, newName);
 
@@ -90,16 +90,16 @@ public class RenameCommand extends HelpfulCommandsCommand {
                 throw NO_CUSTOM_NAME.create(src);
             case 1:
                 Component newNameComponent = Component.literal(newName).setStyle(textStyles.getPrimary());
-                textBuilder.appendTranslatable("commands.helpful_commands.rename.self", oldNameComponent, newNameComponent).setStyle(textStyles.getPrimary());
+                componentBuilder.appendTranslatable("commands.helpful_commands.rename.self", oldNameComponent, newNameComponent).setStyle(textStyles.getPrimary());
                 break;
             case 2:
-                textBuilder.appendTranslatable("commands.helpful_commands.rename.remove.self", oldNameComponent).setStyle(textStyles.getPrimary());
+                componentBuilder.appendTranslatable("commands.helpful_commands.rename.remove.self", oldNameComponent).setStyle(textStyles.getPrimary());
                 break;
         }
 
-        textBuilder.setStyle(textStyles.getSuccess());
+        componentBuilder.setStyle(textStyles.getSuccess());
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -133,19 +133,19 @@ public class RenameCommand extends HelpfulCommandsCommand {
             }
 
             if (commandFeedback && sourcePlayer != player) {
-                TextBuilder textBuilder = new TextBuilder(player);
-                textBuilder.setStyle(textStyles.getAffectedNeutral());
+                ComponentBuilder componentBuilder = new ComponentBuilder(player);
+                componentBuilder.setStyle(textStyles.getAffectedNeutral());
                 Component oldNameComponent = Component.literal(oldName).setStyle(textStyles.getPrimary());
                 switch (result) {
                     case 1:
-                        textBuilder.appendTranslatable("commands.helpful_commands.rename.affected", oldNameComponent, newNameComponent);
+                        componentBuilder.appendTranslatable("commands.helpful_commands.rename.affected", oldNameComponent, newNameComponent);
                         break;
                     case 2:
-                        textBuilder.appendTranslatable("commands.helpful_commands.rename.remove.affected", oldNameComponent);
+                        componentBuilder.appendTranslatable("commands.helpful_commands.rename.remove.affected", oldNameComponent);
                         break;
                 }
 
-                player.sendSystemMessage(textBuilder.getComponent());
+                player.sendSystemMessage(componentBuilder.build());
             }
 
             affected.put(player, oldName);
@@ -155,7 +155,7 @@ public class RenameCommand extends HelpfulCommandsCommand {
             throw NO_ITEMS_FOUND.create(src);
         }
 
-        TextBuilder feedback = new TextBuilder(src);
+        ComponentBuilder feedback = new ComponentBuilder(src);
         feedback.setStyle(textStyles.getSuccess());
         if (affected.size() == 1) {
             Component affectedPlayer = StylingUtil.getAffectedEntityNameText(affected.keySet().iterator().next());
@@ -173,7 +173,7 @@ public class RenameCommand extends HelpfulCommandsCommand {
             }
         }
 
-        src.sendSuccess(feedback::getComponent, true);
+        src.sendSuccess(feedback::build, true);
 
         return affected.size();
     }

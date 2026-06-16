@@ -1,12 +1,12 @@
 package com.expecticament.helpful_commands.command.movementAndTeleportation;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.util.PermissionsUtil;
 import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ConfigManager;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
-import com.expecticament.helpful_commands.manager.TranslationManager;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
@@ -27,7 +27,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class JumpCommand extends HelpfulCommandsCommand {
     private static final Dynamic2CommandExceptionType DISTANCE_CONFIG_VALUE_EXCEEDED = new Dynamic2CommandExceptionType((src, maxDistance) ->
-            new TranslationManager.TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.jump.error.distance_config_value_exceeded", Component.literal(String.valueOf(maxDistance)).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.jump.error.distance_config_value_exceeded", Component.literal(String.valueOf(maxDistance)).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).build()
     );
 
     public JumpCommand(ModCommandManager.ModCommand modCommand) {
@@ -90,11 +90,11 @@ public class JumpCommand extends HelpfulCommandsCommand {
         sourcePlayer.teleportTo(safePos.x, safePos.y, safePos.z);
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
-        TranslationManager.TextBuilder textBuilder = new TranslationManager.TextBuilder(src);
-        textBuilder.setStyle(textStyles.getSuccess());
-        textBuilder.appendTranslatable("commands.helpful_commands.jump", StylingUtil.getPositionText(safePos));
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
+        componentBuilder.setStyle(textStyles.getSuccess());
+        componentBuilder.appendTranslatable("commands.helpful_commands.jump", StylingUtil.getPositionText(safePos));
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return Command.SINGLE_SUCCESS;
     }

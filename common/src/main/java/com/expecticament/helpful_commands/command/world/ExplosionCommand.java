@@ -7,7 +7,7 @@ import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ConfigManager;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
-import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
@@ -30,7 +30,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class ExplosionCommand extends HelpfulCommandsCommand {
     private static final Dynamic2CommandExceptionType POWER_CONFIG_VALUE_EXCEEDED = new Dynamic2CommandExceptionType((src, maxPower) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.explosion.power_config_value_exceeded", Component.literal(String.valueOf(maxPower)).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.explosion.power_config_value_exceeded", Component.literal(String.valueOf(maxPower)).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).build()
     );
 
     public ExplosionCommand(ModCommandManager.ModCommand modCommand) {
@@ -80,11 +80,11 @@ public class ExplosionCommand extends HelpfulCommandsCommand {
         serverLevel.explode(null, position.x(), position.y(), position.z(), validatedPower, destroyBlocks ? Level.ExplosionInteraction.TNT : Level.ExplosionInteraction.NONE);
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
-        TextBuilder textBuilder = new TextBuilder(src);
-        textBuilder.setStyle(textStyles.getSuccess());
-        textBuilder.appendTranslatable("commands.helpful_commands.explosion", StylingUtil.getLocationText(position, ServerLevelUtil.getLevelLocation(serverLevel)));
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
+        componentBuilder.setStyle(textStyles.getSuccess());
+        componentBuilder.appendTranslatable("commands.helpful_commands.explosion", StylingUtil.getLocationText(position, ServerLevelUtil.getLevelLocation(serverLevel)));
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return Command.SINGLE_SUCCESS;
     }

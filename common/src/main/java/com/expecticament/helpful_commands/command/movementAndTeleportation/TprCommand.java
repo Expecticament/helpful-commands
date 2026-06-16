@@ -1,10 +1,11 @@
 package com.expecticament.helpful_commands.command.movementAndTeleportation;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
+import com.expecticament.helpful_commands.manager.translation.TranslationManager;
 import com.expecticament.helpful_commands.util.PermissionsUtil;
 import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.*;
-import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.permission.PermissionHandlerProvider;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
@@ -30,22 +31,22 @@ import java.util.List;
 
 public class TprCommand extends HelpfulCommandsCommand {
     private static final Dynamic2CommandExceptionType TARGET_CANT_ACCEPT_REQUESTS = new Dynamic2CommandExceptionType((src, targetPlayer) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.request.error.target_cant_accept_requests", StylingUtil.getAffectedEntityNameText((ServerPlayer) targetPlayer)).getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.request.error.target_cant_accept_requests", StylingUtil.getAffectedEntityNameText((ServerPlayer) targetPlayer)).build()
     );
     private static final Dynamic2CommandExceptionType ON_COOLDOWN = new Dynamic2CommandExceptionType((src, remaining) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.request.error.on_cooldown", StylingUtil.formatDuration((long) remaining, (CommandSourceStack) src)).getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.request.error.on_cooldown", StylingUtil.formatDuration((long) remaining, (CommandSourceStack) src)).build()
     );
     private static final DynamicCommandExceptionType PENDING_REQUEST_EXISTS = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.request.error.pending_request_exists").getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.request.error.pending_request_exists").build()
     );
     private static final DynamicCommandExceptionType NO_PENDING_REQUEST = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.cancel.error.no_pending_request").getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.cancel.error.no_pending_request").build()
     );
     private static final Dynamic2CommandExceptionType NO_PENDING_INCOMING_REQUEST = new Dynamic2CommandExceptionType((src, otherPlayer) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.error.no_pending_incoming_request", StylingUtil.getAffectedEntityNameText((ServerPlayer) otherPlayer)).getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.error.no_pending_incoming_request", StylingUtil.getAffectedEntityNameText((ServerPlayer) otherPlayer)).build()
     );
     private static final DynamicCommandExceptionType FAILED_TO_TELEPORT = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.accept.error.failed_to_teleport").getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.tpr.accept.error.failed_to_teleport").build()
     );
 
     public TprCommand(ModCommandManager.ModCommand modCommand) {
@@ -121,9 +122,9 @@ public class TprCommand extends HelpfulCommandsCommand {
             HelpfulCommandsStyle.TextStyles textStyles = currentStyle.getTextStyles();
             HelpfulCommandsStyle.TextDecorators textDecorators = currentStyle.getTextDecorators();
 
-            TextBuilder otherTextBuilder = new TextBuilder(otherPlayer);
+            ComponentBuilder otherComponentBuilder = new ComponentBuilder(otherPlayer);
             Component acceptBtn = StylingUtil.getButton(textDecorators.getCheckmark(), Component.literal(TranslationManager.translate(otherPlayer, "commands.helpful_commands.tpr.request.accept")), textStyles.getAffectedPositive().withClickEvent(new ClickEvent.RunCommand("/tpr accept " + sourcePlayer.getName().getString())));
-            otherTextBuilder
+            otherComponentBuilder
                     .appendComponent(StylingUtil.getTitle(Component.literal(TranslationManager.translate(otherPlayer, "commands.helpful_commands.tpr.request.title"))))
                     .appendNewline()
                     .appendComponent(Component.literal(textDecorators.getBulletPoint()).setStyle(textStyles.getTertiary()))
@@ -131,33 +132,33 @@ public class TprCommand extends HelpfulCommandsCommand {
                     .appendWhitespace()
                     .appendComponent(Component.literal(sourcePlayer.getName().getString()).setStyle(textStyles.getSecondary()));
             if (comment != null && !comment.isEmpty() && !comment.equals(" ")) {
-                otherTextBuilder
+                otherComponentBuilder
                         .appendNewline()
                         .appendComponent(Component.literal(textDecorators.getBulletPoint()).setStyle(textStyles.getTertiary()))
                         .appendComponent(Component.literal(TranslationManager.translate(otherPlayer, "commands.helpful_commands.tpr.request.comment")).setStyle(textStyles.getTertiary()))
                         .appendWhitespace()
                         .appendLiteral(comment);
             }
-            otherTextBuilder
+            otherComponentBuilder
                     .appendNewline()
                     .appendComponent(Component.literal(textDecorators.getBulletPoint()).setStyle(textStyles.getTertiary()))
-                    .appendComponent(new TextBuilder(otherPlayer).setStyle(textStyles.getTertiary()).appendTranslatable("commands.helpful_commands.tpr.request.timeout", StylingUtil.formatDuration(timeout, otherPlayer)).getComponent())
+                    .appendComponent(new ComponentBuilder(otherPlayer).setStyle(textStyles.getTertiary()).appendTranslatable("commands.helpful_commands.tpr.request.timeout", StylingUtil.formatDuration(timeout, otherPlayer)).build())
                     .appendNewline()
                     .appendNewline()
                     .appendComponent(acceptBtn);
             if (canDeny(otherPlayer)) {
                 Component denyBtn = StylingUtil.getButton(textDecorators.getCross(), Component.literal(TranslationManager.translate(otherPlayer, "commands.helpful_commands.tpr.request.deny")), textStyles.getAffectedNegative().withClickEvent(new ClickEvent.RunCommand("/tpr deny " + sourcePlayer.getName().getString())));
-                otherTextBuilder
+                otherComponentBuilder
                         .appendWhitespace()
                         .appendComponent(denyBtn);
             }
 
-            otherPlayer.sendSystemMessage(otherTextBuilder.getComponent());
+            otherPlayer.sendSystemMessage(otherComponentBuilder.build());
 
-            TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.tpr.request", StylingUtil.getAffectedEntityNameText(otherPlayer), StylingUtil.formatDuration(timeout, sourcePlayer));
-            textBuilder.setStyle(textStyles.getSuccess());
-            src.sendSuccess(textBuilder::getComponent, false);
+            ComponentBuilder componentBuilder = new ComponentBuilder(src);
+            componentBuilder.appendTranslatable("commands.helpful_commands.tpr.request", StylingUtil.getAffectedEntityNameText(otherPlayer), StylingUtil.formatDuration(timeout, sourcePlayer));
+            componentBuilder.setStyle(textStyles.getSuccess());
+            src.sendSuccess(componentBuilder::build, false);
         } catch (TpRequestsManager.PendingRequestExistsException e) {
             throw PENDING_REQUEST_EXISTS.create(src);
         }
@@ -172,7 +173,7 @@ public class TprCommand extends HelpfulCommandsCommand {
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
-        TextBuilder textBuilder = new TextBuilder(src);
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
 
         TpRequestsManager.Request request = TpRequestsManager.getSentRequest(sourcePlayer);
 
@@ -185,14 +186,14 @@ public class TprCommand extends HelpfulCommandsCommand {
 
         ServerPlayer otherPlayer = src.getServer().getPlayerList().getPlayer(request.getTo());
         if (otherPlayer == null) {
-            textBuilder.appendTranslatable("commands.helpful_commands.tpr.cancel.noPlayer");
+            componentBuilder.appendTranslatable("commands.helpful_commands.tpr.cancel.noPlayer");
         } else {
-            textBuilder.appendTranslatable("commands.helpful_commands.tpr.cancel.withPlayer", StylingUtil.getAffectedEntityNameText(otherPlayer));
+            componentBuilder.appendTranslatable("commands.helpful_commands.tpr.cancel.withPlayer", StylingUtil.getAffectedEntityNameText(otherPlayer));
         }
 
-        textBuilder.setStyle(textStyles.getSuccess());
+        componentBuilder.setStyle(textStyles.getSuccess());
 
-        src.sendSuccess(textBuilder::getComponent, false);
+        src.sendSuccess(componentBuilder::build, false);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -207,7 +208,7 @@ public class TprCommand extends HelpfulCommandsCommand {
             throw EntityArgument.NO_PLAYERS_FOUND.create();
         }
 
-        TextBuilder textBuilder = new TextBuilder(src);
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
 
         if (sourcePlayer == otherPlayer) {
             throw TARGET_MUST_BE_OTHER_PLAYER.create(src);
@@ -234,14 +235,14 @@ public class TprCommand extends HelpfulCommandsCommand {
             TpRequestsManager.removeRequest(otherPlayer);
             CooldownManager.applyCooldown(otherPlayer, CooldownManager.CooldownType.TPR_REQUEST, PermissionsUtil.getMetaOrElseConfigValue(otherPlayer, ConfigManager.CONFIG_FIELD.TPR_REQUEST_COOLDOWN_ON_ACCEPTED));
 
-            TextBuilder otherPlayerTextBuilder = new TextBuilder(src);
-            otherPlayerTextBuilder.setStyle(textStyles.getAffectedPositive());
-            otherPlayerTextBuilder.appendTranslatable("commands.helpful_commands.tpr.accept.affected", StylingUtil.getAffectedEntityNameText(sourcePlayer));
-            otherPlayer.sendSystemMessage(otherPlayerTextBuilder.getComponent());
+            ComponentBuilder otherPlayerComponentBuilder = new ComponentBuilder(src);
+            otherPlayerComponentBuilder.setStyle(textStyles.getAffectedPositive());
+            otherPlayerComponentBuilder.appendTranslatable("commands.helpful_commands.tpr.accept.affected", StylingUtil.getAffectedEntityNameText(sourcePlayer));
+            otherPlayer.sendSystemMessage(otherPlayerComponentBuilder.build());
 
-            textBuilder.appendTranslatable("commands.helpful_commands.tpr.accept", StylingUtil.getAffectedEntityNameText(otherPlayer));
-            textBuilder.setStyle(textStyles.getSuccess());
-            src.sendSuccess(textBuilder::getComponent, true);
+            componentBuilder.appendTranslatable("commands.helpful_commands.tpr.accept", StylingUtil.getAffectedEntityNameText(otherPlayer));
+            componentBuilder.setStyle(textStyles.getSuccess());
+            src.sendSuccess(componentBuilder::build, true);
         } else {
             throw FAILED_TO_TELEPORT.create(src);
         }
@@ -259,7 +260,7 @@ public class TprCommand extends HelpfulCommandsCommand {
             throw EntityArgument.NO_PLAYERS_FOUND.create();
         }
 
-        TextBuilder textBuilder = new TextBuilder(src);
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
 
         if (sourcePlayer == otherPlayer) {
             throw TARGET_MUST_BE_OTHER_PLAYER.create(src);
@@ -283,14 +284,14 @@ public class TprCommand extends HelpfulCommandsCommand {
 
         TpRequestsManager.removeRequest(otherPlayer);
 
-        TextBuilder otherPlayerTextBuilder = new TextBuilder(src);
-        otherPlayerTextBuilder.setStyle(textStyles.getAffectedNegative());
-        otherPlayerTextBuilder.appendTranslatable("commands.helpful_commands.tpr.deny.affected", StylingUtil.getAffectedEntityNameText(sourcePlayer));
-        otherPlayer.sendSystemMessage(otherPlayerTextBuilder.getComponent());
+        ComponentBuilder otherPlayerComponentBuilder = new ComponentBuilder(src);
+        otherPlayerComponentBuilder.setStyle(textStyles.getAffectedNegative());
+        otherPlayerComponentBuilder.appendTranslatable("commands.helpful_commands.tpr.deny.affected", StylingUtil.getAffectedEntityNameText(sourcePlayer));
+        otherPlayer.sendSystemMessage(otherPlayerComponentBuilder.build());
 
-        textBuilder.appendTranslatable("commands.helpful_commands.tpr.deny", StylingUtil.getAffectedEntityNameText(otherPlayer));
-        textBuilder.setStyle(textStyles.getSuccess());
-        src.sendSuccess(textBuilder::getComponent, true);
+        componentBuilder.appendTranslatable("commands.helpful_commands.tpr.deny", StylingUtil.getAffectedEntityNameText(otherPlayer));
+        componentBuilder.setStyle(textStyles.getSuccess());
+        src.sendSuccess(componentBuilder::build, true);
 
         return Command.SINGLE_SUCCESS;
     }

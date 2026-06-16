@@ -1,12 +1,13 @@
 package com.expecticament.helpful_commands.command.playersAndEntities;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.util.GameRulesUtil;
 import com.expecticament.helpful_commands.util.PermissionsUtil;
 import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
-import com.expecticament.helpful_commands.manager.TranslationManager;
+import com.expecticament.helpful_commands.manager.translation.TranslationManager;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
@@ -56,16 +57,16 @@ public class ExtinguishCommand extends HelpfulCommandsCommand {
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
-        TranslationManager.TextBuilder textBuilder = new TranslationManager.TextBuilder(src);
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
 
         if (!extinguish(sourcePlayer)) {
             return 0;
         }
 
-        textBuilder.appendTranslatable("commands.helpful_commands.extinguish.self");
-        textBuilder.setStyle(textStyles.getSuccess());
+        componentBuilder.appendTranslatable("commands.helpful_commands.extinguish.self");
+        componentBuilder.setStyle(textStyles.getSuccess());
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -88,9 +89,9 @@ public class ExtinguishCommand extends HelpfulCommandsCommand {
                     if (entity.isAlwaysTicking() && commandFeedback) {
                         ServerPlayer player = (ServerPlayer) entity;
                         if (player != sourcePlayer) {
-                            TranslationManager.TextBuilder textBuilder = new TranslationManager.TextBuilder(player);
-                            textBuilder.appendTranslatable("commands.helpful_commands.extinguish.affected").setStyle(textStyles.getAffectedPositive());
-                            player.sendSystemMessage(textBuilder.getComponent());
+                            ComponentBuilder componentBuilder = new ComponentBuilder(player);
+                            componentBuilder.appendTranslatable("commands.helpful_commands.extinguish.affected").setStyle(textStyles.getAffectedPositive());
+                            player.sendSystemMessage(componentBuilder.build());
                         }
                     }
                 })
@@ -110,10 +111,10 @@ public class ExtinguishCommand extends HelpfulCommandsCommand {
                     .append(TranslationManager.translate(src, "commands.helpful_commands.extinguish.other.multiple"));
         }
 
-        TranslationManager.TextBuilder textBuilder = new TranslationManager.TextBuilder(src);
-        textBuilder.appendTranslatable("commands.helpful_commands.extinguish.other", affectedText).setStyle(textStyles.getSuccess());
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
+        componentBuilder.appendTranslatable("commands.helpful_commands.extinguish.other", affectedText).setStyle(textStyles.getSuccess());
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return affected.size();
     }

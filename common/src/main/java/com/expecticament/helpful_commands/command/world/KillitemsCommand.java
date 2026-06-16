@@ -6,8 +6,8 @@ import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ConfigManager;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
-import com.expecticament.helpful_commands.manager.TranslationManager;
-import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpful_commands.manager.translation.TranslationManager;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.CommandDispatcher;
@@ -32,7 +32,7 @@ import java.util.function.Predicate;
 
 public class KillitemsCommand extends HelpfulCommandsCommand {
     private static final Dynamic2CommandExceptionType RANGE_CONFIG_VALUE_EXCEEDED = new Dynamic2CommandExceptionType((src, maxRange) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.killitems.range_config_value_exceeded", Component.literal(String.valueOf(maxRange)).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.killitems.range_config_value_exceeded", Component.literal(String.valueOf(maxRange)).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).build()
     );
 
     public KillitemsCommand(ModCommandManager.ModCommand modCommand) {
@@ -107,11 +107,11 @@ public class KillitemsCommand extends HelpfulCommandsCommand {
             throw NO_ITEMS_FOUND.create(src);
         }
 
-        TextBuilder textBuilder = new TextBuilder(src);
-        textBuilder.appendTranslatable("commands.helpful_commands.killitems", StylingUtil.getAffectedEntitiesNumberText(itemEntities), Component.literal(TranslationManager.translate(src, "commands.helpful_commands.killitems." + ((itemEntities.size() == 1 && !multiple) ? "single" : "multiple"))));
-        textBuilder.setStyle(textStyles.getSuccess());
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
+        componentBuilder.appendTranslatable("commands.helpful_commands.killitems", StylingUtil.getAffectedEntitiesNumberText(itemEntities), Component.literal(TranslationManager.translate(src, "commands.helpful_commands.killitems." + ((itemEntities.size() == 1 && !multiple) ? "single" : "multiple"))));
+        componentBuilder.setStyle(textStyles.getSuccess());
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return itemEntities.size();
     }

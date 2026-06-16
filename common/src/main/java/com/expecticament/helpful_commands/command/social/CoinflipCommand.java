@@ -6,8 +6,8 @@ import com.expecticament.helpful_commands.util.SoundUtil;
 import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
-import com.expecticament.helpful_commands.manager.TranslationManager;
-import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpful_commands.manager.translation.TranslationManager;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
@@ -78,13 +78,13 @@ public class CoinflipCommand extends HelpfulCommandsCommand {
             Component landedCoinSideComponent = Component.literal(TranslationManager.translate(player, "commands.helpful_commands.coinflip." + landedCoinSide.toString().toLowerCase())).setStyle(textStyles.getPrimary());
             Component resultComponent = Component.literal(TranslationManager.translate(player, "commands.helpful_commands.coinflip." + (won ? "won" : "lost"))).setStyle(won ? textStyles.getAffectedPositive() : textStyles.getAffectedNegative());
 
-            TextBuilder textBuilder = new TextBuilder(player);
-            textBuilder.appendTranslatable("commands.helpful_commands.coinflip", landedCoinSideComponent, affectedPlayerText, pickedCoinSideComponent, resultComponent);
+            ComponentBuilder componentBuilder = new ComponentBuilder(player);
+            componentBuilder.appendTranslatable("commands.helpful_commands.coinflip", landedCoinSideComponent, affectedPlayerText, pickedCoinSideComponent, resultComponent);
             if (won) {
-                textBuilder.appendLiteral("!");
+                componentBuilder.appendLiteral("!");
             }
 
-            player.sendSystemMessage(textBuilder.getComponent());
+            player.sendSystemMessage(componentBuilder.build());
         }
 
         SoundUtil.playSound(sourcePlayer, won ? SoundEvents.PLAYER_LEVELUP : SoundEvents.WANDERING_TRADER_NO, 0.5f, 1);

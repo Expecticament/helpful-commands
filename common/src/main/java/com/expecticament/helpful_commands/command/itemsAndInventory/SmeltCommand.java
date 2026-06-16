@@ -6,7 +6,7 @@ import com.expecticament.helpful_commands.util.PermissionsUtil;
 import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
-import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
@@ -32,7 +32,7 @@ import java.util.Optional;
 
 public class SmeltCommand extends HelpfulCommandsCommand {
     private static final DynamicCommandExceptionType ITEM_NOT_SMELTABLE = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.smelt.error.item_not_smeltable").getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.smelt.error.item_not_smeltable").build()
     );
 
     public SmeltCommand(ModCommandManager.ModCommand modCommand) {
@@ -74,11 +74,11 @@ public class SmeltCommand extends HelpfulCommandsCommand {
             throw ITEM_NOT_SMELTABLE.create(src);
         }
 
-        TextBuilder textBuilder = new TextBuilder(src);
-        textBuilder.appendTranslatable("commands.helpful_commands.smelt.self", StylingUtil.getItemStackName(mainHandItemStack)).setStyle(textStyles.getPrimary());
-        textBuilder.setStyle(textStyles.getSuccess());
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
+        componentBuilder.appendTranslatable("commands.helpful_commands.smelt.self", StylingUtil.getItemStackName(mainHandItemStack)).setStyle(textStyles.getPrimary());
+        componentBuilder.setStyle(textStyles.getSuccess());
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -109,11 +109,11 @@ public class SmeltCommand extends HelpfulCommandsCommand {
             }
 
             if (commandFeedback && sourcePlayer != player) {
-                TextBuilder textBuilder = new TextBuilder(player);
-                textBuilder.setStyle(textStyles.getAffectedNeutral());
-                textBuilder.appendTranslatable("commands.helpful_commands.smelt.affected", itemNameComponent);
+                ComponentBuilder componentBuilder = new ComponentBuilder(player);
+                componentBuilder.setStyle(textStyles.getAffectedNeutral());
+                componentBuilder.appendTranslatable("commands.helpful_commands.smelt.affected", itemNameComponent);
 
-                player.sendSystemMessage(textBuilder.getComponent());
+                player.sendSystemMessage(componentBuilder.build());
             }
 
             affected.put(player, itemNameComponent.getString());
@@ -123,7 +123,7 @@ public class SmeltCommand extends HelpfulCommandsCommand {
             throw NO_ITEMS_FOUND.create(src);
         }
 
-        TextBuilder feedback = new TextBuilder(src);
+        ComponentBuilder feedback = new ComponentBuilder(src);
         feedback.setStyle(textStyles.getSuccess());
         if (affected.size() == 1) {
             feedback.appendTranslatable("commands.helpful_commands.smelt.other", StylingUtil.getAffectedEntityNameText(affected.keySet().iterator().next()), Component.literal(affected.values().iterator().next()).setStyle(textStyles.getPrimary()));
@@ -131,7 +131,7 @@ public class SmeltCommand extends HelpfulCommandsCommand {
             feedback.appendTranslatable("commands.helpful_commands.smelt.others", StylingUtil.getAffectedEntitiesNumberText(affected));
         }
 
-        src.sendSuccess(feedback::getComponent, true);
+        src.sendSuccess(feedback::build, true);
 
         return affected.size();
     }

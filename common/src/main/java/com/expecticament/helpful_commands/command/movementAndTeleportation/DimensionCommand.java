@@ -7,8 +7,8 @@ import com.expecticament.helpful_commands.util.ServerLevelUtil;
 import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
-import com.expecticament.helpful_commands.manager.TranslationManager;
-import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpful_commands.manager.translation.TranslationManager;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
@@ -34,7 +34,7 @@ import java.util.List;
 
 public class DimensionCommand extends HelpfulCommandsCommand {
     private static final Dynamic2CommandExceptionType ALREADY_IN_DIMENSION = new Dynamic2CommandExceptionType((src, dimensionName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.dimension.error.already_in_dimension", Component.literal(dimensionName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.dimension.error.already_in_dimension", Component.literal(dimensionName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).build()
     );
 
     public DimensionCommand(ModCommandManager.ModCommand modCommand) {
@@ -72,7 +72,7 @@ public class DimensionCommand extends HelpfulCommandsCommand {
         int result = switchDimension(sourcePlayer, serverLevel);
         Component dimensionText = getDimensionText(serverLevel, textStyles);
 
-        TextBuilder textBuilder = new TextBuilder(src);
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
 
         if (result == 1) {
             throw ALREADY_IN_DIMENSION.create(src, ServerLevelUtil.getLevelLocation(serverLevel));
@@ -81,10 +81,10 @@ public class DimensionCommand extends HelpfulCommandsCommand {
             throw FAILED_TO_TELEPORT.create(src);
         }
 
-        textBuilder.appendTranslatable("commands.helpful_commands.dimension.self", dimensionText);
-        textBuilder.setStyle(textStyles.getSuccess());
+        componentBuilder.appendTranslatable("commands.helpful_commands.dimension.self", dimensionText);
+        componentBuilder.setStyle(textStyles.getSuccess());
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -109,9 +109,9 @@ public class DimensionCommand extends HelpfulCommandsCommand {
                     if (entity.isAlwaysTicking() && commandFeedback) {
                         ServerPlayer player = (ServerPlayer) entity;
                         if (player != sourcePlayer) {
-                            TextBuilder textBuilder = new TextBuilder(player);
-                            textBuilder.appendTranslatable("commands.helpful_commands.dimension.affected", dimensionText).setStyle(textStyles.getAffectedNeutral());
-                            player.sendSystemMessage(textBuilder.getComponent());
+                            ComponentBuilder componentBuilder = new ComponentBuilder(player);
+                            componentBuilder.appendTranslatable("commands.helpful_commands.dimension.affected", dimensionText).setStyle(textStyles.getAffectedNeutral());
+                            player.sendSystemMessage(componentBuilder.build());
                         }
                     }
                 })
@@ -131,10 +131,10 @@ public class DimensionCommand extends HelpfulCommandsCommand {
                     .append(TranslationManager.translate(src, "commands.helpful_commands.dimension.other.multiple"));
         }
 
-        TextBuilder textBuilder = new TextBuilder(src);
-        textBuilder.appendTranslatable("commands.helpful_commands.dimension.other", affectedText, dimensionText).setStyle(textStyles.getSuccess());
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
+        componentBuilder.appendTranslatable("commands.helpful_commands.dimension.other", affectedText, dimensionText).setStyle(textStyles.getSuccess());
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return affected.size();
     }

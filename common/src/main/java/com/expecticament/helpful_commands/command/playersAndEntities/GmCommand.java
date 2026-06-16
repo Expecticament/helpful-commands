@@ -1,12 +1,13 @@
 package com.expecticament.helpful_commands.command.playersAndEntities;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.util.GameRulesUtil;
 import com.expecticament.helpful_commands.util.PermissionsUtil;
 import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
-import com.expecticament.helpful_commands.manager.TranslationManager;
+import com.expecticament.helpful_commands.manager.translation.TranslationManager;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
@@ -83,16 +84,16 @@ public class GmCommand extends HelpfulCommandsCommand {
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
-        TranslationManager.TextBuilder textBuilder = new TranslationManager.TextBuilder(src);
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
 
         if (!sourcePlayer.setGameMode(gameType)) {
             return 0;
         }
 
-        textBuilder.appendTranslatable("commands.helpful_commands.gm.self", Component.translatable("gameMode." + gameType.getName()).setStyle(textStyles.getPrimary()));
-        textBuilder.setStyle(textStyles.getSuccess());
+        componentBuilder.appendTranslatable("commands.helpful_commands.gm.self", Component.translatable("gameMode." + gameType.getName()).setStyle(textStyles.getPrimary()));
+        componentBuilder.setStyle(textStyles.getSuccess());
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -116,9 +117,9 @@ public class GmCommand extends HelpfulCommandsCommand {
                 .peek(player -> {
                     if (commandFeedback) {
                         if (player != sourcePlayer) {
-                            TranslationManager.TextBuilder textBuilder = new TranslationManager.TextBuilder(player);
-                            textBuilder.appendTranslatable("commands.helpful_commands.gm.affected", gameModeNameComponent).setStyle(textStyles.getAffectedNeutral());
-                            player.sendSystemMessage(textBuilder.getComponent());
+                            ComponentBuilder componentBuilder = new ComponentBuilder(player);
+                            componentBuilder.appendTranslatable("commands.helpful_commands.gm.affected", gameModeNameComponent).setStyle(textStyles.getAffectedNeutral());
+                            player.sendSystemMessage(componentBuilder.build());
                         }
                     }
                 })
@@ -138,10 +139,10 @@ public class GmCommand extends HelpfulCommandsCommand {
                     .append(TranslationManager.translate(src, "commands.helpful_commands.gm.other.multiple"));
         }
 
-        TranslationManager.TextBuilder textBuilder = new TranslationManager.TextBuilder(src);
-        textBuilder.appendTranslatable("commands.helpful_commands.gm.other", gameModeNameComponent, affectedText).setStyle(textStyles.getSuccess());
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
+        componentBuilder.appendTranslatable("commands.helpful_commands.gm.other", gameModeNameComponent, affectedText).setStyle(textStyles.getSuccess());
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return affected.size();
     }

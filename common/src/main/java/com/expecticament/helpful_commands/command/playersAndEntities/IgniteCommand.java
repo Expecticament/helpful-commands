@@ -1,12 +1,13 @@
 package com.expecticament.helpful_commands.command.playersAndEntities;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.util.GameRulesUtil;
 import com.expecticament.helpful_commands.util.PermissionsUtil;
 import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
-import com.expecticament.helpful_commands.manager.TranslationManager;
+import com.expecticament.helpful_commands.manager.translation.TranslationManager;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
@@ -59,16 +60,16 @@ public class IgniteCommand extends HelpfulCommandsCommand {
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
-        TranslationManager.TextBuilder textBuilder = new TranslationManager.TextBuilder(src);
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
 
         if (!ignite(sourcePlayer, duration)) {
             return 0;
         }
 
-        textBuilder.appendTranslatable("commands.helpful_commands.ignite.self", Component.literal(String.valueOf(duration)).setStyle(textStyles.getPrimary()), Component.literal(TranslationManager.translate(src, duration == 1 ? "commands.helpful_commands.ignite.second" : "commands.helpful_commands.ignite.seconds")));
-        textBuilder.setStyle(textStyles.getSuccess());
+        componentBuilder.appendTranslatable("commands.helpful_commands.ignite.self", Component.literal(String.valueOf(duration)).setStyle(textStyles.getPrimary()), Component.literal(TranslationManager.translate(src, duration == 1 ? "commands.helpful_commands.ignite.second" : "commands.helpful_commands.ignite.seconds")));
+        componentBuilder.setStyle(textStyles.getSuccess());
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -91,9 +92,9 @@ public class IgniteCommand extends HelpfulCommandsCommand {
                     if (entity.isAlwaysTicking() && commandFeedback) {
                         ServerPlayer player = (ServerPlayer) entity;
                         if (player != sourcePlayer) {
-                            TranslationManager.TextBuilder textBuilder = new TranslationManager.TextBuilder(player);
-                            textBuilder.appendTranslatable("commands.helpful_commands.ignite.affected").setStyle(textStyles.getAffectedNegative());
-                            player.sendSystemMessage(textBuilder.getComponent());
+                            ComponentBuilder componentBuilder = new ComponentBuilder(player);
+                            componentBuilder.appendTranslatable("commands.helpful_commands.ignite.affected").setStyle(textStyles.getAffectedNegative());
+                            player.sendSystemMessage(componentBuilder.build());
                         }
                     }
                 })
@@ -113,10 +114,10 @@ public class IgniteCommand extends HelpfulCommandsCommand {
                     .append(TranslationManager.translate(src, "commands.helpful_commands.ignite.other.multiple"));
         }
 
-        TranslationManager.TextBuilder textBuilder = new TranslationManager.TextBuilder(src);
-        textBuilder.appendTranslatable("commands.helpful_commands.ignite.other", affectedText, Component.literal(String.valueOf(duration)).setStyle(textStyles.getPrimary()), Component.literal(TranslationManager.translate(src, duration == 1 ? "commands.helpful_commands.ignite.second" : "commands.helpful_commands.ignite.seconds"))).setStyle(textStyles.getSuccess());
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
+        componentBuilder.appendTranslatable("commands.helpful_commands.ignite.other", affectedText, Component.literal(String.valueOf(duration)).setStyle(textStyles.getPrimary()), Component.literal(TranslationManager.translate(src, duration == 1 ? "commands.helpful_commands.ignite.second" : "commands.helpful_commands.ignite.seconds"))).setStyle(textStyles.getSuccess());
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return affected.size();
     }

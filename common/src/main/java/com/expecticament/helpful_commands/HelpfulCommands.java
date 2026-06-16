@@ -1,6 +1,7 @@
 package com.expecticament.helpful_commands;
 
 import com.expecticament.helpful_commands.manager.home.HomeManager;
+import com.expecticament.helpful_commands.manager.translation.TranslationManager;
 import com.expecticament.helpful_commands.manager.warp.WarpManager;
 import com.expecticament.helpful_commands.util.ServerLevelUtil;
 import com.expecticament.helpful_commands.manager.*;

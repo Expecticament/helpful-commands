@@ -6,7 +6,7 @@ import com.expecticament.helpful_commands.util.ServerLevelUtil;
 import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
-import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
@@ -62,11 +62,11 @@ public class LightningCommand extends HelpfulCommandsCommand {
         serverLevel.addFreshEntity(livingEntity);
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
-        TextBuilder textBuilder = new TextBuilder(src);
-        textBuilder.setStyle(textStyles.getSuccess());
-        textBuilder.appendTranslatable("commands.helpful_commands.lightning", StylingUtil.getLocationText(position, ServerLevelUtil.getLevelLocation(serverLevel)));
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
+        componentBuilder.setStyle(textStyles.getSuccess());
+        componentBuilder.appendTranslatable("commands.helpful_commands.lightning", StylingUtil.getLocationText(position, ServerLevelUtil.getLevelLocation(serverLevel)));
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return Command.SINGLE_SUCCESS;
     }

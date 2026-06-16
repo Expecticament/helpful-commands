@@ -4,11 +4,12 @@ import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
 import com.expecticament.helpful_commands.manager.home.Home;
 import com.expecticament.helpful_commands.manager.home.HomeException;
 import com.expecticament.helpful_commands.manager.home.HomeManager;
+import com.expecticament.helpful_commands.manager.translation.TranslationManager;
 import com.expecticament.helpful_commands.util.PermissionsUtil;
 import com.expecticament.helpful_commands.util.ServerLevelUtil;
 import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.*;
-import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
 import com.expecticament.helpful_commands.suggestionProvider.HomeNameSuggestionProvider;
@@ -32,16 +33,16 @@ import net.minecraft.world.entity.Relative;
 
 public class HomeCommand extends HelpfulCommandsCommand {
     private static final Dynamic2CommandExceptionType HOME_DOESNT_EXIST = new Dynamic2CommandExceptionType((src, homeName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.error.doesnt_exist", Component.literal(homeName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.error.doesnt_exist", Component.literal(homeName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).build()
     );
     private static final Dynamic2CommandExceptionType HOME_ALREADY_EXISTS = new Dynamic2CommandExceptionType((src, homeName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.error.already_exists", Component.literal(homeName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.error.already_exists", Component.literal(homeName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).build()
     );
     private static final DynamicCommandExceptionType HOME_LIMIT_REACHED = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.add.error.limit_reached").getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.add.error.limit_reached").build()
     );
     private static final Dynamic2CommandExceptionType SAME_HOME_NAME_PROVIDED = new Dynamic2CommandExceptionType((src, homeName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.edit.name.error.same_name", Component.literal(homeName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.home.edit.name.error.same_name", Component.literal(homeName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).build()
     );
 
     public HomeCommand(ModCommandManager.ModCommand modCommand) {
@@ -125,11 +126,11 @@ public class HomeCommand extends HelpfulCommandsCommand {
 
                 CooldownManager.applyCooldown(sourcePlayer, CooldownManager.CooldownType.HOME_TP, PermissionsUtil.getMetaOrElseConfigValue(sourcePlayer, ConfigManager.CONFIG_FIELD.HOME_TP_COOLDOWN));
 
-                TextBuilder textBuilder = new TextBuilder(sourcePlayer);
-                textBuilder.appendTranslatable("commands.helpful_commands.home.teleport", Component.literal(homeName).setStyle(textStyles.getPrimary()));
-                textBuilder.setStyle(textStyles.getSuccess());
+                ComponentBuilder componentBuilder = new ComponentBuilder(sourcePlayer);
+                componentBuilder.appendTranslatable("commands.helpful_commands.home.teleport", Component.literal(homeName).setStyle(textStyles.getPrimary()));
+                componentBuilder.setStyle(textStyles.getSuccess());
 
-                src.sendSuccess(textBuilder::getComponent, true);
+                src.sendSuccess(componentBuilder::build, true);
             } catch (ServerLevelUtil.UnknownServerLevelException e) {
                 throw UNKNOWN_DIMENSION.create(src, home.dimension);
             }
@@ -150,11 +151,11 @@ public class HomeCommand extends HelpfulCommandsCommand {
         try {
             HomeManager.createHome(sourcePlayer, homeName);
 
-            TextBuilder textBuilder = new TextBuilder(sourcePlayer);
-            textBuilder.appendTranslatable("commands.helpful_commands.home.add", Component.literal(homeName).setStyle(textStyles.getPrimary()));
-            textBuilder.setStyle(textStyles.getSuccess());
+            ComponentBuilder componentBuilder = new ComponentBuilder(sourcePlayer);
+            componentBuilder.appendTranslatable("commands.helpful_commands.home.add", Component.literal(homeName).setStyle(textStyles.getPrimary()));
+            componentBuilder.setStyle(textStyles.getSuccess());
 
-            src.sendSuccess(textBuilder::getComponent, true);
+            src.sendSuccess(componentBuilder::build, true);
         } catch (HomeException.AlreadyExists e) {
             throw HOME_ALREADY_EXISTS.create(src, homeName);
         } catch (HomeException.LimitReached e) {
@@ -174,11 +175,11 @@ public class HomeCommand extends HelpfulCommandsCommand {
         try {
             HomeManager.removeHome(sourcePlayer, homeName);
 
-            TextBuilder textBuilder = new TextBuilder(sourcePlayer);
-            textBuilder.appendTranslatable("commands.helpful_commands.home.remove", Component.literal(homeName).setStyle(textStyles.getPrimary()));
-            textBuilder.setStyle(textStyles.getSuccess());
+            ComponentBuilder componentBuilder = new ComponentBuilder(sourcePlayer);
+            componentBuilder.appendTranslatable("commands.helpful_commands.home.remove", Component.literal(homeName).setStyle(textStyles.getPrimary()));
+            componentBuilder.setStyle(textStyles.getSuccess());
 
-            src.sendSuccess(textBuilder::getComponent, true);
+            src.sendSuccess(componentBuilder::build, true);
         } catch (HomeException.DoesntExist e) {
             throw HOME_DOESNT_EXIST.create(src, homeName);
         }
@@ -196,11 +197,11 @@ public class HomeCommand extends HelpfulCommandsCommand {
         try {
             HomeManager.setHomeName(sourcePlayer, homeName, newName);
 
-            TextBuilder textBuilder = new TextBuilder(sourcePlayer);
-            textBuilder.appendTranslatable("commands.helpful_commands.home.edit.name", Component.literal(homeName).setStyle(textStyles.getPrimary()), Component.literal(newName).setStyle(textStyles.getPrimary()));
-            textBuilder.setStyle(textStyles.getSuccess());
+            ComponentBuilder componentBuilder = new ComponentBuilder(sourcePlayer);
+            componentBuilder.appendTranslatable("commands.helpful_commands.home.edit.name", Component.literal(homeName).setStyle(textStyles.getPrimary()), Component.literal(newName).setStyle(textStyles.getPrimary()));
+            componentBuilder.setStyle(textStyles.getSuccess());
 
-            src.sendSuccess(textBuilder::getComponent, true);
+            src.sendSuccess(componentBuilder::build, true);
         } catch (HomeException.DoesntExist e) {
             throw HOME_DOESNT_EXIST.create(src, homeName);
         } catch (HomeException.SameName e) {
@@ -222,11 +223,11 @@ public class HomeCommand extends HelpfulCommandsCommand {
         try {
             HomeManager.setHomeLocation(sourcePlayer, homeName, sourcePlayer.position(), sourcePlayer.level());
 
-            TextBuilder textBuilder = new TextBuilder(sourcePlayer);
-            textBuilder.appendTranslatable("commands.helpful_commands.home.edit.location", Component.literal(homeName).setStyle(textStyles.getPrimary()));
-            textBuilder.setStyle(textStyles.getSuccess());
+            ComponentBuilder componentBuilder = new ComponentBuilder(sourcePlayer);
+            componentBuilder.appendTranslatable("commands.helpful_commands.home.edit.location", Component.literal(homeName).setStyle(textStyles.getPrimary()));
+            componentBuilder.setStyle(textStyles.getSuccess());
 
-            src.sendSuccess(textBuilder::getComponent, true);
+            src.sendSuccess(componentBuilder::build, true);
         } catch (HomeException.DoesntExist e) {
             throw HOME_DOESNT_EXIST.create(src, homeName);
         }
@@ -244,9 +245,9 @@ public class HomeCommand extends HelpfulCommandsCommand {
 
         try {
             Home home = HomeManager.getHome(sourcePlayer, homeName);
-            TextBuilder textBuilder = new TextBuilder(sourcePlayer);
+            ComponentBuilder componentBuilder = new ComponentBuilder(sourcePlayer);
 
-            textBuilder
+            componentBuilder
                     .appendComponent(StylingUtil.getTitle(Component.literal(TranslationManager.translate(sourcePlayer, "commands.helpful_commands.home.info.title")), Component.literal(homeName)))
                     .appendNewline()
                     .appendComponent(Component.literal(textDecorators.getBulletPoint()).setStyle(textStyles.getTertiary()))
@@ -264,7 +265,7 @@ public class HomeCommand extends HelpfulCommandsCommand {
             boolean canRemove = PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_HOME_REMOVE);
 
             if (canTp || canEdit || canRemove) {
-                textBuilder
+                componentBuilder
                         .appendNewline()
                         .appendNewline();
 
@@ -272,7 +273,7 @@ public class HomeCommand extends HelpfulCommandsCommand {
                     HoverEvent tpBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(sourcePlayer, "helpful_commands.hover.click_to_teleport")));
                     ClickEvent tpBtnClickEvent = new ClickEvent.RunCommand("/home tp " + homeName);
                     Style tpBtnStyle = textStyles.getSecondary().withHoverEvent(tpBtnHoverEvent).withClickEvent(tpBtnClickEvent);
-                    textBuilder.appendComponent(StylingUtil.getButton(textDecorators.getTeleport(), Component.literal(TranslationManager.translate(src, "helpful_commands.common.teleport")), tpBtnStyle));
+                    componentBuilder.appendComponent(StylingUtil.getButton(textDecorators.getTeleport(), Component.literal(TranslationManager.translate(src, "helpful_commands.common.teleport")), tpBtnStyle));
                 }
 
                 if (canEdit) {
@@ -280,9 +281,9 @@ public class HomeCommand extends HelpfulCommandsCommand {
                     ClickEvent editBtnClickEvent = new ClickEvent.SuggestCommand("/home edit " + homeName + " ");
                     Style editBtnStyle = textStyles.getTertiary().withHoverEvent(editBtnHoverEvent).withClickEvent(editBtnClickEvent);
                     if (canTp) {
-                        textBuilder.appendWhitespace();
+                        componentBuilder.appendWhitespace();
                     }
-                    textBuilder.appendComponent(StylingUtil.getButton(Component.literal(textDecorators.getEdit()), editBtnStyle));
+                    componentBuilder.appendComponent(StylingUtil.getButton(Component.literal(textDecorators.getEdit()), editBtnStyle));
                 }
 
                 if (canRemove) {
@@ -290,13 +291,13 @@ public class HomeCommand extends HelpfulCommandsCommand {
                     ClickEvent removeBtnClickEvent = new ClickEvent.RunCommand("/home remove " + homeName);
                     Style removeBtnStyle = textStyles.getDangerousAction().withHoverEvent(removeBtnHoverEvent).withClickEvent(removeBtnClickEvent);
                     if (canTp || canEdit) {
-                        textBuilder.appendWhitespace();
+                        componentBuilder.appendWhitespace();
                     }
-                    textBuilder.appendComponent(StylingUtil.getButton(Component.literal(textDecorators.getRemove()), removeBtnStyle));
+                    componentBuilder.appendComponent(StylingUtil.getButton(Component.literal(textDecorators.getRemove()), removeBtnStyle));
                 }
             }
 
-            src.sendSystemMessage(textBuilder.getComponent());
+            src.sendSystemMessage(componentBuilder.build());
         } catch (HomeException.DoesntExist e) {
             throw HOME_DOESNT_EXIST.create(src, homeName);
         }

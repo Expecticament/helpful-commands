@@ -7,7 +7,7 @@ import com.expecticament.helpful_commands.util.SoundUtil;
 import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
-import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
@@ -75,7 +75,7 @@ public class HatCommand extends HelpfulCommandsCommand {
 
         ServerPlayer sourcePlayer = validatePlayerOnly(src);
 
-        TextBuilder textBuilder = new TextBuilder(src);
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
 
         if (itemFromMainHand) {
             Inventory inventory = sourcePlayer.getInventory();
@@ -88,13 +88,13 @@ public class HatCommand extends HelpfulCommandsCommand {
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
         if (itemStack.getItem() != Items.AIR) {
-            textBuilder.appendTranslatable("commands.helpful_commands.hat.self", getItemName(itemStack));
+            componentBuilder.appendTranslatable("commands.helpful_commands.hat.self", getItemName(itemStack));
         } else {
-            textBuilder.appendTranslatable("commands.helpful_commands.hat.remove.self");
+            componentBuilder.appendTranslatable("commands.helpful_commands.hat.remove.self");
         }
-        textBuilder.setStyle(textStyles.getSuccess());
+        componentBuilder.setStyle(textStyles.getSuccess());
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -133,15 +133,15 @@ public class HatCommand extends HelpfulCommandsCommand {
                 continue;
             }
             if (commandFeedback && player != sourcePlayer) {
-                TextBuilder textBuilder = new TextBuilder(player);
+                ComponentBuilder componentBuilder = new ComponentBuilder(player);
                 if (isAir) {
-                    textBuilder.appendTranslatable("commands.helpful_commands.hat.remove.affected");
+                    componentBuilder.appendTranslatable("commands.helpful_commands.hat.remove.affected");
 
                 } else {
-                    textBuilder.appendTranslatable("commands.helpful_commands.hat.affected", itemNameComponent);
+                    componentBuilder.appendTranslatable("commands.helpful_commands.hat.affected", itemNameComponent);
                 }
-                textBuilder.setStyle(textStyles.getAffectedNeutral());
-                player.sendSystemMessage(textBuilder.getComponent());
+                componentBuilder.setStyle(textStyles.getAffectedNeutral());
+                player.sendSystemMessage(componentBuilder.build());
             }
             affected.add(player);
         }
@@ -150,25 +150,25 @@ public class HatCommand extends HelpfulCommandsCommand {
             throw EntityArgument.NO_PLAYERS_FOUND.create();
         }
 
-        TextBuilder textBuilder = new TextBuilder(src);
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
 
         if (affected.size() == 1) {
             if (isAir) {
-                textBuilder.appendTranslatable("commands.helpful_commands.hat.remove.other", StylingUtil.getAffectedEntityNameText(affected.getFirst()));
+                componentBuilder.appendTranslatable("commands.helpful_commands.hat.remove.other", StylingUtil.getAffectedEntityNameText(affected.getFirst()));
             } else {
-                textBuilder.appendTranslatable("commands.helpful_commands.hat.other", itemNameComponent, StylingUtil.getAffectedEntityNameText(affected.getFirst()));
+                componentBuilder.appendTranslatable("commands.helpful_commands.hat.other", itemNameComponent, StylingUtil.getAffectedEntityNameText(affected.getFirst()));
             }
         } else {
             if (isAir) {
-                textBuilder.appendTranslatable("commands.helpful_commands.hat.remove.others", StylingUtil.getAffectedEntitiesNumberText(affected));
+                componentBuilder.appendTranslatable("commands.helpful_commands.hat.remove.others", StylingUtil.getAffectedEntitiesNumberText(affected));
             } else {
-                textBuilder.appendTranslatable("commands.helpful_commands.hat.others", itemNameComponent, StylingUtil.getAffectedEntitiesNumberText(affected));
+                componentBuilder.appendTranslatable("commands.helpful_commands.hat.others", itemNameComponent, StylingUtil.getAffectedEntitiesNumberText(affected));
             }
         }
 
-        textBuilder.setStyle(textStyles.getSuccess());
+        componentBuilder.setStyle(textStyles.getSuccess());
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return players.size();
     }

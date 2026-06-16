@@ -149,7 +149,7 @@
   "commands.helpful_commands.repair.other": "Repaired %s's %s",
   "commands.helpful_commands.repair.others": "Repaired %s items",
   "commands.helpful_commands.repair.error.item_not_damageable": "The item in your main hand can't be damaged",
-  "commands.helpful_commands.repair.error.item_not_damaged": "The item in your main isn't damaged",
+  "commands.helpful_commands.repair.error.item_not_damaged": "The item in your main hand isn't damaged",
 
   "commands.helpful_commands.smelt.self": "Smelted your %s",
   "commands.helpful_commands.smelt.affected": "Your %s has been smelted",

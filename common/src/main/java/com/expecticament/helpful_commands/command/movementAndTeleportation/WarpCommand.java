@@ -9,8 +9,8 @@ import com.expecticament.helpful_commands.util.ServerLevelUtil;
 import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
-import com.expecticament.helpful_commands.manager.TranslationManager;
-import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpful_commands.manager.translation.TranslationManager;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.manager.warp.WarpManager;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
@@ -43,19 +43,19 @@ import java.util.Objects;
 
 public class WarpCommand extends HelpfulCommandsCommand {
     private static final Dynamic2CommandExceptionType WARP_DOESNT_EXIST = new Dynamic2CommandExceptionType((src, warpName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.doesnt_exist", Component.literal(warpName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.doesnt_exist", Component.literal(warpName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).build()
     );
     private static final Dynamic2CommandExceptionType WARP_ALREADY_EXISTS = new Dynamic2CommandExceptionType((src, warpName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.already_exists", Component.literal(warpName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.already_exists", Component.literal(warpName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).build()
     );
     private static final Dynamic2CommandExceptionType SAME_WARP_NAME_PROVIDED = new Dynamic2CommandExceptionType((src, warpName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.edit.name.error.same_name", Component.literal(warpName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.edit.name.error.same_name", Component.literal(warpName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).build()
     );
     private static final DynamicCommandExceptionType NO_POSITION_PROVIDED = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.no_position").getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.no_position").build()
     );
     private static final DynamicCommandExceptionType NO_DIMENSION_PROVIDED = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.no_dimension").getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.warp.error.no_dimension").build()
     );
 
     public WarpCommand(ModCommandManager.ModCommand modCommand) {
@@ -177,9 +177,9 @@ public class WarpCommand extends HelpfulCommandsCommand {
                         .peek(e -> {
                             if (e.isAlwaysTicking() && e != sourcePlayer && commandFeedback) {
                                 ServerPlayer plr = (ServerPlayer) e;
-                                TextBuilder affectedMsgTextBuilder = new TextBuilder(src);
-                                affectedMsgTextBuilder.appendTranslatable("commands.helpful_commands.warp.teleport.affected", Component.literal(warpName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getAffectedNeutral());
-                                plr.sendSystemMessage(affectedMsgTextBuilder.getComponent());
+                                ComponentBuilder affectedMsgComponentBuilder = new ComponentBuilder(src);
+                                affectedMsgComponentBuilder.appendTranslatable("commands.helpful_commands.warp.teleport.affected", Component.literal(warpName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getAffectedNeutral());
+                                plr.sendSystemMessage(affectedMsgComponentBuilder.build());
                             }
                         })
                         .toList();
@@ -205,19 +205,19 @@ public class WarpCommand extends HelpfulCommandsCommand {
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
         MutableComponent warpNameText = Component.literal(warpName).setStyle(textStyles.getPrimary());
 
-        TextBuilder textBuilder = new TextBuilder(src);
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
 
         if (multiple) {
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.teleport.others", StylingUtil.getAffectedEntitiesNumberText(affected), warpNameText);
+            componentBuilder.appendTranslatable("commands.helpful_commands.warp.teleport.others", StylingUtil.getAffectedEntitiesNumberText(affected), warpNameText);
         } else if (self) {
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.teleport.self", warpNameText);
+            componentBuilder.appendTranslatable("commands.helpful_commands.warp.teleport.self", warpNameText);
         } else {
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.teleport.other", StylingUtil.getAffectedEntityNameText(affected.getFirst()), warpNameText);
+            componentBuilder.appendTranslatable("commands.helpful_commands.warp.teleport.other", StylingUtil.getAffectedEntityNameText(affected.getFirst()), warpNameText);
         }
 
-        textBuilder.setStyle(textStyles.getSuccess());
+        componentBuilder.setStyle(textStyles.getSuccess());
 
-        return textBuilder.getComponent();
+        return componentBuilder.build();
     }
 
     private int addWarp(CommandContext<CommandSourceStack> ctx, String warpName) throws CommandSyntaxException {
@@ -257,9 +257,9 @@ public class WarpCommand extends HelpfulCommandsCommand {
 
         try {
             WarpManager.createWarp(warpName, warpDescription, position, serverLevel);
-            TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.add", Component.literal(warpName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
-            src.sendSuccess(textBuilder::getComponent, true);
+            ComponentBuilder componentBuilder = new ComponentBuilder(src);
+            componentBuilder.appendTranslatable("commands.helpful_commands.warp.add", Component.literal(warpName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
+            src.sendSuccess(componentBuilder::build, true);
         } catch (WarpException.AlreadyExists e) {
             throw WARP_ALREADY_EXISTS.create(src, warpName);
         }
@@ -276,9 +276,9 @@ public class WarpCommand extends HelpfulCommandsCommand {
 
         try {
             WarpManager.removeWarp(warpName);
-            TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.remove", Component.literal(warpName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
-            src.sendSuccess(textBuilder::getComponent, true);
+            ComponentBuilder componentBuilder = new ComponentBuilder(src);
+            componentBuilder.appendTranslatable("commands.helpful_commands.warp.remove", Component.literal(warpName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
+            src.sendSuccess(componentBuilder::build, true);
         } catch (WarpException.DoesntExist e) {
             throw WARP_DOESNT_EXIST.create(src, warpName);
         }
@@ -295,9 +295,9 @@ public class WarpCommand extends HelpfulCommandsCommand {
 
         try {
             WarpManager.setWarpName(warpName, newName);
-            TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.edit.name", Component.literal(warpName).setStyle(textStyles.getPrimary()), Component.literal(newName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
-            src.sendSuccess(textBuilder::getComponent, true);
+            ComponentBuilder componentBuilder = new ComponentBuilder(src);
+            componentBuilder.appendTranslatable("commands.helpful_commands.warp.edit.name", Component.literal(warpName).setStyle(textStyles.getPrimary()), Component.literal(newName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
+            src.sendSuccess(componentBuilder::build, true);
         } catch (WarpException.DoesntExist e) {
             throw WARP_DOESNT_EXIST.create(src, warpName);
         } catch (WarpException.SameName e) {
@@ -318,9 +318,9 @@ public class WarpCommand extends HelpfulCommandsCommand {
 
         try {
             WarpManager.setWarpDescription(warpName, newDescription);
-            TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.edit.description", Component.literal(warpName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
-            src.sendSuccess(textBuilder::getComponent, true);
+            ComponentBuilder componentBuilder = new ComponentBuilder(src);
+            componentBuilder.appendTranslatable("commands.helpful_commands.warp.edit.description", Component.literal(warpName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
+            src.sendSuccess(componentBuilder::build, true);
         } catch (WarpException.DoesntExist e) {
             throw WARP_DOESNT_EXIST.create(src, warpName);
         }
@@ -361,9 +361,9 @@ public class WarpCommand extends HelpfulCommandsCommand {
 
         try {
             WarpManager.setWarpLocation(warpName, newPosition, newServerLevel);
-            TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.warp.edit.location", Component.literal(warpName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
-            src.sendSuccess(textBuilder::getComponent, true);
+            ComponentBuilder componentBuilder = new ComponentBuilder(src);
+            componentBuilder.appendTranslatable("commands.helpful_commands.warp.edit.location", Component.literal(warpName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
+            src.sendSuccess(componentBuilder::build, true);
         } catch (WarpException.DoesntExist e) {
             throw WARP_DOESNT_EXIST.create(src, warpName);
         }
@@ -381,21 +381,21 @@ public class WarpCommand extends HelpfulCommandsCommand {
 
         try{
             Warp warp = WarpManager.getWarp(warpName);
-            TextBuilder textBuilder = new TextBuilder(src);
+            ComponentBuilder componentBuilder = new ComponentBuilder(src);
 
             Component bulletPointComponent = Component.literal(textDecorators.getBulletPoint()).setStyle(textStyles.getTertiary());
             Component colonComponent = Component.literal(": ").setStyle(textStyles.getTertiary());
 
-            textBuilder.appendComponent(StylingUtil.getTitle(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.warp.info.title")), Component.literal(warpName)));
+            componentBuilder.appendComponent(StylingUtil.getTitle(Component.literal(TranslationManager.translate(src, "commands.helpful_commands.warp.info.title")), Component.literal(warpName)));
             if (!warp.description.isEmpty() && !warp.description.equals(" ")) {
-                textBuilder
+                componentBuilder
                         .appendNewline()
                         .appendComponent(bulletPointComponent)
                         .appendComponent(Component.literal(TranslationManager.translate(src, "helpful_commands.common.description")).setStyle(textStyles.getTertiary()))
                         .appendComponent(colonComponent)
                         .appendLiteral(warp.description);
             }
-            textBuilder
+            componentBuilder
                     .appendNewline()
                     .appendComponent(bulletPointComponent)
                     .appendComponent(Component.literal(TranslationManager.translate(src, "helpful_commands.common.position")).setStyle(textStyles.getTertiary()))
@@ -408,7 +408,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
                     .appendComponent(Component.literal(warp.dimension).setStyle(textStyles.getSecondary()));
 
             if (!src.isPlayer()) {
-                textBuilder
+                componentBuilder
                         .appendNewline()
                         .appendNewline()
                         .appendLiteral(TranslationManager.translate(src, "helpful_commands.common.teleport") + ": /warp tp %s <entities>".formatted(warpName))
@@ -421,7 +421,7 @@ public class WarpCommand extends HelpfulCommandsCommand {
                 boolean canEdit = PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_EDIT);
                 boolean canRemove = PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_WARP_REMOVE);
                 if (canTp || canEdit || canRemove) {
-                    textBuilder
+                    componentBuilder
                             .appendNewline()
                             .appendNewline();
 
@@ -429,30 +429,30 @@ public class WarpCommand extends HelpfulCommandsCommand {
                         HoverEvent tpBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "helpful_commands.hover.click_to_teleport")));
                         ClickEvent tpBtnClickEvent = new ClickEvent.RunCommand("/warp tp " + warpName);
                         Style tpBtnStyle = textStyles.getSecondary().withHoverEvent(tpBtnHoverEvent).withClickEvent(tpBtnClickEvent);
-                        textBuilder.appendComponent(StylingUtil.getButton(textDecorators.getTeleport(), Component.literal(TranslationManager.translate(src, "helpful_commands.common.teleport")), tpBtnStyle));
+                        componentBuilder.appendComponent(StylingUtil.getButton(textDecorators.getTeleport(), Component.literal(TranslationManager.translate(src, "helpful_commands.common.teleport")), tpBtnStyle));
                     }
                     if (canEdit) {
                         HoverEvent editBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "helpful_commands.hover.click_to_edit")));
                         ClickEvent editBtnClickEvent = new ClickEvent.SuggestCommand("/warp edit " + warpName + " ");
                         Style editBtnStyle = textStyles.getTertiary().withHoverEvent(editBtnHoverEvent).withClickEvent(editBtnClickEvent);
                         if (canTp) {
-                            textBuilder.appendWhitespace();
+                            componentBuilder.appendWhitespace();
                         }
-                        textBuilder.appendComponent(StylingUtil.getButton(Component.literal(textDecorators.getEdit()), editBtnStyle));
+                        componentBuilder.appendComponent(StylingUtil.getButton(Component.literal(textDecorators.getEdit()), editBtnStyle));
                     }
                     if (canRemove) {
                         HoverEvent removeBtnHoverEvent = new HoverEvent.ShowText(Component.literal(TranslationManager.translate(src, "helpful_commands.hover.click_to_remove")));
                         ClickEvent removeBtnClickEvent = new ClickEvent.RunCommand("/warp remove " + warpName);
                         Style removeBtnStyle = textStyles.getDangerousAction().withHoverEvent(removeBtnHoverEvent).withClickEvent(removeBtnClickEvent);
                         if (canTp || canEdit) {
-                            textBuilder.appendWhitespace();
+                            componentBuilder.appendWhitespace();
                         }
-                        textBuilder.appendComponent(StylingUtil.getButton(Component.literal(textDecorators.getRemove()), removeBtnStyle));
+                        componentBuilder.appendComponent(StylingUtil.getButton(Component.literal(textDecorators.getRemove()), removeBtnStyle));
                     }
                 }
             }
 
-            src.sendSystemMessage(textBuilder.getComponent());
+            src.sendSystemMessage(componentBuilder.build());
         } catch (WarpException.DoesntExist e) {
             throw WARP_DOESNT_EXIST.create(src, warpName);
         }

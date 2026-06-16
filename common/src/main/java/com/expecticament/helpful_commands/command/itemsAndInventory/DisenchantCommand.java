@@ -6,7 +6,7 @@ import com.expecticament.helpful_commands.util.PermissionsUtil;
 import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
-import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
@@ -37,13 +37,13 @@ public class DisenchantCommand extends HelpfulCommandsCommand {
     public record EnchantmentData(Enchantment enchantment, int level) {}
 
     private static final Dynamic3CommandExceptionType NO_ENCHANTMENT_SELF = new Dynamic3CommandExceptionType((src, itemName, enchantmentName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.disenchant.error.no_enchantment",
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.disenchant.error.no_enchantment",
                     Component.literal(itemName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary()),
-                    (Component) enchantmentName).getComponent()
+                    (Component) enchantmentName).build()
     );
     private static final Dynamic2CommandExceptionType NO_ENCHANTMENTS_SELF = new Dynamic2CommandExceptionType((src, itemName) ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.disenchant.error.no_enchantments",
-                    Component.literal(itemName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.disenchant.error.no_enchantments",
+                    Component.literal(itemName.toString()).setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary())).build()
     );
 
     public DisenchantCommand(ModCommandManager.ModCommand modCommand) {
@@ -90,7 +90,7 @@ public class DisenchantCommand extends HelpfulCommandsCommand {
         }
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
-        TextBuilder srcFeedback = new TextBuilder(src);
+        ComponentBuilder srcFeedback = new ComponentBuilder(src);
         Component itemNameComponent = StylingUtil.getItemStackName(mainHandItemStack);
 
         if (enchantmentHolder != null) {
@@ -98,10 +98,10 @@ public class DisenchantCommand extends HelpfulCommandsCommand {
             if (removedEnchantment != null) {
                 srcFeedback.appendTranslatable("commands.helpful_commands.disenchant.self",
                         getEnchantmentNameAndLevelComponent(removedEnchantment.enchantment(), removedEnchantment.level(), textStyles.getPrimary()),
-                        new TextBuilder(src).appendTranslatable("commands.helpful_commands.disenchant.enchantment").getComponent(),
+                        new ComponentBuilder(src).appendTranslatable("commands.helpful_commands.disenchant.enchantment").build(),
                         itemNameComponent);
                 srcFeedback.setStyle(textStyles.getSuccess());
-                src.sendSuccess(srcFeedback::getComponent, true);
+                src.sendSuccess(srcFeedback::build, true);
                 return Command.SINGLE_SUCCESS;
             } else {
                 throw NO_ENCHANTMENT_SELF.create(src, itemNameComponent.getString(), Component.literal(enchantmentHolder.value().description().getString()).setStyle(textStyles.getPrimary()));
@@ -110,14 +110,14 @@ public class DisenchantCommand extends HelpfulCommandsCommand {
             List<EnchantmentData> removedEnchantments = removeAllEnchantments(mainHandItemStack);
             int count = removedEnchantments.size();
             if (count > 0) {
-                TextBuilder enchantmentTextBuilder = new TextBuilder(src);
-                enchantmentTextBuilder.appendTranslatable("commands.helpful_commands.disenchant.enchantment" + (count == 1 ? "" : "s"));
+                ComponentBuilder enchantmentComponentBuilder = new ComponentBuilder(src);
+                enchantmentComponentBuilder.appendTranslatable("commands.helpful_commands.disenchant.enchantment" + (count == 1 ? "" : "s"));
                 srcFeedback.appendTranslatable("commands.helpful_commands.disenchant.self",
                         getRemovedEnchantmentsCountComponent(removedEnchantments, textStyles),
-                        enchantmentTextBuilder.getComponent(),
+                        enchantmentComponentBuilder.build(),
                         itemNameComponent);
                 srcFeedback.setStyle(textStyles.getSuccess());
-                src.sendSuccess(srcFeedback::getComponent, true);
+                src.sendSuccess(srcFeedback::build, true);
                 return count;
             } else {
                 throw NO_ENCHANTMENTS_SELF.create(src, itemNameComponent.getString());
@@ -158,16 +158,16 @@ public class DisenchantCommand extends HelpfulCommandsCommand {
                 if (entity.isAlwaysTicking() && commandFeedback) {
                     ServerPlayer player = (ServerPlayer) entity;
                     if (player != sourcePlayer) {
-                        TextBuilder textBuilder = new TextBuilder(player);
-                        textBuilder.setStyle(textStyles.getAffectedPositive());
-                        textBuilder.appendTranslatable("commands.helpful_commands.disenchant.affected",
+                        ComponentBuilder componentBuilder = new ComponentBuilder(player);
+                        componentBuilder.setStyle(textStyles.getAffectedPositive());
+                        componentBuilder.appendTranslatable("commands.helpful_commands.disenchant.affected",
                                 getEnchantmentNameAndLevelComponent(removedEnchantment.enchantment(), removedEnchantment.level(), textStyles.getPrimary()),
-                                new TextBuilder(player).appendTranslatable("commands.helpful_commands.disenchant.enchantment").getComponent(),
-                                new TextBuilder(player).appendTranslatable("commands.helpful_commands.disenchant.affected.single").getComponent(),
+                                new ComponentBuilder(player).appendTranslatable("commands.helpful_commands.disenchant.enchantment").build(),
+                                new ComponentBuilder(player).appendTranslatable("commands.helpful_commands.disenchant.affected.single").build(),
                                 StylingUtil.getItemStackName(itemStack))
                                 .setStyle(textStyles.getAffectedNeutral());
 
-                        player.sendSystemMessage(textBuilder.getComponent());
+                        player.sendSystemMessage(componentBuilder.build());
                     }
                 }
 
@@ -183,16 +183,16 @@ public class DisenchantCommand extends HelpfulCommandsCommand {
                     ServerPlayer player = (ServerPlayer) entity;
                     if (player != sourcePlayer) {
                         int removedSize = removedEnchantments.size();
-                        TextBuilder textBuilder = new TextBuilder(player);
-                        textBuilder.setStyle(textStyles.getAffectedPositive());
-                        textBuilder.appendTranslatable("commands.helpful_commands.disenchant.affected",
+                        ComponentBuilder componentBuilder = new ComponentBuilder(player);
+                        componentBuilder.setStyle(textStyles.getAffectedPositive());
+                        componentBuilder.appendTranslatable("commands.helpful_commands.disenchant.affected",
                                         getRemovedEnchantmentsCountComponent(removedEnchantments, textStyles),
-                                        new TextBuilder(player).appendTranslatable("commands.helpful_commands.disenchant.enchantment" + (removedSize == 1 ? "" : "s")).getComponent(),
-                                        new TextBuilder(player).appendTranslatable("commands.helpful_commands.disenchant.affected." + (removedSize == 1 ? "single" : "multiple")).getComponent(),
+                                        new ComponentBuilder(player).appendTranslatable("commands.helpful_commands.disenchant.enchantment" + (removedSize == 1 ? "" : "s")).build(),
+                                        new ComponentBuilder(player).appendTranslatable("commands.helpful_commands.disenchant.affected." + (removedSize == 1 ? "single" : "multiple")).build(),
                                         StylingUtil.getItemStackName(itemStack))
                                 .setStyle(textStyles.getAffectedNeutral());
 
-                        player.sendSystemMessage(textBuilder.getComponent());
+                        player.sendSystemMessage(componentBuilder.build());
                     }
                 }
 
@@ -207,13 +207,13 @@ public class DisenchantCommand extends HelpfulCommandsCommand {
             throw NO_ITEMS_FOUND.create(src);
         }
 
-        TextBuilder feedback = new TextBuilder(src);
+        ComponentBuilder feedback = new ComponentBuilder(src);
         feedback.appendTranslatable("commands.helpful_commands.disenchant.others",
                 getRemovedEnchantmentsCountComponent(src, affected, affectedItems, removedCount, textStyles),
-                new TextBuilder(src).appendTranslatable("commands.helpful_commands.disenchant.enchantment" + (removedCount == 1 ? "" : "s")).getComponent())
+                new ComponentBuilder(src).appendTranslatable("commands.helpful_commands.disenchant.enchantment" + (removedCount == 1 ? "" : "s")).build())
                 .setStyle(textStyles.getSuccess());
 
-        src.sendSuccess(feedback::getComponent, true);
+        src.sendSuccess(feedback::build, true);
 
         return affected.size();
     }
@@ -285,12 +285,12 @@ public class DisenchantCommand extends HelpfulCommandsCommand {
     }
 
     private Component getRemovedEnchantmentsCountComponent(CommandSourceStack src, Map<Entity, List<EnchantmentData>> affected, Map<Entity, ItemStack> affectedItems, int count, HelpfulCommandsStyle.TextStyles textStyles) {
-        TextBuilder textBuilder = new TextBuilder(src);
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
 
         boolean isFirstEntry = true;
         for (Map.Entry<Entity, List<EnchantmentData>> entry : affected.entrySet()) {
             if (!isFirstEntry) {
-                textBuilder.appendNewline();
+                componentBuilder.appendNewline();
             }
 
             Entity entity = entry.getKey();
@@ -312,11 +312,11 @@ public class DisenchantCommand extends HelpfulCommandsCommand {
                 isFirstRemoved = false;
             }
 
-            textBuilder.appendTranslatable("commands.helpful_commands.disenchant.hover.entry", entityNameComponent, itemNameComponent, enchantmentList);
+            componentBuilder.appendTranslatable("commands.helpful_commands.disenchant.hover.entry", entityNameComponent, itemNameComponent, enchantmentList);
 
             isFirstEntry = false;
         }
 
-        return Component.literal(String.valueOf(count)).setStyle(textStyles.getPrimary().withHoverEvent(new HoverEvent.ShowText(textBuilder.getComponent())));
+        return Component.literal(String.valueOf(count)).setStyle(textStyles.getPrimary().withHoverEvent(new HoverEvent.ShowText(componentBuilder.build())));
     }
 }

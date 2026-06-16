@@ -6,8 +6,8 @@ import com.expecticament.helpful_commands.util.ServerLevelUtil;
 import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
-import com.expecticament.helpful_commands.manager.TranslationManager;
-import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpful_commands.manager.translation.TranslationManager;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
@@ -75,10 +75,10 @@ public class CoordsCommand extends HelpfulCommandsCommand {
 
         String dimensionKey = ServerLevelUtil.getLevelLocation(sourcePlayer.level());
 
-        TextBuilder textBuilder = new TextBuilder(src);
-        textBuilder.appendTranslatable("commands.helpful_commands.coords.self", StylingUtil.getLocationText(sourcePlayer.position(), dimensionKey));
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
+        componentBuilder.appendTranslatable("commands.helpful_commands.coords.self", StylingUtil.getLocationText(sourcePlayer.position(), dimensionKey));
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -109,15 +109,15 @@ public class CoordsCommand extends HelpfulCommandsCommand {
         }
 
         for (ServerPlayer plr : playerList) {
-            TextBuilder textBuilder = new TextBuilder(plr);
-            textBuilder.appendTranslatable("commands.helpful_commands.coords.other", StylingUtil.getAffectedEntityNameText(player), StylingUtil.getLocationText(player.position(), dimensionKey));
-            plr.sendSystemMessage(textBuilder.getComponent());
+            ComponentBuilder componentBuilder = new ComponentBuilder(plr);
+            componentBuilder.appendTranslatable("commands.helpful_commands.coords.other", StylingUtil.getAffectedEntityNameText(player), StylingUtil.getLocationText(player.position(), dimensionKey));
+            plr.sendSystemMessage(componentBuilder.build());
         }
 
         if (sourcePlayer == null) {
-            TextBuilder textBuilder = new TextBuilder(src);
-            textBuilder.appendTranslatable("commands.helpful_commands.coords.other", StylingUtil.getAffectedEntityNameText(player), StylingUtil.getLocationText(player.position(), dimensionKey));
-            src.sendSystemMessage(textBuilder.getComponent());
+            ComponentBuilder componentBuilder = new ComponentBuilder(src);
+            componentBuilder.appendTranslatable("commands.helpful_commands.coords.other", StylingUtil.getAffectedEntityNameText(player), StylingUtil.getLocationText(player.position(), dimensionKey));
+            src.sendSystemMessage(componentBuilder.build());
         }
 
         return Command.SINGLE_SUCCESS;
@@ -139,13 +139,13 @@ public class CoordsCommand extends HelpfulCommandsCommand {
 
         String dimensionKey = ServerLevelUtil.getLevelLocation(sourcePlayer.level());
         for (ServerPlayer player : playerList) {
-            TextBuilder textBuilder = new TextBuilder(player);
-            textBuilder.appendTranslatable("commands.helpful_commands.coords.share.affected", StylingUtil.getAffectedEntityNameText(sourcePlayer), StylingUtil.getLocationText(sourcePlayer.position(), dimensionKey));
-            player.sendSystemMessage(textBuilder.getComponent());
+            ComponentBuilder componentBuilder = new ComponentBuilder(player);
+            componentBuilder.appendTranslatable("commands.helpful_commands.coords.share.affected", StylingUtil.getAffectedEntityNameText(sourcePlayer), StylingUtil.getLocationText(sourcePlayer.position(), dimensionKey));
+            player.sendSystemMessage(componentBuilder.build());
         }
 
-        TextBuilder textBuilder = new TextBuilder(sourcePlayer);
-        textBuilder.setStyle(textStyles.getSuccess());
+        ComponentBuilder componentBuilder = new ComponentBuilder(sourcePlayer);
+        componentBuilder.setStyle(textStyles.getSuccess());
 
         MutableComponent affected = Component.empty();
         if (playerList.size() == 1) {
@@ -156,9 +156,9 @@ public class CoordsCommand extends HelpfulCommandsCommand {
                     .append(TranslationManager.translate(src, "commands.helpful_commands.coords.share.multiple"));
         }
 
-        textBuilder.appendTranslatable("commands.helpful_commands.coords.share.other", affected);
+        componentBuilder.appendTranslatable("commands.helpful_commands.coords.share.other", affected);
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return playerList.size();
     }
@@ -174,10 +174,10 @@ public class CoordsCommand extends HelpfulCommandsCommand {
 
         String dimensionKey = ServerLevelUtil.getLevelLocation(player.level());
 
-        TextBuilder textBuilder = new TextBuilder(src);
-        textBuilder.appendTranslatable("commands.helpful_commands.coords.other", StylingUtil.getAffectedEntityNameText(player), StylingUtil.getLocationText(player.position(), dimensionKey));
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
+        componentBuilder.appendTranslatable("commands.helpful_commands.coords.other", StylingUtil.getAffectedEntityNameText(player), StylingUtil.getLocationText(player.position(), dimensionKey));
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return Command.SINGLE_SUCCESS;
     }

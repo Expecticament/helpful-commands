@@ -6,7 +6,7 @@ import com.expecticament.helpful_commands.util.PermissionsUtil;
 import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
-import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
@@ -29,10 +29,10 @@ import java.util.Map;
 
 public class RepairCommand extends HelpfulCommandsCommand {
     private static final DynamicCommandExceptionType ITEM_NOT_DAMAGEABLE = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.repair.error.item_not_damageable").getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.repair.error.item_not_damageable").build()
     );
     private static final DynamicCommandExceptionType ITEM_NOT_DAMAGED = new DynamicCommandExceptionType(src ->
-            new TextBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.repair.error.item_not_damaged").getComponent()
+            new ComponentBuilder((CommandSourceStack) src).appendTranslatable("commands.helpful_commands.repair.error.item_not_damaged").build()
     );
 
     public RepairCommand(ModCommandManager.ModCommand modCommand) {
@@ -70,7 +70,7 @@ public class RepairCommand extends HelpfulCommandsCommand {
             throw EMPTY_ITEM_STACK_MAIN_HAND.create(src);
         }
 
-        TextBuilder textBuilder = new TextBuilder(src);
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
 
         int result = repair(mainHandItemStack);
 
@@ -80,13 +80,13 @@ public class RepairCommand extends HelpfulCommandsCommand {
             case -1:
                 throw ITEM_NOT_DAMAGEABLE.create(src);
             case 0:
-                textBuilder.appendTranslatable("commands.helpful_commands.repair.self", StylingUtil.getItemStackName(mainHandItemStack)).setStyle(textStyles.getPrimary());
+                componentBuilder.appendTranslatable("commands.helpful_commands.repair.self", StylingUtil.getItemStackName(mainHandItemStack)).setStyle(textStyles.getPrimary());
                 break;
         }
 
-        textBuilder.setStyle(textStyles.getSuccess());
+        componentBuilder.setStyle(textStyles.getSuccess());
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -118,11 +118,11 @@ public class RepairCommand extends HelpfulCommandsCommand {
             Component itemNameComponent = StylingUtil.getItemStackName(mainHandItemStack);
 
             if (commandFeedback && sourcePlayer != player) {
-                TextBuilder textBuilder = new TextBuilder(player);
-                textBuilder.setStyle(textStyles.getAffectedPositive());
-                textBuilder.appendTranslatable("commands.helpful_commands.repair.affected", itemNameComponent);
+                ComponentBuilder componentBuilder = new ComponentBuilder(player);
+                componentBuilder.setStyle(textStyles.getAffectedPositive());
+                componentBuilder.appendTranslatable("commands.helpful_commands.repair.affected", itemNameComponent);
 
-                player.sendSystemMessage(textBuilder.getComponent());
+                player.sendSystemMessage(componentBuilder.build());
             }
 
             affected.put(player, itemNameComponent.getString());
@@ -132,7 +132,7 @@ public class RepairCommand extends HelpfulCommandsCommand {
             throw NO_ITEMS_FOUND.create(src);
         }
 
-        TextBuilder feedback = new TextBuilder(src);
+        ComponentBuilder feedback = new ComponentBuilder(src);
         feedback.setStyle(textStyles.getSuccess());
         if (affected.size() == 1) {
             feedback.appendTranslatable("commands.helpful_commands.repair.other", StylingUtil.getAffectedEntityNameText(affected.keySet().iterator().next()), Component.literal(affected.values().iterator().next()).setStyle(textStyles.getPrimary()));
@@ -140,7 +140,7 @@ public class RepairCommand extends HelpfulCommandsCommand {
             feedback.appendTranslatable("commands.helpful_commands.repair.others", StylingUtil.getAffectedEntitiesNumberText(affected));
         }
 
-        src.sendSuccess(feedback::getComponent, true);
+        src.sendSuccess(feedback::build, true);
 
         return affected.size();
     }

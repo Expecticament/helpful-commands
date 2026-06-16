@@ -5,7 +5,7 @@ import com.expecticament.helpful_commands.util.PermissionsUtil;
 import com.expecticament.helpful_commands.util.ServerLevelUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
-import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
@@ -75,15 +75,15 @@ public class TimeCommand extends HelpfulCommandsCommand {
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
-        TextBuilder hoverTextBuilder = new TextBuilder(src);
-        hoverTextBuilder.appendTranslatable("commands.helpful_commands.time.ticks", Component.literal(String.valueOf(clockManager.getTotalTicks(clock))));
-        TextBuilder timeTextBuilder = new TextBuilder(src);
-        timeTextBuilder.appendTranslatable("commands.helpful_commands.time." + time).setStyle(textStyles.getPrimary().withHoverEvent(new HoverEvent.ShowText(hoverTextBuilder.getComponent())));
+        ComponentBuilder hoverComponentBuilder = new ComponentBuilder(src);
+        hoverComponentBuilder.appendTranslatable("commands.helpful_commands.time.ticks", Component.literal(String.valueOf(clockManager.getTotalTicks(clock))));
+        ComponentBuilder timeComponentBuilder = new ComponentBuilder(src);
+        timeComponentBuilder.appendTranslatable("commands.helpful_commands.time." + time).setStyle(textStyles.getPrimary().withHoverEvent(new HoverEvent.ShowText(hoverComponentBuilder.build())));
 
-        TextBuilder messageTextBuilder = new TextBuilder(src);
-        messageTextBuilder.appendTranslatable("commands.helpful_commands.time", Component.literal(ServerLevelUtil.getLevelLocation(level)).setStyle(textStyles.getPrimary()), timeTextBuilder.getComponent()).setStyle(textStyles.getSuccess());
+        ComponentBuilder messageComponentBuilder = new ComponentBuilder(src);
+        messageComponentBuilder.appendTranslatable("commands.helpful_commands.time", Component.literal(ServerLevelUtil.getLevelLocation(level)).setStyle(textStyles.getPrimary()), timeComponentBuilder.build()).setStyle(textStyles.getSuccess());
 
-        src.sendSuccess(messageTextBuilder::getComponent, true);
+        src.sendSuccess(messageComponentBuilder::build, true);
 
         return Command.SINGLE_SUCCESS;
     }

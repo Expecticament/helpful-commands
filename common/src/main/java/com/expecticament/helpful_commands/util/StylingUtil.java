@@ -1,7 +1,7 @@
 package com.expecticament.helpful_commands.util;
 
 import com.expecticament.helpful_commands.manager.StylingManager;
-import com.expecticament.helpful_commands.manager.TranslationManager;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
@@ -203,22 +203,22 @@ public class StylingUtil {
         long minutes = (seconds % 3600) / 60;
         long remainingSeconds = seconds % 60;
 
-        TranslationManager.TextBuilder textBuilder = new TranslationManager.TextBuilder(source);
-        textBuilder.setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary());
+        ComponentBuilder componentBuilder = new ComponentBuilder(source);
+        componentBuilder.setStyle(StylingManager.getCurrentStyle().getTextStyles().getPrimary());
 
         if (days > 0) {
-            textBuilder.appendTranslatable("helpful_commands.common.day", Component.literal(String.valueOf(days)));
+            componentBuilder.appendTranslatable("helpful_commands.common.day", Component.literal(String.valueOf(days)));
         }
         if (hours > 0) {
-            textBuilder.appendTranslatable("helpful_commands.common.hour", Component.literal(String.valueOf(hours)));
+            componentBuilder.appendTranslatable("helpful_commands.common.hour", Component.literal(String.valueOf(hours)));
         }
         if (minutes > 0) {
-            textBuilder.appendTranslatable("helpful_commands.common.minute", Component.literal(String.valueOf(minutes)));
+            componentBuilder.appendTranslatable("helpful_commands.common.minute", Component.literal(String.valueOf(minutes)));
         }
         if (remainingSeconds > 0 || days + hours + minutes == 0) {
-            textBuilder.appendTranslatable("helpful_commands.common.second", Component.literal(String.valueOf(remainingSeconds)));
+            componentBuilder.appendTranslatable("helpful_commands.common.second", Component.literal(String.valueOf(remainingSeconds)));
         }
 
-        return textBuilder.getComponent();
+        return componentBuilder.build();
     }
 }

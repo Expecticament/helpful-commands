@@ -6,8 +6,8 @@ import com.expecticament.helpful_commands.util.PermissionsUtil;
 import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
-import com.expecticament.helpful_commands.manager.TranslationManager;
-import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpful_commands.manager.translation.TranslationManager;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
@@ -65,17 +65,17 @@ public class FlyCommand extends HelpfulCommandsCommand {
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
-        TextBuilder textBuilder = new TextBuilder(src);
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
 
         if (!toggleFlying(sourcePlayer, state)) {
             return 0;
         }
 
         boolean mayFly = sourcePlayer.getAbilities().mayfly;
-        textBuilder.appendTranslatable("commands.helpful_commands.fly.self", Component.literal(TranslationManager.translate(src, "commands.helpful_commands.fly." + String.valueOf(mayFly).toLowerCase())));
-        textBuilder.setStyle(mayFly ? textStyles.getAffectedPositive() : textStyles.getAffectedNegative());
+        componentBuilder.appendTranslatable("commands.helpful_commands.fly.self", Component.literal(TranslationManager.translate(src, "commands.helpful_commands.fly." + String.valueOf(mayFly).toLowerCase())));
+        componentBuilder.setStyle(mayFly ? textStyles.getAffectedPositive() : textStyles.getAffectedNegative());
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -97,9 +97,9 @@ public class FlyCommand extends HelpfulCommandsCommand {
                 .peek(player -> {
                     if (commandFeedback) {
                         if (player != sourcePlayer) {
-                            TextBuilder textBuilder = new TextBuilder(player);
-                            textBuilder.appendTranslatable("commands.helpful_commands.fly.affected", Component.literal(TranslationManager.translate(src, "commands.helpful_commands.fly." + String.valueOf(state).toLowerCase()))).setStyle(textStyles.getAffectedNeutral());
-                            player.sendSystemMessage(textBuilder.getComponent());
+                            ComponentBuilder componentBuilder = new ComponentBuilder(player);
+                            componentBuilder.appendTranslatable("commands.helpful_commands.fly.affected", Component.literal(TranslationManager.translate(src, "commands.helpful_commands.fly." + String.valueOf(state).toLowerCase()))).setStyle(textStyles.getAffectedNeutral());
+                            player.sendSystemMessage(componentBuilder.build());
                         }
                     }
                 })
@@ -119,10 +119,10 @@ public class FlyCommand extends HelpfulCommandsCommand {
                     .append(TranslationManager.translate(src, "commands.helpful_commands.fly.other.multiple"));
         }
 
-        TextBuilder textBuilder = new TextBuilder(src);
-        textBuilder.appendTranslatable("commands.helpful_commands.fly.other", Component.literal(TranslationManager.translate(src, "commands.helpful_commands.fly." + String.valueOf(state).toLowerCase())), affectedText).setStyle(textStyles.getSuccess());
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
+        componentBuilder.appendTranslatable("commands.helpful_commands.fly.other", Component.literal(TranslationManager.translate(src, "commands.helpful_commands.fly." + String.valueOf(state).toLowerCase())), affectedText).setStyle(textStyles.getSuccess());
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return affected.size();
     }

@@ -1,11 +1,11 @@
 package com.expecticament.helpful_commands.command.playersAndEntities;
 
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.util.PermissionsUtil;
 import com.expecticament.helpful_commands.util.StylingUtil;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
-import com.expecticament.helpful_commands.manager.TranslationManager;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
 import com.mojang.brigadier.Command;
@@ -87,14 +87,14 @@ public class DmgCommand extends HelpfulCommandsCommand {
         ServerLevel serverLevel = src.getLevel();
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
-        TranslationManager.TextBuilder textBuilder = new TranslationManager.TextBuilder(src);
-        textBuilder.setStyle(textStyles.getSuccess());
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
+        componentBuilder.setStyle(textStyles.getSuccess());
 
         if (entities.size() == 1) {
             Entity entity = entities.iterator().next();
             if (entity.hurtServer(serverLevel, damageSource, amount)) {
-                textBuilder.appendTranslatable("commands.helpful_commands.dmg.other.single", Component.literal(String.valueOf(amount)).setStyle(textStyles.getPrimary()), StylingUtil.getAffectedEntityNameText(entity));
-                src.sendSuccess(textBuilder::getComponent, true);
+                componentBuilder.appendTranslatable("commands.helpful_commands.dmg.other.single", Component.literal(String.valueOf(amount)).setStyle(textStyles.getPrimary()), StylingUtil.getAffectedEntityNameText(entity));
+                src.sendSuccess(componentBuilder::build, true);
                 return Command.SINGLE_SUCCESS;
             } else {
                 throw ERROR_INVULNERABLE.create();
@@ -112,9 +112,9 @@ public class DmgCommand extends HelpfulCommandsCommand {
             throw EntityArgument.NO_ENTITIES_FOUND.create();
         }
 
-        textBuilder.appendTranslatable("commands.helpful_commands.dmg.other.multiple", Component.literal(String.valueOf(amount)).setStyle(textStyles.getPrimary()), StylingUtil.getAffectedEntitiesNumberText(affected));
+        componentBuilder.appendTranslatable("commands.helpful_commands.dmg.other.multiple", Component.literal(String.valueOf(amount)).setStyle(textStyles.getPrimary()), StylingUtil.getAffectedEntitiesNumberText(affected));
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
 
         return affected.size();
     }

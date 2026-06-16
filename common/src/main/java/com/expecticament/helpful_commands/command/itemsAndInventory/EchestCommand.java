@@ -3,8 +3,8 @@ package com.expecticament.helpful_commands.command.itemsAndInventory;
 import com.expecticament.helpful_commands.command.HelpfulCommandsCommand;
 import com.expecticament.helpful_commands.manager.ModCommandManager;
 import com.expecticament.helpful_commands.manager.StylingManager;
-import com.expecticament.helpful_commands.manager.TranslationManager;
-import com.expecticament.helpful_commands.manager.TranslationManager.TextBuilder;
+import com.expecticament.helpful_commands.manager.translation.TranslationManager;
+import com.expecticament.helpful_commands.manager.translation.ComponentBuilder;
 import com.expecticament.helpful_commands.permission.ModPermissions;
 import com.expecticament.helpful_commands.style.HelpfulCommandsStyle;
 import com.expecticament.helpful_commands.util.PermissionsUtil;
@@ -116,17 +116,17 @@ public class EchestCommand extends HelpfulCommandsCommand {
     private void openOnlineInventory(CommandSourceStack src, ServerPlayer viewer, ServerPlayer onlinePlayer) {
         Component screenTitle = Component.translatable("container.enderchest");
         if (viewer != onlinePlayer) {
-            TextBuilder screenTitleTextBuilder = new TextBuilder(src);
-            screenTitleTextBuilder.appendTranslatable("commands.helpful_commands.echest.screen_title", Component.literal(onlinePlayer.getName().getString()));
-            screenTitle = screenTitleTextBuilder.getComponent();
+            ComponentBuilder screenTitleComponentBuilder = new ComponentBuilder(src);
+            screenTitleComponentBuilder.appendTranslatable("commands.helpful_commands.echest.screen_title", Component.literal(onlinePlayer.getName().getString()));
+            screenTitle = screenTitleComponentBuilder.build();
         }
         viewer.openMenu(new SimpleMenuProvider((syncId, inv, player) -> new OnlineEchestMenu(syncId, inv, onlinePlayer), screenTitle));
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
-        TextBuilder textBuilder = new TextBuilder(src);
-        textBuilder.appendTranslatable("commands.helpful_commands.echest." + (viewer == onlinePlayer ? "self" : "other"), StylingUtil.getAffectedEntityNameText(onlinePlayer)).setStyle(textStyles.getSuccess());
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
+        componentBuilder.appendTranslatable("commands.helpful_commands.echest." + (viewer == onlinePlayer ? "self" : "other"), StylingUtil.getAffectedEntityNameText(onlinePlayer)).setStyle(textStyles.getSuccess());
 
-        src.sendSuccess(textBuilder::getComponent, true);
+        src.sendSuccess(componentBuilder::build, true);
     }
 
     private void openOfflineInventory(CommandSourceStack src, ServerPlayer viewer, String targetName, UUID targetUUID, CompoundTag playerData) {
@@ -156,15 +156,15 @@ public class EchestCommand extends HelpfulCommandsCommand {
 
         MinecraftServer server = src.getServer();
 
-        TextBuilder screenTitleTextBuilder = new TextBuilder(src);
-        screenTitleTextBuilder.appendTranslatable("commands.helpful_commands.echest.screen_title", Component.literal(targetName), Component.literal(TranslationManager.translate(src, "helpful_commands.common.offline")));
-        viewer.openMenu(new SimpleMenuProvider((syncId, viewerInv, player) -> new OfflineEchestMenu(syncId, viewerInv, offlineInv, updatedInv -> saveOfflineInventory(server, targetUUID, playerData, updatedInv, ops)), screenTitleTextBuilder.getComponent()));
+        ComponentBuilder screenTitleComponentBuilder = new ComponentBuilder(src);
+        screenTitleComponentBuilder.appendTranslatable("commands.helpful_commands.echest.screen_title", Component.literal(targetName), Component.literal(TranslationManager.translate(src, "helpful_commands.common.offline")));
+        viewer.openMenu(new SimpleMenuProvider((syncId, viewerInv, player) -> new OfflineEchestMenu(syncId, viewerInv, offlineInv, updatedInv -> saveOfflineInventory(server, targetUUID, playerData, updatedInv, ops)), screenTitleComponentBuilder.build()));
 
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
-        TextBuilder feedbackTextBuilder = new TextBuilder(src);
-        feedbackTextBuilder.appendTranslatable("commands.helpful_commands.echest.other", Component.literal(targetName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
+        ComponentBuilder feedbackComponentBuilder = new ComponentBuilder(src);
+        feedbackComponentBuilder.appendTranslatable("commands.helpful_commands.echest.other", Component.literal(targetName).setStyle(textStyles.getPrimary())).setStyle(textStyles.getSuccess());
 
-        src.sendSuccess(feedbackTextBuilder::getComponent, true);
+        src.sendSuccess(feedbackComponentBuilder::build, true);
     }
 
     private void saveOfflineInventory(MinecraftServer server, UUID uuid, CompoundTag originalData, SimpleContainer inv, RegistryOps<Tag> ops) {
