@@ -90,7 +90,7 @@ public class KillitemsCommand extends HelpfulCommandsCommand {
         if (sourcePlayer != null) {
             center = sourcePlayer.position();
         } else {
-            center = src.getLevel().getRespawnData().pos().getCenter();
+            center = Vec3.atCenterOf(src.getLevel().getRespawnData().pos());
         }
         AABB aabb = new AABB(center.x - range, center.y - range, center.z - range, center.x + range, center.y + range, center.z + range);
 

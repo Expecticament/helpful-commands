@@ -200,7 +200,7 @@ public class SpawnCommand extends HelpfulCommandsCommand {
         ClickEvent tpBtnClickEvent = new ClickEvent.RunCommand("/spawn " + (isPlayer ? "player tp" + (isOwnSpawn ? "" : " " + playerName) : "world tp"));
         Style tpBtnStyle = textStyles.getSecondary().withHoverEvent(tpBtnHoverEvent).withClickEvent(tpBtnClickEvent);
 
-        Vec3 pos = respawnData.pos().getCenter();
+        Vec3 pos = Vec3.atCenterOf(respawnData.pos());
         String dimensionLocation = respawnData.dimension().identifier().toString();
 
         ComponentBuilder componentBuilder = new ComponentBuilder(src);
@@ -243,7 +243,7 @@ public class SpawnCommand extends HelpfulCommandsCommand {
             throw UNKNOWN_DIMENSION.create(source, dimensionLocation);
         }
 
-        Vec3 pos = respawnData.pos().getCenter();
+        Vec3 pos = Vec3.atCenterOf(respawnData.pos());
         return teleportedPlayer.teleportTo(serverLevel, pos.x(), pos.y(), pos.z(), new HashSet<>(), respawnData.yaw(), respawnData.pitch(), false) ? 0 : 2;
     }
 
@@ -256,7 +256,7 @@ public class SpawnCommand extends HelpfulCommandsCommand {
             throw UNKNOWN_DIMENSION.create(source, dimensionLocation);
         }
 
-        Vec3 pos = respawnData.pos().getCenter();
+        Vec3 pos = Vec3.atCenterOf(respawnData.pos());
         return teleportedPlayer.teleportTo(serverLevel, pos.x(), pos.y(), pos.z(), new HashSet<>(), respawnData.yaw(), respawnData.pitch(), false);
     }
 }

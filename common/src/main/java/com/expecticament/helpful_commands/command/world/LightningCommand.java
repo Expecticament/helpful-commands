@@ -20,6 +20,7 @@ import net.minecraft.commands.arguments.coordinates.Vec3Argument;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.phys.Vec3;
 
@@ -57,7 +58,8 @@ public class LightningCommand extends HelpfulCommandsCommand {
 
         ServerLevel serverLevel = src.getLevel();
 
-        LightningBolt livingEntity = new LightningBolt(EntityType.LIGHTNING_BOLT, serverLevel);
+
+        LightningBolt livingEntity = new LightningBolt(EntityTypes.LIGHTNING_BOLT, serverLevel);
         livingEntity.setPos(position.x(), position.y(), position.z());
         serverLevel.addFreshEntity(livingEntity);
 
