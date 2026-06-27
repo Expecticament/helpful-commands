@@ -29,7 +29,9 @@ public class TimeCommand extends HelpfulCommandsCommand {
     private final int time;
     private final ModPermissions.Permission permission;
 
-    private static final DynamicCommandExceptionType ERROR_NO_DEFAULT_CLOCK = new DynamicCommandExceptionType((dimension) -> Component.translatableEscape("commands.time.no_default_clock", new Object[]{dimension}));
+    private static final DynamicCommandExceptionType ERROR_NO_DEFAULT_CLOCK = new DynamicCommandExceptionType(
+            (dimension) -> Component.translatableEscape("commands.time.no_default_clock", dimension)
+    );
 
     public TimeCommand(ModCommandManager.ModCommand modCommand, int time, ModPermissions.Permission permission) {
         super(modCommand);
@@ -89,6 +91,6 @@ public class TimeCommand extends HelpfulCommandsCommand {
     }
 
     private static Holder<WorldClock> getDefaultClock(Holder<DimensionType> dimensionType) throws CommandSyntaxException {
-        return (Holder)((DimensionType)dimensionType.value()).defaultClock().orElseThrow(() -> ERROR_NO_DEFAULT_CLOCK.create(dimensionType.getRegisteredName()));
+        return dimensionType.value().defaultClock().orElseThrow(() -> ERROR_NO_DEFAULT_CLOCK.create(dimensionType.getRegisteredName()));
     }
 }
