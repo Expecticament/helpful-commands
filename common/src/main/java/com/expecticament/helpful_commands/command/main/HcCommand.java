@@ -189,13 +189,13 @@ public class HcCommand extends HelpfulCommandsCommand {
         Component curseForgeComponent;
         Component modrinthComponent;
         if (isPlayer) {
-            authorComponent = Component.literal("Expecticament").setStyle(textStyles.getSecondary().withUnderlined(true).withHoverEvent(linkHoverEvent).withClickEvent(new ClickEvent.OpenUrl(URI.create(authorLink))));
+            authorComponent = Component.literal("expecticament").setStyle(textStyles.getSecondary().withUnderlined(true).withHoverEvent(linkHoverEvent).withClickEvent(new ClickEvent.OpenUrl(URI.create(authorLink))));
             docsComponent = Component.literal(TranslationManager.translate(src, "commands.helpful_commands.hc.about.docs")).setStyle(textStyles.getSecondary().withUnderlined(true).withHoverEvent(linkHoverEvent).withClickEvent(new ClickEvent.OpenUrl(URI.create(docsLink))));
             gitHubComponent = Component.literal("GitHub").setStyle(textStyles.getSecondary().withUnderlined(true).withHoverEvent(linkHoverEvent).withClickEvent(new ClickEvent.OpenUrl(URI.create(gitHubLink))));
             curseForgeComponent = Component.literal("CurseForge").setStyle(textStyles.getSecondary().withUnderlined(true).withHoverEvent(linkHoverEvent).withClickEvent(new ClickEvent.OpenUrl(URI.create(curseForgeLink))));
             modrinthComponent = Component.literal("Modrinth").setStyle(textStyles.getSecondary().withUnderlined(true).withHoverEvent(linkHoverEvent).withClickEvent(new ClickEvent.OpenUrl(URI.create(modrinthLink))));
         } else {
-            authorComponent = Component.literal("Expecticament (%s)".formatted(authorLink));
+            authorComponent = Component.literal("expecticament (%s)".formatted(authorLink));
             docsComponent = Component.literal("\n" + TranslationManager.translate(src, "commands.helpful_commands.hc.about.docs")).append(": %s".formatted(docsLink));
             gitHubComponent = Component.literal("GitHub: %s".formatted(gitHubLink));
             curseForgeComponent = Component.literal("CurseForge: %s".formatted(curseForgeLink));

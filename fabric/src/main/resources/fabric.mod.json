@@ -15,8 +15,8 @@
     ],
     "contact": {
         "homepage": "https://helpfulcommands.expecticament.com",
-        "sources": "https://github.com/Expecticament/helpful-commands",
-        "issues": "https://github.com/Expecticament/helpful-commands/issues"
+        "sources": "https://github.com/expecticament/helpful-commands",
+        "issues": "https://github.com/expecticament/helpful-commands/issues"
     },
     "license": "${license}",
     "icon": "assets/helpful_commands/icon.png",
@@ -40,7 +40,7 @@
                 "modmenu.youtube": "https://www.youtube.com/@expecticament",
                 "modmenu.curseforge": "https://www.curseforge.com/minecraft/mc-mods/helpful-commands",
                 "modmenu.modrinth": "https://modrinth.com/mod/helpful-commands",
-                "modmenu.github_releases": "https://github.com/Expecticament/helpful-commands/releases"
+                "modmenu.github_releases": "https://github.com/expecticament/helpful-commands/releases"
             }
         }
     }

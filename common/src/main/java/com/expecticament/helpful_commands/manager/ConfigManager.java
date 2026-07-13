@@ -221,7 +221,7 @@ public class ConfigManager {
 
         JUMP_DISTANCE_LIMIT(ConfigFieldProperties.dbl(2048, 0.1), true),
 
-        KILLITEMS_MAX_RANGE(ConfigFieldProperties.integer(128, 1), true);
+        KILLITEMS_MAX_RANGE(ConfigFieldProperties.integer(256, 1), true);
 
         private final ConfigFieldProperties properties;
         private final boolean lpMetaSupport;

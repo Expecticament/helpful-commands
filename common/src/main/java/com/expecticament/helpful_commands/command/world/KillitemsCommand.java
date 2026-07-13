@@ -76,22 +76,14 @@ public class KillitemsCommand extends HelpfulCommandsCommand {
         HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
 
         int maxRange = PermissionsUtil.getMetaOrElseConfigValue(src, ConfigManager.CONFIG_FIELD.KILLITEMS_MAX_RANGE);
-
         if (range < 1) {
-            range = Math.clamp(64, 1, maxRange);
-        } else {
-            if (range > maxRange) {
-                throw RANGE_CONFIG_VALUE_EXCEEDED.create(src, maxRange);
-            }
+            range = maxRange;
+        } else if (range > maxRange){
+            throw RANGE_CONFIG_VALUE_EXCEEDED.create(src, maxRange);
         }
 
+        Vec3 center = src.getPosition();
         ServerLevel level = src.getLevel();
-        Vec3 center;
-        if (sourcePlayer != null) {
-            center = sourcePlayer.position();
-        } else {
-            center = Vec3.atCenterOf(src.getLevel().getRespawnData().pos());
-        }
         AABB aabb = new AABB(center.x - range, center.y - range, center.z - range, center.x + range, center.y + range, center.z + range);
 
         List<ItemEntity> itemEntities = level.getEntitiesOfClass(ItemEntity.class, aabb, itemEntity -> itemPredicate == null || itemPredicate.test(itemEntity.getItem()));
