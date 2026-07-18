@@ -9,7 +9,7 @@ displayName = "${mod_name}"
 #updateJSONURL="https://change.me.example.invalid/updates.json" (see https://docs.neoforged.net/docs/misc/updatechecker/)
 displayURL="https://helpfulcommands.expecticament.com"
 logoFile="assets/${mod_id}/icon.png"
-#credits="${credits}"
+credits="${credits}"
 authors = "${mod_author}"
 description = '''${description}'''
 [[mixins]]
