@@ -1,8 +1,8 @@
 package com.expecticament.helpfulcommands.permission;
 
 import com.expecticament.helpfulcommands.Constants;
+import com.expecticament.helpfulcommands.platform.Platform;
 import com.expecticament.helpfulcommands.platform.Services;
-import com.expecticament.helpfulcommands.platform.services.IPlatformHelper;
 import net.minecraft.server.permissions.PermissionLevel;
 
 public class ModPermissions {
@@ -44,7 +44,7 @@ public class ModPermissions {
 
         Permission(PermissionLevel defaultRequiredPermissionLevel, String id) {
             String permName = id.isEmpty() ? this.name().toLowerCase().replace("_", ".") : id;
-            if (Services.PLATFORM.getPlatform().equals(IPlatformHelper.Platform.NEO_FORGE)) {
+            if (Services.PLATFORM.getPlatform().equals(Platform.NEO_FORGE)) {
                 this.id = permName;
             } else {
                 this.id = "%s.%s".formatted(Constants.MOD_ID, permName);
