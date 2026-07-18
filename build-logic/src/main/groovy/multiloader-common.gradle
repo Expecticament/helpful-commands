@@ -10,7 +10,9 @@ base {
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(java_version)
     withSourcesJar()
-    withJavadocJar()
+    if (providers.gradleProperty("buildJavadocJar").getOrElse('false').toBoolean()) {
+        withJavadocJar()
+    }
 }
 
 tasks.withType(Jar).configureEach {
@@ -48,7 +50,6 @@ processResources {
             'description'                  : project.description,
             'neoforge_version'             : neoforge_version,
             'neoforge_loader_version_range': neoforge_loader_version_range,
-            'credits'                      : credits,
             'java_version'                 : java_version,
 
             'fabric_permissions_api_version' : fabric_permissions_api_version
