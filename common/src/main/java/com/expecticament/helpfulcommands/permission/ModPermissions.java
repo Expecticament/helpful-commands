@@ -47,7 +47,7 @@ public class ModPermissions {
             if (Services.PLATFORM.getPlatform().equals(Platform.NEO_FORGE)) {
                 this.id = permName;
             } else {
-                this.id = "%s.%s".formatted(Constants.MOD_ID, permName);
+                this.id = "%s.%s".formatted("helpful_commands", permName);
             }
             this.defaultRequiredPermissionLevel = defaultRequiredPermissionLevel;
         }
