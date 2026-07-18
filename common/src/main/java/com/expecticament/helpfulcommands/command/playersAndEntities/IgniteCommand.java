@@ -1,0 +1,138 @@
+package com.expecticament.helpfulcommands.command.playersAndEntities;
+
+import com.expecticament.helpfulcommands.command.HelpfulCommandsCommand;
+import com.expecticament.helpfulcommands.manager.ModCommandManager;
+import com.expecticament.helpfulcommands.manager.StylingManager;
+import com.expecticament.helpfulcommands.manager.translation.ComponentBuilder;
+import com.expecticament.helpfulcommands.manager.translation.TranslationManager;
+import com.expecticament.helpfulcommands.permission.ModPermissions;
+import com.expecticament.helpfulcommands.style.HelpfulCommandsStyle;
+import com.expecticament.helpfulcommands.util.GameRulesUtil;
+import com.expecticament.helpfulcommands.util.PermissionsUtil;
+import com.expecticament.helpfulcommands.util.StylingUtil;
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.FloatArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+
+import java.util.Collection;
+import java.util.List;
+
+public class IgniteCommand extends HelpfulCommandsCommand {
+    public IgniteCommand(ModCommandManager.ModCommand modCommand) {
+        super(modCommand);
+    }
+
+    @Override
+    public void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext, Commands.CommandSelection commandSelection) {
+        ModCommandManager.ModCommand modCommand = getModCommand();
+
+        dispatcher.register(Commands.literal(modCommand.getName())
+                .requires(this::canExecute)
+                .then(Commands.argument("duration_seconds", FloatArgumentType.floatArg(1f))
+                        .executes(ctx -> executeSelf(ctx, FloatArgumentType.getFloat(ctx, "duration_seconds")))
+                        .then(Commands.argument("entities", EntityArgument.entities())
+                                .requires(src -> PermissionsUtil.hasPermission(src, ModPermissions.Permission.COMMAND_IGNITE_OTHERS))
+                                .executes(ctx -> executeOther(ctx, FloatArgumentType.getFloat(ctx, "duration_seconds"), EntityArgument.getEntities(ctx, "entities")))
+                        )
+                )
+        );
+    }
+
+    @Override
+    protected boolean checkBaseCommandRequirements(CommandSourceStack source) {
+        return PermissionsUtil.hasPermission(source, ModPermissions.Permission.COMMAND_IGNITE);
+    }
+
+    private int executeSelf(CommandContext<CommandSourceStack> ctx, float duration) throws CommandSyntaxException {
+        CommandSourceStack src = ctx.getSource();
+
+        ServerPlayer sourcePlayer = validatePlayerOnly(src);
+
+        HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
+
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
+
+        if (!ignite(sourcePlayer, duration)) {
+            return 0;
+        }
+
+        componentBuilder.appendTranslatable("commands.helpfulcommands.ignite.self", Component.literal(String.valueOf(duration)).setStyle(textStyles.getPrimary()), Component.literal(TranslationManager.translate(src, duration == 1 ? "commands.helpfulcommands.ignite.second" : "commands.helpfulcommands.ignite.seconds")));
+        componentBuilder.setStyle(textStyles.getSuccess());
+
+        src.sendSuccess(componentBuilder::build, true);
+
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private int executeOther(CommandContext<CommandSourceStack> ctx, float duration, Collection<? extends Entity> entities) throws CommandSyntaxException {
+        CommandSourceStack src = ctx.getSource();
+
+        ServerPlayer sourcePlayer = validateAnySource(src);
+
+        if (sourcePlayer != null && entities.size() == 1 && entities.contains(sourcePlayer)) {
+            return executeSelf(ctx, duration);
+        }
+
+        HelpfulCommandsStyle.TextStyles textStyles = StylingManager.getCurrentStyle().getTextStyles();
+        boolean commandFeedback = GameRulesUtil.isCommandFeedbackEnabled(src.getLevel());
+
+        List<? extends Entity> affected = entities.stream()
+                .filter(entity -> ignite(entity, duration))
+                .peek(entity -> {
+                    if (entity.isAlwaysTicking() && commandFeedback) {
+                        ServerPlayer player = (ServerPlayer) entity;
+                        if (player != sourcePlayer) {
+                            ComponentBuilder componentBuilder = new ComponentBuilder(player);
+                            componentBuilder.appendTranslatable("commands.helpfulcommands.ignite.affected").setStyle(textStyles.getAffectedNegative());
+                            player.sendSystemMessage(componentBuilder.build());
+                        }
+                    }
+                })
+                .toList();
+
+        if (affected.isEmpty()) {
+            throw EntityArgument.NO_ENTITIES_FOUND.create();
+        }
+
+        MutableComponent affectedText = Component.empty();
+        if (affected.size() == 1) {
+            affectedText.append(StylingUtil.getAffectedEntityNameText(affected.getFirst()));
+        } else {
+            affectedText
+                    .append(StylingUtil.getAffectedEntitiesNumberText(affected))
+                    .append(" ")
+                    .append(TranslationManager.translate(src, "commands.helpfulcommands.ignite.other.multiple"));
+        }
+
+        ComponentBuilder componentBuilder = new ComponentBuilder(src);
+        componentBuilder.appendTranslatable("commands.helpfulcommands.ignite.other", affectedText, Component.literal(String.valueOf(duration)).setStyle(textStyles.getPrimary()), Component.literal(TranslationManager.translate(src, duration == 1 ? "commands.helpfulcommands.ignite.second" : "commands.helpfulcommands.ignite.seconds"))).setStyle(textStyles.getSuccess());
+
+        src.sendSuccess(componentBuilder::build, true);
+
+        return affected.size();
+    }
+
+    private boolean ignite(Entity entity, float duration) {
+        if (!(entity.isAlive() && !entity.fireImmune())) {
+            return false;
+        }
+
+        if (entity.isAlwaysTicking() && ((ServerPlayer) entity).getAbilities().invulnerable) {
+            return false;
+        }
+
+        entity.igniteForSeconds(duration);
+
+        return true;
+    }
+}

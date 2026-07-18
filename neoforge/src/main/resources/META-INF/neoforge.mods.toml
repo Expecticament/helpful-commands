@@ -6,10 +6,16 @@ issueTrackerURL = "https://github.com/expecticament/helpful-commands/issues"
 modId = "${mod_id}"
 version = "${version}"
 displayName = "${mod_name}"
+#updateJSONURL="https://change.me.example.invalid/updates.json" (see https://docs.neoforged.net/docs/misc/updatechecker/)
 displayURL="https://helpfulcommands.expecticament.com"
-logoFile="assets/helpful_commands/icon.png"
+logoFile="assets/${mod_id}/icon.png"
+#credits="${credits}"
 authors = "${mod_author}"
 description = '''${description}'''
+[[mixins]]
+config = "${mod_id}.mixins.json"
+[[mixins]]
+config = "${mod_id}.neoforge.mixins.json"
 [[dependencies.${mod_id}]]
 modId = "neoforge"
 type="required"

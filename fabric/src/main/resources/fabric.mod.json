@@ -19,13 +19,17 @@
         "issues": "https://github.com/expecticament/helpful-commands/issues"
     },
     "license": "${license}",
-    "icon": "assets/helpful_commands/icon.png",
+    "icon": "assets/${mod_id}/icon.png",
     "environment": "*",
     "entrypoints": {
         "main": [
-            "com.expecticament.helpful_commands.HelpfulCommandsFabric"
+            "com.expecticament.helpfulcommands.HelpfulCommandsFabric"
         ]
     },
+    "mixins": [
+        "${mod_id}.mixins.json",
+        "${mod_id}.fabric.mixins.json"
+    ],
     "depends": {
         "fabricloader": ">=${fabric_loader_version}",
         "fabric-api": "*",
